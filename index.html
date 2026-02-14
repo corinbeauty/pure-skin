@@ -3,12 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>瀅白之境 Pure Skin V4.1 - 專業管理系統</title>
-    <!-- Tailwind CSS -->
+    <title>瀅白之境 Pure Skin V4.3 - 專業管理系統</title>
+    <!-- 引入系統資源 -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Chart.js for Business Analytics -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Font Awesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <script>
@@ -17,48 +15,25 @@
                 extend: {
                     colors: {
                         pure: {
-                            50: '#f0f9ff',
-                            100: '#e0f2fe',
-                            200: '#bae6fd',
-                            300: '#7dd3fc',
-                            400: '#38bdf8',
-                            500: '#0ea5e9',
-                            600: '#0284c7',
-                            700: '#0369a1',
-                            800: '#075985',
-                            900: '#0c4a6e',
+                            50: '#f0f9ff', 100: '#e0f2fe', 200: '#bae6fd', 300: '#7dd3fc', 400: '#38bdf8',
+                            500: '#0ea5e9', 600: '#0284c7', 700: '#0369a1', 800: '#075985', 900: '#0c4a6e',
                         }
                     },
-                    fontFamily: {
-                        sans: ['Noto Sans TC', 'sans-serif'],
-                    },
+                    fontFamily: { sans: ['Noto Sans TC', 'sans-serif'] },
                     animation: {
                         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                        'float': 'float 3.5s ease-in-out infinite',
-                        'slide-up': 'slideUp 0.6s ease-out forwards',
+                        'float': 'float 3s ease-in-out infinite',
+                        'slide-up': 'slideUp 0.5s ease-out forwards',
                     },
                     keyframes: {
-                        float: {
-                            '0%, 100%': { transform: 'translateY(0)' },
-                            '50%': { transform: 'translateY(-10px)' },
-                        },
-                        slideUp: {
-                            '0%': { transform: 'translateY(20px)', opacity: '0' },
-                            '100%': { transform: 'translateY(0)', opacity: '1' }
-                        }
+                        slideUp: { '0%': { transform: 'translateY(20px)', opacity: '0' }, '100%': { transform: 'translateY(0)', opacity: '1' } }
                     }
                 }
             }
         }
     </script>
     <style>
-        /* Chosen Palette: Pure Aesthetic Blue */
-        /* Application Structure Plan: 
-           本版本 (V4.1) 為了解決認證與數據載入順序問題，將「身份驗證」設為第一優先權。
-           在 User 物件確定獲取後，才會開始載入 6 段式 Firestore 路徑。
-           UI 佈局採用經營儀表板風格，核心功能模組化：載入 -> 門戶 -> 大廳 -> 管理 -> 療程。
-        */
-
+        /* 核心美學樣式 */
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: #f0f9ff; }
         ::-webkit-scrollbar-thumb { background: #bae6fd; border-radius: 10px; }
@@ -73,74 +48,48 @@
         
         .chart-container {
             position: relative;
-            width: 100%;
-            height: 280px;
-            max-width: 600px;
-            margin: 0 auto;
+            width: 100%; height: 280px;
+            max-width: 600px; margin: 0 auto;
         }
 
-        /* Pure CSS Avatar Construction (No SVG) */
+        /* 純 CSS 顧客畫像 (避免 SVG 失敗) */
         .css-avatar {
-            position: relative;
-            width: 130px; height: 130px;
-            background: #fff;
-            border-radius: 50%;
-            border: 5px solid #e0f2fe;
-            margin: 0 auto;
-            overflow: hidden;
-            box-shadow: 0 12px 25px rgba(14, 165, 233, 0.1);
+            position: relative; width: 130px; height: 130px;
+            background: #fff; border-radius: 50%; border: 5px solid #e0f2fe;
+            margin: 0 auto; overflow: hidden; box-shadow: 0 12px 25px rgba(14, 165, 233, 0.1);
         }
-        .css-head {
-            position: absolute; top: 25%; left: 25%; width: 50%; height: 50%;
-            background: #ffe4e6; border-radius: 50%; z-index: 10;
-        }
-        .css-body {
-            position: absolute; bottom: -5%; left: 15%; width: 70%; height: 55%;
-            background: #bae6fd; border-radius: 45% 45% 0 0; z-index: 5;
-        }
-        .css-hair-male {
-            position: absolute; top: 15%; left: 22%; width: 56%; height: 28%;
-            background: #334155; border-radius: 50% 50% 0 0; z-index: 15;
-        }
-        .css-hair-female {
-            position: absolute; top: 15%; left: 15%; width: 70%; height: 78%;
-            background: #fca5a5; border-radius: 50% 50% 40% 40%; z-index: 4;
-        }
+        .css-head { position: absolute; top: 25%; left: 25%; width: 50%; height: 50%; background: #ffe4e6; border-radius: 50%; z-index: 10; }
+        .css-body { position: absolute; bottom: -5%; left: 15%; width: 70%; height: 55%; background: #bae6fd; border-radius: 45% 45% 0 0; z-index: 5; }
+        .css-hair-male { position: absolute; top: 15%; left: 22%; width: 56%; height: 28%; background: #334155; border-radius: 50% 50% 0 0; z-index: 15; }
+        .css-hair-female { position: absolute; top: 15%; left: 15%; width: 70%; height: 78%; background: #fca5a5; border-radius: 50% 50% 40% 40%; z-index: 4; }
 
         #laser-cursor {
-            position: fixed; width: 50px; height: 50px;
-            border: 3px solid #0ea5e9; border-radius: 50%;
-            transform: translate(-50%, -50%); pointer-events: none;
-            z-index: 9999; display: none;
-            box-shadow: 0 0 20px rgba(14, 165, 233, 0.4);
-            background: rgba(14, 165, 233, 0.05);
+            position: fixed; width: 50px; height: 50px; border: 3px solid #0ea5e9; border-radius: 50%;
+            transform: translate(-50%, -50%); pointer-events: none; z-index: 9999; display: none;
+            box-shadow: 0 0 20px rgba(14, 165, 233, 0.4); background: rgba(14, 165, 233, 0.05);
         }
-        #laser-cursor.active {
-            transform: translate(-50%, -50%) scale(0.85);
-            background: rgba(14, 165, 233, 0.35);
-            box-shadow: 0 0 40px #0ea5e9;
-        }
+        #laser-cursor.active { transform: translate(-50%, -50%) scale(0.85); background: rgba(14, 165, 233, 0.35); box-shadow: 0 0 40px #0ea5e9; }
     </style>
 </head>
 <body class="bg-pure-50 text-slate-700 min-h-screen font-sans selection:bg-pure-200 overflow-x-hidden">
 
     <div id="laser-cursor"></div>
 
-    <!-- 通知元件 -->
-    <div id="toast" class="fixed top-6 left-1/2 -translate-x-1/2 z-[10000] transition-all duration-500 transform -translate-y-24 opacity-0 flex items-center gap-3 px-8 py-4 rounded-3xl shadow-2xl bg-white/95 backdrop-blur-md border border-pure-100">
+    <!-- 全域通知 -->
+    <div id="toast" class="fixed top-6 left-1/2 -translate-x-1/2 z-[10000] transition-all duration-300 transform -translate-y-24 opacity-0 flex items-center gap-3 px-8 py-4 rounded-3xl shadow-2xl bg-white/95 backdrop-blur-md border border-pure-100">
         <i id="toast-icon" class="fa-solid fa-circle-check text-green-500"></i>
         <span id="toast-text" class="font-black text-slate-700 text-sm">系統已就緒</span>
     </div>
 
     <main id="app-root" class="w-full min-h-screen flex flex-col items-center justify-center relative overflow-hidden">
         
-        <!-- 背景裝飾 -->
+        <!-- 動態背景 -->
         <div class="absolute top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
             <div class="absolute top-[-10%] left-[-15%] w-[60vw] h-[60vw] bg-pure-200/30 rounded-full filter blur-[120px] animate-pulse-slow"></div>
             <div class="absolute bottom-[-10%] right-[-10%] w-[55vw] h-[55vw] bg-pink-100/30 rounded-full filter blur-[120px] animate-pulse-slow"></div>
         </div>
 
-        <!-- 載入視圖 -->
+        <!-- 0. 載入視圖 -->
         <section id="view-loading" class="flex flex-col items-center gap-6 text-center transition-all duration-500">
             <div class="w-20 h-20 border-4 border-pure-100 border-t-pure-500 rounded-full animate-spin"></div>
             <div>
@@ -149,7 +98,7 @@
             </div>
         </section>
 
-        <!-- 認證門戶 -->
+        <!-- 1. 認證視圖 -->
         <section id="view-login" class="hidden w-full max-w-md px-6 animate-float">
             <div class="glass-panel p-10 rounded-[3.5rem] text-center shadow-2xl">
                 <div class="w-24 h-24 bg-pure-50 rounded-3xl mx-auto flex items-center justify-center mb-8 text-4xl text-pure-600 shadow-inner">
@@ -177,7 +126,7 @@
             </div>
         </section>
 
-        <!-- 經營大廳 -->
+        <!-- 2. 大廳視圖 (Dashboard) -->
         <section id="view-lobby" class="hidden w-full max-w-6xl flex-col gap-8 px-6">
             <header class="flex flex-col md:flex-row justify-between items-center glass-panel p-8 rounded-[3rem] gap-6 animate-slide-up">
                 <div class="flex items-center gap-8">
@@ -186,12 +135,12 @@
                     </div>
                     <div>
                         <h3 class="text-3xl font-black text-slate-800 italic" id="user-display-name">瀅白顧問</h3>
-                        <p class="text-xs font-bold text-pure-500 uppercase tracking-[0.2em]" id="user-title">同步資料中...</p>
+                        <p class="text-xs font-bold text-pure-500 uppercase tracking-[0.2em]" id="user-title">正在同步職位...</p>
                     </div>
                 </div>
                 <div class="flex gap-12 items-center border-l border-slate-100 pl-12">
                     <div class="text-center">
-                        <p class="text-[10px] text-slate-400 font-black uppercase mb-1 tracking-widest">瀅白金資產</p>
+                        <p class="text-[10px] text-slate-400 font-black uppercase mb-1 tracking-widest">資產</p>
                         <p class="text-4xl font-black text-slate-800 font-mono italic">💰 <span id="lobby-gold">0</span></p>
                     </div>
                     <div class="text-center">
@@ -222,18 +171,18 @@
                     
                     <div class="glass-panel p-8 rounded-[3rem] flex flex-col gap-5">
                         <button onclick="app.audio.toggle()" class="flex items-center justify-between w-full p-4 rounded-2xl bg-pure-50 hover:bg-pure-100 transition-colors border border-pure-100/50">
-                            <span class="font-bold text-slate-600"><i id="lobby-music-icon" class="fa-solid fa-volume-xmark mr-3"></i>環境背景音</span>
+                            <span class="font-bold text-slate-600"><i id="lobby-music-icon" class="fa-solid fa-volume-xmark mr-3"></i>背景氛圍音</span>
                             <span id="lobby-music-text" class="text-[10px] font-black text-pure-400 uppercase">OFF</span>
                         </button>
                         <button onclick="app.auth.logout()" class="flex items-center gap-3 text-slate-400 font-bold hover:text-red-500 transition-colors px-4 py-2 text-sm italic">
-                            <i class="fa-solid fa-power-off"></i> 安全登出系統
+                            <i class="fa-solid fa-power-off"></i> 登出系統
                         </button>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- 預約表 -->
+        <!-- 3. 預約名單視圖 -->
         <section id="view-appointments" class="hidden w-full max-w-3xl flex flex-col h-[85vh] animate-slide-up px-4">
             <div class="glass-panel p-10 rounded-t-[4rem] flex justify-between items-center z-10 border-b-0 shadow-none">
                 <div>
@@ -242,50 +191,60 @@
                 </div>
                 <button onclick="app.router.go('lobby')" class="w-14 h-14 rounded-2xl bg-pure-50 flex items-center justify-center text-pure-600 hover:bg-pure-100 shadow-inner transition-all"><i class="fa-solid fa-arrow-left text-xl"></i></button>
             </div>
-            <div class="glass-panel p-8 rounded-b-[4rem] flex-1 overflow-y-auto space-y-4 custom-scrollbar shadow-2xl" id="appointment-list"></div>
+            <div class="glass-panel p-8 rounded-b-[4rem] flex-1 overflow-y-auto space-y-4 custom-scrollbar shadow-2xl" id="appointment-list">
+                <!-- JS 動態生成 -->
+            </div>
         </section>
 
-        <!-- RPG 諮詢 -->
+        <!-- 4. RPG 諮詢視圖 -->
         <section id="view-dialogue" class="hidden w-full max-w-2xl px-6">
             <div class="glass-panel p-12 rounded-[5rem] text-center relative overflow-hidden shadow-2xl">
                 <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-pink-300 to-pure-400"></div>
                 <div id="customer-avatar-box" class="mb-12 animate-float"></div>
                 
-                <div class="bg-blue-50/50 p-10 rounded-[3rem] border border-pure-100 mb-10 shadow-inner">
-                    <h3 class="font-black text-pure-600 text-xl mb-3 underline underline-offset-8" id="diag-name">貴賓諮詢</h3>
-                    <p class="text-slate-700 font-bold leading-relaxed text-2xl" id="diag-text">...</p>
+                <div class="bg-blue-50/50 p-10 rounded-[3rem] border border-pure-100 mb-10 shadow-inner text-left">
+                    <h3 class="font-black text-pure-600 text-xl mb-3" id="diag-name">貴賓諮詢</h3>
+                    <p class="text-slate-700 font-bold leading-relaxed text-2xl" id="diag-text">載入諮詢內容中...</p>
                 </div>
 
-                <div id="diag-options" class="flex flex-col gap-4"></div>
+                <div id="diag-options" class="flex flex-col gap-4">
+                    <!-- JS Generated -->
+                </div>
             </div>
         </section>
 
-        <!-- 雷射畫布 -->
+        <!-- 5. 互動畫布視圖 -->
         <section id="view-game" class="hidden w-full max-w-md flex flex-col items-center gap-10">
             <div class="w-full glass-panel p-6 rounded-full flex items-center gap-8 shadow-2xl border-white border-[6px]">
                 <div class="flex-1 bg-slate-100 h-6 rounded-full overflow-hidden relative">
                     <div id="prog-bar" class="h-full bg-gradient-to-r from-pure-400 to-cyan-500 w-0 transition-all duration-700 shadow-[0_0_20px_#0ea5e9]"></div>
                 </div>
-                <span class="text-sm font-black text-pure-700 font-mono italic">CLEANING</span>
+                <span class="text-sm font-black text-pure-700 italic">CLEANING</span>
             </div>
-            <div class="relative rounded-[5.5rem] overflow-hidden shadow-2xl border-[16px] border-white">
+            
+            <div class="relative rounded-[5.5rem] overflow-hidden shadow-2xl border-[16px] border-white ring-2 ring-slate-100">
                 <canvas id="game-canvas" class="bg-pure-50 cursor-none touch-none"></canvas>
             </div>
-            <p class="text-pure-500 text-xs font-bold mt-3 animate-pulse italic">操作雷射探頭抹除所有毛髮</p>
+            
+            <div class="text-center">
+                <p class="text-slate-400 text-[10px] font-black uppercase tracking-[0.8em] animate-pulse">Laser Protocol Active</p>
+                <p class="text-pure-500 text-xs font-bold mt-3 italic underline underline-offset-4 decoration-pure-200 decoration-2">操作雷射探頭抹除所有毛髮</p>
+            </div>
         </section>
 
-        <!-- 結算彈窗 -->
+        <!-- 6. 結算彈窗 -->
         <div id="modal-result" class="hidden fixed inset-0 z-[100] bg-slate-900/70 backdrop-blur-3xl flex items-center justify-center p-6">
             <div class="glass-panel p-16 rounded-[6rem] text-center max-md w-full border-white border-[8px] shadow-2xl relative">
                 <div class="w-28 h-28 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-10 text-6xl text-green-500 shadow-inner">
-                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    <i class="fa-solid fa-sparkles"></i>
                 </div>
                 <h2 class="text-5xl font-black text-slate-800 mb-4 tracking-tighter italic underline decoration-pure-100 decoration-8 underline-offset-[-2px]">療程圓滿！</h2>
                 <div class="bg-pure-50 p-8 rounded-[3.5rem] border border-pure-100 mb-12 shadow-inner">
                     <span class="text-[10px] text-slate-400 font-black uppercase tracking-[0.3em] block mb-2 italic">Aesthetic Revenue</span>
                     <p class="text-6xl font-black text-pure-600 font-mono italic tracking-tighter">+💰 <span id="reward-val">0</span></p>
                 </div>
-                <button onclick="window.location.reload()" class="w-full py-7 bg-gradient-to-r from-pure-600 to-blue-700 text-white font-black text-2xl rounded-3xl shadow-2xl hover:scale-105 active:scale-95 transition-all shadow-pure-300">
+
+                <button onclick="window.location.reload()" class="w-full py-7 bg-gradient-to-r from-pure-600 to-blue-700 text-white font-black text-2xl rounded-3xl shadow-2xl hover:scale-105 active:scale-95 transition-all shadow-pure-300 uppercase tracking-widest">
                     返回儀表板
                 </button>
             </div>
@@ -293,7 +252,7 @@
 
     </main>
 
-    <!-- 邏輯模組 -->
+    <!-- 系統核心邏輯 -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { 
@@ -302,13 +261,26 @@
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        const firebaseConfig = JSON.parse(__firebase_config);
-        const globalAppId = 'pure-skin-studio-master';
+        // --- 核心修復：動態解析環境變數與 appId ---
+        const firebaseConfig = typeof __firebase_config !== 'undefined' 
+            ? JSON.parse(__firebase_config) 
+            : {
+                apiKey: "AIzaSyCIKSbaZ5R6RTSRcH_-YYfqz_OnQQFr1gc",
+                authDomain: "pure-skin-8640d.firebaseapp.com",
+                projectId: "pure-skin-8640d",
+                storageBucket: "pure-skin-8640d.firebasestorage.app",
+                messagingSenderId: "890613609117",
+                appId: "1:890613609117:web:ed044e453e6cc789b01a74",
+                measurementId: "G-27E3XSTTBH"
+            };
+            
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'pure-skin-studio-master'; 
         
         const fbApp = initializeApp(firebaseConfig);
         const auth = getAuth(fbApp);
         const db = getFirestore(fbApp);
 
+        // --- 備援數據庫 ---
         const FALLBACK_DB = {
             bodyParts: {
                 face: { name: '臉部精雕', cost: 150, desc: '掃除面部細微雜毛。' },
@@ -319,36 +291,34 @@
             titles: ["瀅白實習生", "初級技師", "資深除毛師", "首席技術官", "醫美顧問", "雷射物理學家", "美學導師", "教父級大師"],
             stories: [
                 { text: "我擔心雷射會痛，能量可以稍微幫我調低嗎？", opts: [{t: "我們有專利冷卻技術，請放心。", r: "太棒了！"}, {t: "我會縮短單次操作時間。", r: "好吧。"}] },
-                { text: "下週有重要的海邊拍片，想把腋下處理乾淨。", opts: [{t: "沒問題，保證讓您完美出鏡。", r: "謝謝專家！"}, {t: "療程非常適合您此時的需求。", r: "專家說得對。"}] }
+                { text: "下週有重要的海邊拍片，想把腋下處理乾淨。", opts: [{t: "沒問題，保證讓您完美出鏡。", r: "謝謝專家！"}, {t: "這個療程非常適合您此時的需求。", r: "專家說得對。"}] }
             ]
         };
 
         const App = {
             state: {
-                user: null,
-                data: { gold: 0, level: 1, exp: 0, history: [] },
-                config: FALLBACK_DB,
-                view: 'loading',
+                user: null, data: { gold: 0, level: 1, exp: 0, history: [] },
+                config: FALLBACK_DB, view: 'loading',
                 session: { customer: null, part: null, gender: 'female' },
-                audio: { muted: true, el: null },
-                isAuthResolved: false
+                audio: { muted: true, el: null }, isAuthResolved: false
             },
 
-            // --- 認證與同步 (核心修正) ---
+            // --- 認證邏輯 (V4.1 原子化門控，修復 Token Mismatch) ---
             auth: {
                 init: async () => {
                     const watchdog = setTimeout(() => {
                         if (!App.state.isAuthResolved && App.state.view === 'loading') {
+                            console.warn("認證逾時，解鎖門戶");
                             App.router.go('login');
                         }
-                    }, 2500);
+                    }, 4000);
 
                     onAuthStateChanged(auth, async (user) => {
                         App.state.isAuthResolved = true;
                         clearTimeout(watchdog);
                         if (user) {
                             App.state.user = user;
-                            document.getElementById('loading-status').innerText = "載入美學進度中...";
+                            document.getElementById('loading-status').innerText = "載入美學存檔中...";
                             await App.data.sync(); 
                             App.router.go('lobby');
                         } else {
@@ -356,15 +326,25 @@
                         }
                     });
 
-                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                        signInWithCustomToken(auth, __initial_auth_token).catch(()=>null);
+                    // 嘗試登入流程：優先使用環境提供的 Token
+                    try {
+                        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                            await signInWithCustomToken(auth, __initial_auth_token).catch(async (err) => {
+                                // 捕獲 mismatch 錯誤並嘗試匿名登入作為備援
+                                console.error("Custom Token Mismatch, falling back to anonymous", err);
+                                await signInAnonymously(auth);
+                            });
+                        } else if (!auth.currentUser) {
+                            await signInAnonymously(auth);
+                        }
+                    } catch (err) {
+                        console.error("Auth Init Sequence Failed:", err);
+                        // 最後的防線：直接顯示登入畫面
+                        App.state.isAuthResolved = true;
+                        App.router.go('login');
                     }
                 },
-                loginGoogle: () => signInWithPopup(auth, new GoogleAuthProvider()).catch(()=>App.ui.notify("彈窗被攔截", true)),
-                loginGameCenter: () => {
-                    const provider = new OAuthProvider('apple.com');
-                    signInWithPopup(auth, provider).catch(()=>App.ui.notify("需在 Apple 設備執行", true));
-                },
+                loginGoogle: () => signInWithPopup(auth, new GoogleAuthProvider()).catch(()=>null),
                 loginGuest: () => signInAnonymously(auth).catch(() => {
                     App.state.user = { uid: 'guest_local_' + Date.now(), isAnonymous: true };
                     App.router.go('lobby');
@@ -376,11 +356,13 @@
                 sync: async () => {
                     if (!App.state.user) return;
                     try {
-                        const cfgRef = doc(db, 'artifacts', globalAppId, 'public', 'data', 'definitions', 'config');
+                        // 1. 公共定義 (6段路徑: artifacts/appId/public/data/definitions/config)
+                        const cfgRef = doc(db, 'artifacts', appId, 'public', 'data', 'definitions', 'config');
                         const cfgSnap = await getDoc(cfgRef);
                         if (cfgSnap.exists()) App.state.config = cfgSnap.data();
 
-                        const userRef = doc(db, 'artifacts', globalAppId, 'users', App.state.user.uid, 'saveData', 'profile');
+                        // 2. 個人進度 (6段路徑)
+                        const userRef = doc(db, 'artifacts', appId, 'users', App.state.user.uid, 'saveData', 'profile');
                         onSnapshot(userRef, (snap) => {
                             if (snap.exists()) {
                                 App.state.data = { ...App.state.data, ...snap.data() };
@@ -388,21 +370,19 @@
                             } else {
                                 setDoc(userRef, App.state.data, { merge: true });
                             }
-                        });
-                    } catch (e) { console.warn("進入離線備援模式"); }
+                        }, (err) => console.warn("Firestore Sync Error:", err));
+                    } catch (e) { console.warn("數據同步異常，使用本地備援模式"); }
                 },
                 save: async () => {
                     const uid = App.state.user?.uid;
                     if (uid && !uid.includes('guest_local')) {
-                        const userRef = doc(db, 'artifacts', globalAppId, 'users', uid, 'saveData', 'profile');
+                        const userRef = doc(db, 'artifacts', appId, 'users', uid, 'saveData', 'profile');
                         const newHistory = [...(App.state.data.history || [])];
                         newHistory.push({ d: new Date().toLocaleTimeString('zh-TW', {hour:'2-digit', minute:'2-digit'}), a: App.state.data.lastReward });
                         if (newHistory.length > 7) newHistory.shift();
 
                         await setDoc(userRef, { 
-                            gold: App.state.data.gold, 
-                            level: App.state.data.level,
-                            history: newHistory
+                            gold: App.state.data.gold, level: App.state.data.level, history: newHistory
                         }, { merge: true });
                     }
                 }
@@ -428,8 +408,7 @@
                 renderChart: () => {
                     const ctx = document.getElementById('revenueChart').getContext('2d');
                     const history = App.state.data.history && App.state.data.history.length > 0 
-                        ? App.state.data.history 
-                        : [{a: 150, d:'系統載入中'}];
+                        ? App.state.data.history : [{a: 100, d:'系統載入中'}];
                     
                     if (window.revenueChartInstance) window.revenueChartInstance.destroy();
                     window.revenueChartInstance = new Chart(ctx, {
@@ -438,24 +417,15 @@
                             labels: history.map(h => h.d),
                             datasets: [{
                                 data: history.map(h => h.a),
-                                borderColor: '#0ea5e9',
-                                backgroundColor: 'rgba(14, 165, 233, 0.05)',
-                                borderWidth: 5,
-                                tension: 0.5,
-                                fill: true,
-                                pointRadius: 6,
-                                pointBackgroundColor: '#fff',
-                                pointBorderColor: '#0284c7',
-                                pointBorderWidth: 3
+                                borderColor: '#0ea5e9', backgroundColor: 'rgba(14, 165, 233, 0.05)',
+                                borderWidth: 5, tension: 0.5, fill: true, pointRadius: 6, pointBackgroundColor: '#fff',
+                                pointBorderColor: '#0284c7', pointBorderWidth: 3
                             }]
                         },
                         options: {
                             responsive: true, maintainAspectRatio: false,
                             plugins: { legend: { display: false } },
-                            scales: {
-                                y: { display: false, beginAtZero: true },
-                                x: { grid: { display: false }, ticks: { color: '#94a3b8', font: { weight: 'bold', size: 10 } } }
-                            }
+                            scales: { y: { display: false, beginAtZero: true }, x: { grid: { display: false }, ticks: { color: '#94a3b8', font: { weight: 'bold', size: 10 } } } }
                         }
                     });
                 },
@@ -480,7 +450,7 @@
                                 </div>
                             </div>
                             <div class="text-right">
-                                <span class="px-6 py-3 bg-pure-100 text-pure-700 text-[10px] font-black rounded-2xl group-hover:bg-pure-600 group-hover:text-white transition-all uppercase">啟動診斷</span>
+                                <span class="px-6 py-3 bg-pure-100 text-pure-700 text-[10px] font-black rounded-2xl group-hover:bg-pure-600 group-hover:text-white transition-all uppercase">啟動諮詢</span>
                             </div>
                         </div>`;
                     }).join('');
@@ -528,14 +498,13 @@
                         const rect = canvas.getBoundingClientRect();
                         const cx = e.touches ? e.touches[0].clientX : e.clientX;
                         const cy = e.touches ? e.touches[0].clientY : e.clientY;
-                        laser.style.left = cx + 'px';
-                        laser.style.top = cy + 'px';
+                        laser.style.left = cx + 'px'; laser.style.top = cy + 'px';
                         if (isDragging) {
                             const x = cx - rect.left; const y = cy - rect.top;
                             ctx.globalCompositeOperation = 'destination-out';
                             ctx.beginPath(); ctx.arc(x, y, 32, 0, Math.PI * 2); ctx.fill();
                             laser.classList.add('active');
-                            triggerLaserFX(cx, cy);
+                            triggerLaserParticles(cx, cy);
                         } else { laser.classList.remove('active'); }
                     };
 
@@ -548,7 +517,7 @@
                         for (let i = 3; i < data.length; i += 4) if (data[i] === 0) empty++;
                         const progress = (empty / totalPixels);
                         document.getElementById('prog-bar').style.width = `${progress * 100}%`;
-                        if (progress > 0.97) App.game.finish();
+                        if (progress > 0.97) finalizeGame();
                     };
 
                     canvas.onmousedown = () => isDragging = true;
@@ -558,40 +527,38 @@
                     window.onmousemove = handleMove;
                     window.ontouchmove = handleMove;
                     laser.style.display = 'block';
-                },
-                finish: async () => {
-                    document.getElementById('laser-cursor').style.display = 'none';
-                    const reward = App.state.config.bodyParts[App.state.session.part].cost;
-                    App.state.data.gold += reward;
-                    App.state.data.exp += 50;
-                    if (App.state.data.exp >= 100) { App.state.data.level++; App.state.data.exp = 0; }
-                    App.state.data.lastReward = reward;
-                    await App.data.save();
-                    document.getElementById('reward-val').innerText = reward;
-                    document.getElementById('modal-result').classList.remove('hidden');
                 }
             },
 
             audio: {
                 toggle: () => {
                     if (!App.state.audio.el) {
-                        App.state.audio.el = new Audio("https://assets.mixkit.co/music/preview/mixkit-serene-view-443.mp3");
-                        App.state.audio.el.loop = true;
-                        App.state.audio.el.volume = 0.2;
+                        App.state.audio.el = new Audio("https://assets.mixkit.co/music/preview/kit-serene-view-443.mp3");
+                        App.state.audio.el.loop = true; App.state.audio.el.volume = 0.2;
                     }
                     if (App.state.audio.muted) {
-                        App.state.audio.el.play().catch(() => App.ui.notify("點擊頁面以啟用音訊"));
+                        App.state.audio.el.play().catch(() => App.ui.notify("點擊頁面以啟用音訊體驗"));
                         App.state.audio.muted = false;
                         document.getElementById('lobby-music-icon').className = "fa-solid fa-volume-high text-pure-500";
                         document.getElementById('lobby-music-text').innerText = "ON";
                     } else {
-                        App.state.audio.el.pause();
-                        App.state.audio.muted = true;
+                        App.state.audio.el.pause(); App.state.audio.muted = true;
                         document.getElementById('lobby-music-icon').className = "fa-solid fa-volume-xmark";
                         document.getElementById('lobby-music-text').innerText = "OFF";
                     }
                 }
             }
+        };
+
+        const finalizeGame = async () => {
+            document.getElementById('laser-cursor').style.display = 'none';
+            const reward = App.state.config.bodyParts[App.state.session.part].cost;
+            App.state.data.gold += reward; App.state.data.exp += 50;
+            if (App.state.data.exp >= 100) { App.state.data.level++; App.state.data.exp = 0; }
+            App.state.data.lastReward = reward;
+            await App.data.save();
+            document.getElementById('reward-val').innerText = reward;
+            document.getElementById('modal-result').classList.remove('hidden');
         };
 
         window.app = App;
@@ -606,14 +573,13 @@
             const optDiv = document.getElementById('diag-options');
             optDiv.innerHTML = story.opts.map(opt => `
                 <button onclick="app.router.go('game')" class="w-full text-left p-8 bg-white rounded-[2.5rem] text-xl font-black text-slate-700 hover:bg-pure-600 hover:text-white transition-all shadow-sm border border-pure-100 flex justify-between items-center group">
-                    <span>${opt.t}</span>
-                    <i class="fa-solid fa-circle-chevron-right opacity-0 group-hover:opacity-100 transition-all transform group-hover:translate-x-2 text-pure-500"></i>
+                    <span>${opt.t}</span> <i class="fa-solid fa-circle-chevron-right opacity-0 group-hover:opacity-100 transition-all transform group-hover:translate-x-2 text-pure-500"></i>
                 </button>
             `).join('');
             App.router.go('dialogue');
         };
 
-        function triggerLaserFX(x, y) {
+        function triggerLaserParticles(x, y) {
             const el = document.createElement('div');
             el.style.cssText = `position:fixed; left:${x}px; top:${y}px; width:4px; height:4px; background:#fff; border-radius:50%; pointer-events:none; z-index:9998; box-shadow: 0 0 15px #0ea5e9;`;
             document.body.appendChild(el);
