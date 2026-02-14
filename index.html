@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>瀅白之境 Pure Skin V5.16 - 行動美學旗艦版</title>
-    <!-- 引入外部資源 -->
+    <title>瀅白之境 Pure Skin V6.0 - 經營大師旗艦版</title>
+    <!-- 引入系統資源 -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -27,6 +27,7 @@
                         'fade-in': 'fadeIn 0.6s ease-out forwards',
                         'marketing-radar': 'marketingRadar 2s infinite cubic-bezier(0, 0, 0.2, 1)',
                         'breath-border': 'breathBorder 1.5s ease-in-out infinite',
+                        'shake': 'shake 0.5s cubic-bezier(.36,.07,.19,.97) both',
                     },
                     keyframes: {
                         slideUp: { '0%': { transform: 'translateY(20px)', opacity: '0' }, '100%': { transform: 'translateY(0)', opacity: '1' } },
@@ -35,20 +36,20 @@
                             '0%, 100%': { borderColor: 'rgba(14, 165, 233, 0.2)', transform: 'scale(1)', boxShadow: '0 0 0px rgba(14, 165, 233, 0)' },
                             '50%': { borderColor: 'rgba(14, 165, 233, 0.8)', transform: 'scale(1.02)', boxShadow: '0 0 15px rgba(14, 165, 233, 0.4)' }
                         },
-                        marketingRadar: { '0%': { transform: 'scale(1)', opacity: '0.8' }, '100%': { transform: 'scale(2.5)', opacity: '0' } }
+                        marketingRadar: { '0%': { transform: 'scale(1)', opacity: '0.8' }, '100%': { transform: 'scale(2.2)', opacity: '0' } },
+                        shake: { '10%, 90%': { transform: 'translate3d(-1px, 0, 0)' }, '20%, 80%': { transform: 'translate3d(2px, 0, 0)' }, '30%, 50%, 70%': { transform: 'translate3d(-4px, 0, 0)' }, '40%, 60%': { transform: 'translate3d(4px, 0, 0)' } }
                     }
                 }
             }
         }
     </script>
     <style>
-        /* 手機適配與極致美化樣式 */
+        /* 核心手機與視覺美化樣式 */
         * { -webkit-tap-highlight-color: transparent; outline: none; }
         ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #bae6fd; border-radius: 10px; }
-
-        body { overscroll-behavior: none; -webkit-user-select: none; user-select: none; }
+        body { overscroll-behavior: none; -webkit-user-select: none; user-select: none; background: #fdfdfe; }
 
         .glass-panel {
             background: rgba(255, 255, 255, 0.85);
@@ -60,7 +61,7 @@
         
         .chart-container { position: relative; width: 100%; height: 200px; margin: 0 auto; }
 
-        /* NPC Elsa 視覺重繪 */
+        /* NPC Elsa V6.0 */
         .elsa-container { position: relative; width: 140px; height: 300px; transform: scale(0.85); margin-bottom: -40px; }
         .elsa-hair {
             position: absolute; top: 5px; left: 15px; width: 110px; height: 130px;
@@ -77,6 +78,7 @@
         }
         .glass-frame { width: 32px; height: 32px; border: 2px solid #1e293b; border-radius: 50%; background: rgba(255,255,255,0.1); }
         .elsa-eye-dot { position: absolute; top: 52px; width: 8px; height: 8px; background: #0f172a; border-radius: 50%; z-index: 16; }
+        .elsa-mouth { position: absolute; bottom: 12px; left: 32px; width: 16px; height: 4px; background: #fb7185; border-radius: 2px; z-index: 11; }
         .elsa-labcoat {
             position: absolute; top: 105px; left: 15px; width: 110px; height: 180px;
             background: #ffffff; border-radius: 15px; z-index: 5; border: 1px solid #e2e8f0;
@@ -86,31 +88,31 @@
             border: 3px solid #3b82f6; border-top: none; border-radius: 0 0 45px 45px; z-index: 12;
         }
 
-        /* 預約時刻表：手機單頁橫滑佈局 */
+        /* 預約表格：手機單頁橫滑佈局 */
         .calendar-wrapper { overflow-x: auto; width: 100%; -webkit-overflow-scrolling: touch; padding-bottom: 10px; }
-        .calendar-table { min-width: 580px; border-collapse: separate; border-spacing: 4px; table-layout: fixed; }
-        .calendar-table th { padding: 8px 4px; background: #f8fafc; border-radius: 10px; font-size: 0.55rem; font-weight: 900; color: #64748b; text-align: center; text-transform: uppercase; }
+        .calendar-table { min-width: 620px; border-collapse: separate; border-spacing: 3px; table-layout: fixed; }
+        .calendar-table th { padding: 6px 2px; background: #f8fafc; border-radius: 8px; font-size: 0.5rem; font-weight: 900; color: #64748b; text-align: center; }
         .calendar-cell { 
-            height: 48px; background: rgba(241, 245, 249, 0.6); border-radius: 12px;
-            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; border: 2px solid transparent; position: relative;
+            height: 44px; background: rgba(241, 245, 249, 0.6); border-radius: 10px;
+            transition: 0.3s; cursor: pointer; border: 1.5px solid transparent; position: relative;
             display: flex; align-items: center; justify-content: center; text-align: center;
         }
         .calendar-cell.occupied-male { background: #eff6ff; border-color: #3b82f6; }
         .calendar-cell.occupied-female { background: #fff1f2; border-color: #f43f5e; }
-        .calendar-cell.empty { border: 1.5px dashed #e2e8f0; }
-        .calendar-cell.marketing-active { background: #f0f9ff; border: 2px solid #0ea5e9; }
-        .calendar-cell.overdue { background: #fee2e2; border-color: #ef4444; opacity: 0.9; }
+        .calendar-cell.empty { border: 1px dashed #cbd5e1; }
+        .calendar-cell.marketing-active { background: #f0f9ff; border: 1.5px solid #0ea5e9; }
+        .calendar-cell.overdue { background: #fee2e2; border-color: #ef4444; opacity: 0.8; }
+        .calendar-cell.expired { background: #f1f5f9; color: #94a3b8; cursor: not-allowed; border: none; opacity: 0.5; }
 
         .pending-breath { animation: breathBorder 2s ease-in-out infinite; z-index: 5; }
 
-        .tutor-bubble { position: absolute; z-index: 10000; transition: all 0.5s; display: none; pointer-events: none; }
-        .bubble-content { background: white; border: 3px solid #bae6fd; border-radius: 2.5rem; padding: 1.5rem; width: 270px; pointer-events: auto; position: relative; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15); }
-        .bubble-content::after { content: ''; position: absolute; width: 24px; height: 24px; background: white; border-left: 3px solid #bae6fd; border-bottom: 3px solid #bae6fd; transform: rotate(-45deg); bottom: -14px; left: 50%; margin-left: -12px; }
+        .marketing-pulse-wrapper { position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+        .radar-circle { position: absolute; width: 28px; height: 28px; background: rgba(14, 165, 233, 0.4); border-radius: 50%; pointer-events: none; }
 
         #laser-cursor { 
             position: fixed; width: 64px; height: 64px; border: 4px solid #cbd5e1; border-radius: 50%; 
             transform: translate(-50%, -50%); pointer-events: none; z-index: 9999; display: none; 
-            box-shadow: 0 0 20px rgba(0,0,0,0.1); transition: border-color 0.3s, box-shadow 0.3s;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1); transition: 0.3s;
         }
         #laser-cursor.active-power { 
             border-color: #0ea5e9; box-shadow: 0 0 40px rgba(14, 165, 233, 0.7); background: rgba(14, 165, 233, 0.1);
@@ -119,16 +121,34 @@
         .power-switch { width: 72px; height: 38px; background: #cbd5e1; border-radius: 20px; position: relative; cursor: pointer; transition: 0.3s; }
         .power-switch.on { background: #0ea5e9; }
         .power-switch .knob { width: 30px; height: 30px; background: white; border-radius: 50%; position: absolute; top: 4px; left: 4px; transition: 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-        .power-switch.on .knob { transform: translateX(34px); }
 
-        .css-avatar { position: relative; width: 110px; height: 110px; border-radius: 50%; background: white; overflow: hidden; border: 4px solid #e0f2fe; box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
+        .css-avatar { position: relative; width: 80px; height: 80px; border-radius: 50%; background: white; overflow: hidden; border: 4px solid #e0f2fe; }
+        
+        /* 訊息氣泡 RPG 樣式 */
+        .msg-bubble-left { background: #f1f5f9; border-radius: 1.5rem 1.5rem 1.5rem 0.2rem; padding: 1rem; position: relative; max-width: 80%; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .msg-bubble-right { background: #0ea5e9; color: white; border-radius: 1.5rem 1.5rem 0.2rem 1.5rem; padding: 1rem; position: relative; max-width: 80%; margin-left: auto; box-shadow: 0 5px 15px rgba(14,165,233,0.1); }
     </style>
 </head>
 <body class="bg-pure-50 text-slate-700 min-h-screen font-sans selection:bg-pure-200 overflow-x-hidden">
 
     <div id="laser-cursor"></div>
 
-    <!-- 導師 Elsa 教學組件 -->
+    <!-- 系統級來電通知 (Phone Call) -->
+    <div id="phone-call-overlay" class="hidden fixed inset-0 z-[15000] bg-slate-900/80 backdrop-blur-xl flex items-center justify-center p-6">
+        <div class="glass-panel w-full max-w-sm p-10 rounded-[4rem] text-center animate-shake">
+            <div class="w-24 h-24 bg-pure-500 rounded-full mx-auto mb-8 flex items-center justify-center text-white text-4xl shadow-xl animate-pulse">
+                <i class="fa-solid fa-phone-volume"></i>
+            </div>
+            <h4 id="caller-name" class="text-3xl font-black text-slate-800 mb-2 italic">不明來電</h4>
+            <p id="caller-status" class="text-slate-400 font-bold text-xs uppercase tracking-widest mb-10 italic">Incoming Call...</p>
+            <div class="flex gap-4">
+                <button onclick="app.comm.declineCall()" class="flex-1 py-5 bg-red-50 text-red-500 rounded-3xl font-black shadow-inner">拒接</button>
+                <button onclick="app.comm.acceptCall()" class="flex-1 py-5 bg-green-500 text-white rounded-3xl font-black shadow-xl">接聽回答</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 導師 Elsa 引導與對話氣泡 -->
     <div id="tutor-anchor" class="fixed z-[10000] bottom-10 right-10 flex flex-col items-center gap-2 transition-all duration-500" style="display: none;">
         <div class="elsa-container animate-float">
             <div class="elsa-hair"></div>
@@ -146,7 +166,7 @@
         </div>
     </div>
 
-    <!-- 全域通知 -->
+    <!-- 通知元件 -->
     <div id="toast" class="fixed top-6 left-1/2 -translate-x-1/2 z-[20000] transition-all duration-500 transform -translate-y-24 opacity-0 flex items-center gap-3 px-8 py-4 rounded-[2.5rem] shadow-2xl bg-white/95 backdrop-blur-md border border-pure-100">
         <i id="toast-icon" class="fa-solid fa-circle-check text-green-500"></i>
         <span id="toast-text" class="font-black text-slate-700 text-sm">系統已就緒</span>
@@ -155,7 +175,7 @@
     <!-- 手機懸浮時鐘列 -->
     <div id="fixed-clock" class="fixed bottom-6 left-6 z-[150] glass-panel px-5 py-3 rounded-[2rem] flex items-center gap-5 shadow-2xl border-pure-100 animate-fade-in pointer-events-none">
         <div class="flex flex-col items-start leading-none">
-            <span id="game-date" class="font-black text-slate-400 text-[10px] uppercase tracking-tighter mb-1">第 1 天營運</span>
+            <span id="game-date" class="font-black text-slate-400 text-[10px] uppercase tracking-tighter mb-1 italic">Day X</span>
             <div class="flex items-center gap-2">
                 <i class="fa-solid fa-clock text-pure-500 text-xs"></i>
                 <span id="game-clock" class="font-black text-slate-800 text-xl font-mono italic">10:00 AM</span>
@@ -165,13 +185,13 @@
 
     <main id="app-root" class="w-full min-h-screen flex flex-col items-center relative overflow-hidden px-4 py-8">
         
-        <!-- 背景飾品 -->
+        <!-- 背景動態飾品 -->
         <div class="absolute top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
             <div class="absolute top-[-5%] left-[-10%] w-[100vw] h-[100vw] bg-pure-200/25 rounded-full filter blur-[140px] animate-pulse-slow"></div>
             <div class="absolute bottom-[-10%] right-[-10%] w-[90vw] h-[90vw] bg-pink-100/25 rounded-full filter blur-[140px] animate-pulse-slow"></div>
         </div>
 
-        <!-- 0. 載入視圖 -->
+        <!-- 載入視圖 -->
         <section id="view-loading" class="flex flex-col items-center justify-center gap-8 text-center h-screen transition-all duration-500">
             <div class="relative">
                 <div class="w-28 h-28 border-4 border-pure-100 border-t-pure-500 rounded-full animate-spin"></div>
@@ -183,17 +203,17 @@
             </div>
         </section>
 
-        <!-- 1. 認證中心 -->
+        <!-- 認證中心 -->
         <section id="view-login" class="hidden w-full max-w-md my-auto animate-float">
             <div class="glass-panel p-10 rounded-[4rem] text-center shadow-2xl border-white border-4">
-                <div class="w-24 h-24 bg-white rounded-[2.5rem] mx-auto flex items-center justify-center mb-8 text-5xl text-pure-600 shadow-inner border border-pure-50">🧊</div>
+                <div class="w-24 h-24 bg-white rounded-[2.5rem] mx-auto flex items-center justify-center mb-8 text-5xl text-pure-600 shadow-inner">🧊</div>
                 <h2 class="text-4xl font-black mb-2 text-slate-800 tracking-tight italic">美學教父之路</h2>
-                <p class="text-slate-400 text-xs font-bold tracking-[0.2em] uppercase mb-12">Pure Aesthetics Portal</p>
+                <p class="text-slate-400 text-xs font-bold tracking-[0.2em] uppercase mb-12 italic">Identity Verification</p>
                 <div class="space-y-5">
-                    <button onclick="app.auth.loginGoogle()" class="w-full py-6 bg-white border border-slate-100 rounded-[2.5rem] flex items-center justify-center gap-4 shadow-sm hover:bg-pure-50 transition-all font-black text-slate-600 text-lg">
+                    <button onclick="app.auth.loginGoogle()" class="w-full py-6 bg-white border border-slate-100 rounded-[2.5rem] flex items-center justify-center gap-4 shadow-sm hover:bg-blue-50 transition-all font-black text-slate-600 text-lg">
                         <i class="fa-brands fa-google text-2xl text-pure-600"></i> Google 快速認證
                     </button>
-                    <button onclick="app.auth.loginGameCenter()" class="w-full py-6 bg-slate-900 text-white rounded-[2.5rem] flex items-center justify-center gap-4 shadow-xl active:scale-95 transition-transform font-black text-lg">
+                    <button onclick="app.auth.loginGameCenter()" class="w-full py-6 bg-slate-900 text-white rounded-[2.5rem] flex items-center justify-center gap-4 shadow-xl active:scale-95 transition-transform font-black text-lg text-center">
                         <i class="fa-brands fa-apple text-3xl"></i> Game Center 登入
                     </button>
                 </div>
@@ -201,7 +221,7 @@
             </div>
         </section>
 
-        <!-- 1.2 命名視圖 -->
+        <!-- 命名視圖 -->
         <section id="view-naming" class="hidden w-full max-w-md my-auto px-4">
             <div class="glass-panel p-12 rounded-[4.5rem] text-center shadow-2xl animate-slide-up border-white border-2">
                 <h2 class="text-3xl font-black text-slate-800 mb-10 italic tracking-tighter">設定專家名稱</h2>
@@ -210,50 +230,37 @@
             </div>
         </section>
 
-        <!-- 1.5 歡迎與導覽啟動 -->
-        <section id="view-welcome" class="hidden w-full max-w-2xl my-auto text-center px-6">
-            <div class="glass-panel p-12 rounded-[5rem] shadow-2xl border-white border-4 animate-fade-in relative overflow-hidden">
-                <div class="absolute -top-10 -left-10 w-40 h-40 bg-pure-50 rounded-full opacity-40"></div>
-                <div class="text-9xl mb-12 drop-shadow-2xl">🧊</div>
-                <h2 class="text-5xl font-black text-slate-800 mb-8 italic tracking-tighter text-center">歡迎開啟教父之路</h2>
-                <p class="text-slate-500 font-bold leading-relaxed text-xl mb-14 italic text-center px-4">
-                    您的專業排程與智慧時刻表已同步。<br>準備好接受 Elsa 導師的引導了嗎？
-                </p>
-                <button onclick="app.tutorial.start()" class="px-16 py-8 bg-gradient-to-r from-pure-600 to-blue-700 text-white font-black text-2xl rounded-[3.5rem] shadow-2xl hover:scale-105 active:scale-95 transition-all uppercase tracking-widest mx-auto block">
-                    開始引導教學 ❯
-                </button>
-            </div>
-        </section>
-
-        <!-- 2. 大廳 (DASHBOARD) -->
+        <!-- 大廳視圖 (RPG 經營模式) -->
         <section id="view-lobby" class="hidden w-full max-w-6xl flex flex-col gap-6 w-full">
             <header id="frame-profile" class="glass-panel p-6 rounded-[3.5rem] flex flex-col gap-6 shadow-2xl border-blue-50">
                 <div class="flex items-center gap-6">
-                    <div class="w-20 h-20 bg-gradient-to-tr from-pure-500 to-cyan-400 rounded-3xl flex items-center justify-center text-white shadow-xl text-3xl"><i class="fa-solid fa-gem"></i></div>
+                    <div class="w-20 h-20 bg-gradient-to-tr from-pure-500 to-cyan-400 rounded-3xl flex items-center justify-center text-white shadow-xl text-3xl font-black italic">M</div>
                     <div class="flex-1">
                         <h3 class="text-3xl font-black text-slate-800 italic" id="user-display-name">顧問</h3>
-                        <div class="flex items-center gap-2 mt-1">
-                            <span class="bg-pure-500 text-white text-[8px] px-3 py-1 rounded-full font-black uppercase tracking-widest">大師級 Master</span>
-                            <p class="text-[10px] font-black text-pure-500 uppercase tracking-widest" id="user-title">-</p>
-                        </div>
+                        <p class="text-[10px] font-black text-pure-500 uppercase tracking-widest" id="user-title">-</p>
                     </div>
+                    <!-- 訊息中心入口 -->
+                    <button onclick="app.router.go('comm')" class="relative w-16 h-16 bg-white rounded-3xl flex items-center justify-center text-2xl text-slate-400 shadow-sm border border-pure-100 hover:text-pure-600 transition-colors">
+                        <i class="fa-solid fa-message"></i>
+                        <div id="msg-badge" class="hidden absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white text-[10px] font-black flex items-center justify-center rounded-full border-2 border-white">1</div>
+                    </button>
                 </div>
                 <div class="flex gap-4 items-center pt-6 border-t border-slate-100">
                     <div class="flex-1 bg-pure-50/50 p-4 rounded-3xl text-center">
-                        <p class="text-[9px] text-slate-400 font-black uppercase mb-1 tracking-widest">資產</p>
-                        <p class="text-3xl font-black text-slate-800 font-mono italic">💰 <span id="lobby-gold">0</span></p>
+                        <p class="text-[9px] text-slate-400 font-black uppercase mb-1 tracking-widest text-center">資產</p>
+                        <p class="text-3xl font-black text-slate-800 font-mono italic text-center">💰 <span id="lobby-gold">0</span></p>
                     </div>
                     <div class="flex-1 bg-pure-50/50 p-4 rounded-3xl text-center">
-                        <p class="text-[9px] text-slate-400 font-black uppercase mb-1 tracking-widest">經營等級</p>
-                        <p class="text-3xl font-black text-pure-600 font-mono italic" id="lobby-level">1</p>
+                        <p class="text-[9px] text-slate-400 font-black uppercase mb-1 tracking-widest text-center">等級</p>
+                        <p class="text-3xl font-black text-pure-600 font-mono italic text-center" id="lobby-level">1</p>
                     </div>
                 </div>
             </header>
 
             <div id="frame-chart" class="glass-panel p-8 rounded-[4rem] flex flex-col gap-6 shadow-inner border border-pure-50">
                 <div class="flex justify-between items-center px-2">
-                    <h4 class="text-xl font-black text-slate-800 tracking-tighter italic font-mono"><i class="fa-solid fa-chart-line mr-3 text-pure-500"></i>經營趨勢分析</h4>
-                    <button onclick="app.router.go('reports')" class="px-5 py-2 bg-pure-100 text-pure-600 rounded-full font-black text-[10px] hover:bg-pure-200 transition-all uppercase tracking-widest font-mono">財務報表</button>
+                    <h4 class="text-xl font-black text-slate-800 tracking-tighter italic font-mono text-center"><i class="fa-solid fa-chart-line mr-3 text-pure-500"></i>營收分析</h4>
+                    <button onclick="app.router.go('reports')" class="px-5 py-2 bg-pure-100 text-pure-600 rounded-full font-black text-[10px] hover:bg-pure-200 transition-all uppercase tracking-widest font-mono">Reports</button>
                 </div>
                 <div class="chart-container"><canvas id="revenueChart"></canvas></div>
             </div>
@@ -261,24 +268,14 @@
             <button id="frame-appt" onclick="app.router.go('appointments')" class="group relative bg-gradient-to-br from-pure-600 to-blue-800 text-white p-10 rounded-[4.5rem] shadow-2xl active:scale-95 transition-all text-left overflow-hidden h-44">
                 <div class="absolute right-[-10px] bottom-[-20px] text-[11rem] text-white opacity-10"><i class="fa-solid fa-calendar-check"></i></div>
                 <h2 class="text-4xl font-black italic mb-2 tracking-tighter uppercase text-center">預約時刻表</h2>
-                <p class="text-sm font-medium opacity-85 leading-relaxed italic pr-12 text-center">一週跨日排程矩陣與引流投放開發。</p>
+                <p class="text-sm font-medium opacity-85 leading-relaxed italic pr-12 text-center text-wrap">一週跨日排程矩陣與引流投放開發。</p>
             </button>
-
-            <div id="frame-settings" class="glass-panel p-6 rounded-[3rem] flex flex-col gap-5 shadow-sm border border-pure-50 mt-4">
-                <button onclick="app.audio.toggle()" class="flex items-center justify-between w-full p-5 rounded-[2rem] bg-pure-50 hover:bg-pure-100 transition-colors">
-                    <span class="font-black text-slate-600 italic text-sm px-2"><i class="fa-solid fa-music mr-4 text-pure-500"></i>音樂氛圍感</span>
-                    <span id="lobby-music-text" class="text-[10px] font-black text-pure-400 font-mono bg-white px-4 py-1.5 rounded-full shadow-sm">OFF</span>
-                </button>
-                <button onclick="app.auth.logout()" class="flex items-center justify-center gap-3 text-slate-400 font-bold hover:text-red-500 transition-colors py-2 text-xs">
-                    <i class="fa-solid fa-power-off"></i> 安全登出系統 EXIT
-                </button>
-            </div>
         </section>
 
-        <!-- 3. 預約時刻表 (行動優化週視圖) -->
+        <!-- 預約時刻表 (視覺壓縮版) -->
         <section id="view-appointments" class="hidden w-full max-w-6xl flex flex-col h-[82vh] animate-slide-up">
             <div class="glass-panel p-8 rounded-t-[4.5rem] flex justify-between items-center z-10 border-b-0 shadow-none">
-                <div><h2 class="text-3xl font-black text-slate-800 italic tracking-tighter font-mono uppercase">預約時刻表</h2><p class="text-[10px] text-pure-400 font-bold mt-1 uppercase italic tracking-widest font-mono">Weekly Schedule Matrix</p></div>
+                <div><h2 class="text-3xl font-black text-slate-800 italic tracking-tighter font-mono uppercase">預約時刻表</h2><p class="text-[10px] text-pure-400 font-bold mt-1 uppercase italic tracking-widest font-mono">10:00 - 21:00 Scheduler</p></div>
                 <button onclick="app.router.go('lobby')" class="w-14 h-14 rounded-[1.5rem] bg-pure-50 flex items-center justify-center text-pure-600 hover:bg-pure-100 shadow-inner active:scale-90 transition-all"><i class="fa-solid fa-home text-xl"></i></button>
             </div>
             <div class="glass-panel p-4 rounded-b-[4.5rem] flex-1 shadow-2xl border-t-0 bg-white/95">
@@ -288,168 +285,139 @@
             </div>
         </section>
 
-        <!-- 4. 經營報表中心 -->
-        <section id="view-reports" class="hidden w-full max-w-5xl flex flex-col h-[82vh] animate-slide-up">
-            <div class="glass-panel p-8 rounded-t-[4.5rem] flex justify-between items-center border-b-0">
-                <div><h2 class="text-3xl font-black text-slate-800 italic tracking-tighter">美學財報分析</h2><p class="text-[10px] text-pure-400 font-bold mt-1 uppercase italic font-mono">Business Intelligence</p></div>
-                <button onclick="app.router.go('lobby')" class="w-14 h-14 rounded-[1.5rem] bg-pure-50 flex items-center justify-center shadow-inner hover:bg-pure-100 transition-all active:scale-90"><i class="fa-solid fa-arrow-left text-pure-600 text-xl"></i></button>
+        <!-- 通訊預約中心 (Comm Center RPG) -->
+        <section id="view-comm" class="hidden w-full max-w-4xl flex flex-col h-[80vh] animate-slide-up">
+            <div class="glass-panel p-8 rounded-t-[4rem] flex justify-between items-center z-10 border-b-0">
+                <div><h2 class="text-3xl font-black text-slate-800 italic tracking-tighter">通訊預約中心</h2><p class="text-[9px] text-pure-400 font-black uppercase tracking-widest mt-1 italic">Customer Communication HUB</p></div>
+                <button onclick="app.router.go('lobby')" class="w-14 h-14 rounded-2xl bg-pure-50 flex items-center justify-center text-pure-600 hover:bg-pure-100 transition-all shadow-inner"><i class="fa-solid fa-home text-xl"></i></button>
             </div>
-            <div class="glass-panel p-8 rounded-b-[4.5rem] flex-1 overflow-y-auto space-y-8 shadow-2xl custom-scrollbar">
-                <div class="flex flex-col gap-8 p-8 bg-pure-50/80 rounded-[3rem] border border-pure-100 shadow-inner">
-                    <div class="flex flex-col text-center"><span class="text-[10px] font-black text-slate-400 uppercase mb-3 italic tracking-[0.2em]">查詢日期時段</span><input type="date" id="report-date-picker" onchange="app.reports.lookup()" class="bg-white border-2 border-pure-100 p-4 rounded-[1.5rem] font-black outline-none focus:border-pure-400 text-center shadow-sm text-sm"></div>
-                    <div class="grid grid-cols-2 gap-6 text-center">
-                        <div class="bg-white p-6 rounded-[2.5rem] shadow-sm"><p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">當日總收入</p><p class="text-3xl font-black text-pure-600 font-mono italic">💰 <span id="report-income">0</span></p></div>
-                        <div class="bg-white p-6 rounded-[2.5rem] shadow-sm"><p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">服務貴賓數</p><p class="text-3xl font-black text-slate-600 font-mono italic">👤 <span id="report-guests">0</span></p></div>
+            <div class="glass-panel p-6 rounded-b-[4rem] flex-1 bg-white/80 overflow-y-auto custom-scrollbar flex flex-col gap-6" id="comm-list">
+                <!-- 訊息流列表 -->
+            </div>
+        </section>
+
+        <!-- RPG 對話介面 (V6.0 全新設計：帶頭像) -->
+        <section id="view-dialogue" class="hidden fixed inset-0 z-[16000] bg-slate-900/10 backdrop-blur-md flex flex-col items-center justify-end p-8">
+            <div class="glass-panel w-full max-w-2xl p-10 rounded-[4rem] shadow-2xl flex flex-col gap-8 border-white border-2">
+                <div class="flex items-start gap-6">
+                    <div id="diag-avatar-container" class="flex-shrink-0 animate-float">
+                        <!-- CSS Avatar here -->
+                    </div>
+                    <div class="flex-1">
+                        <h4 id="diag-name" class="font-black text-pure-600 text-lg mb-2 italic tracking-widest underline decoration-blue-200">名字載入中</h4>
+                        <div class="msg-bubble-left">
+                            <p id="diag-text" class="text-slate-700 font-bold leading-relaxed text-xl italic min-h-[3em]">...</p>
+                        </div>
                     </div>
                 </div>
-                <div class="p-8 border-2 border-pure-50 rounded-[4rem] bg-white/50 shadow-inner text-center">
-                    <h5 class="text-lg font-black text-slate-700 mb-8 italic underline decoration-pure-200 text-center">月度經營數據趨勢</h5>
-                    <div class="chart-container"><canvas id="monthlyChart"></canvas></div>
+                <div id="diag-options" class="flex flex-col gap-3">
+                    <!-- 選項 -->
                 </div>
             </div>
         </section>
 
-        <!-- 5. 互動操作畫面 -->
+        <!-- 結算評價、互動除毛等視圖 (維持 V5.18 旗艦規格) -->
         <section id="view-game" class="hidden w-full max-w-4xl flex-col items-center gap-10 my-auto">
             <div class="w-full max-w-md glass-panel p-8 rounded-[3.5rem] flex items-center justify-between shadow-2xl border-white border-4">
-                <div class="flex items-center gap-6">
-                    <div id="laser-power-switch" onclick="window.toggleLaser()" class="power-switch">
-                        <div class="knob"></div>
-                    </div>
-                    <div class="leading-none">
-                        <p class="font-black text-slate-800 text-lg italic uppercase tracking-widest">雷射電源</p>
-                        <p id="power-status-text" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">待機模式 STANDBY</p>
-                    </div>
-                </div>
-                <div class="text-right leading-none">
-                    <span id="prog-text" class="text-3xl font-black text-pure-600 font-mono italic">0.0%</span>
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">淨白進度</p>
-                </div>
+                <div class="flex items-center gap-6"><div id="laser-power-switch" onclick="window.toggleLaser()" class="power-switch"><div class="knob"></div></div><div class="leading-none text-left"><p class="font-black text-slate-800 text-lg italic uppercase tracking-widest">雷射電源</p><p id="power-status-text" class="text-[10px] font-bold text-slate-400 uppercase mt-1">待機模式 STANDBY</p></div></div>
+                <div class="text-right leading-none"><span id="prog-text" class="text-3xl font-black text-pure-600 font-mono italic">0.0%</span><p class="text-[10px] font-bold text-slate-400 uppercase mt-1">淨白進度</p></div>
             </div>
-
-            <div class="relative rounded-[5.5rem] overflow-hidden shadow-2xl border-[16px] border-white ring-4 ring-blue-50/50">
-                <canvas id="game-canvas" class="bg-pure-50"></canvas>
-            </div>
-
+            <div class="relative rounded-[5.5rem] overflow-hidden shadow-2xl border-[16px] border-white ring-4 ring-blue-50/50"><canvas id="game-canvas" class="bg-pure-50"></canvas></div>
             <div class="w-full max-w-md flex flex-col gap-6">
-                <div class="w-full h-4 bg-slate-100 rounded-full overflow-hidden shadow-inner border-2 border-white">
-                    <div id="prog-bar" class="h-full bg-gradient-to-r from-pure-400 to-cyan-500 w-0 transition-all duration-300"></div>
-                </div>
-                <button onclick="window.requestManualFinish()" class="w-full py-8 bg-gradient-to-br from-pure-600 to-blue-800 text-white font-black text-2xl rounded-[3rem] shadow-2xl active:scale-95 transition-all italic uppercase tracking-widest">
-                    完成療程結算 FINISH ❯
-                </button>
+                <div class="w-full h-4 bg-slate-100 rounded-full overflow-hidden shadow-inner border-2 border-white"><div id="prog-bar" class="h-full bg-gradient-to-r from-pure-400 to-cyan-500 w-0 transition-all duration-300"></div></div>
+                <button onclick="window.requestManualFinish()" class="w-full py-8 bg-gradient-to-br from-pure-600 to-blue-800 text-white font-black text-2xl rounded-[3rem] shadow-2xl active:scale-95 transition-all italic uppercase tracking-widest">完成療程結算 FINISH ❯</button>
             </div>
         </section>
-
-        <!-- 結算評價彈窗 -->
-        <div id="modal-result" class="hidden fixed inset-0 z-[200] items-center justify-center bg-blue-900/80 backdrop-blur-3xl px-6 animate-slide-in">
-            <div class="glass-panel p-16 rounded-[6rem] text-center max-md w-full border-white border-[10px] shadow-2xl relative overflow-hidden">
-                <div id="result-rank-icon" class="text-9xl mb-10 drop-shadow-2xl text-center">🧊</div>
-                <h2 class="text-5xl font-black text-slate-800 mb-4 tracking-tighter italic text-center" id="result-rank-title">極致瀅白！</h2>
-                <div id="result-stars" class="flex justify-center gap-2 mb-10 text-yellow-400 text-3xl"></div>
-                <p id="result-feedback-text" class="text-slate-500 font-bold mb-14 leading-relaxed text-xl italic px-6 text-center"></p>
-                
-                <div class="bg-blue-50 p-8 rounded-[4rem] border border-blue-100 flex justify-between items-center mb-14 shadow-inner">
-                    <span class="font-black text-slate-500 uppercase tracking-widest text-sm italic">結算獎金 Reward</span>
-                    <span class="font-black text-blue-600 text-5xl tracking-tighter font-mono">💰 <span id="reward-val">0</span></span>
-                </div>
-                <button onclick="window.location.reload()" class="w-full py-8 bg-gradient-to-r from-pure-600 to-blue-700 text-white font-black text-2xl rounded-[3.5rem] shadow-2xl active:scale-95 transition-transform uppercase tracking-widest italic">接下一位貴賓 ❯</button>
-            </div>
-        </div>
-
-        <!-- 結束營業結算 Modal -->
-        <div id="modal-closing" class="hidden fixed inset-0 z-[15000] bg-slate-950/80 backdrop-blur-xl flex items-center justify-center p-6 text-center">
-            <div class="glass-panel max-w-md w-full p-12 rounded-[4rem] shadow-2xl border-white border-4 animate-slide-up">
-                <div class="text-7xl mb-8 text-center">🌙</div>
-                <h2 class="text-4xl font-black text-slate-800 mb-2 italic tracking-tighter text-center">營業結束</h2>
-                <p class="text-slate-400 font-bold mb-10 text-sm tracking-widest uppercase italic text-center" id="closing-day-label">Day 1 經營結算</p>
-                <div class="grid grid-cols-2 gap-4 mb-10">
-                    <div class="bg-pure-50 p-6 rounded-3xl shadow-inner border border-pure-100">
-                        <span class="text-[9px] font-black text-slate-400 uppercase block mb-1">今日總收入</span>
-                        <span class="text-2xl font-black text-pure-600 font-mono italic">💰 <span id="closing-income">0</span></span>
-                    </div>
-                    <div class="bg-pure-50 p-6 rounded-3xl shadow-inner border border-pure-100">
-                        <span class="text-[9px] font-black text-slate-400 uppercase block mb-1">服務貴賓數</span>
-                        <span class="text-2xl font-black text-pure-600 font-mono italic">👤 <span id="closing-guests">0</span></span>
-                    </div>
-                </div>
-                <button onclick="app.timer.startNextDay()" class="w-full py-5 bg-gradient-to-r from-pure-600 to-blue-700 text-white font-black text-xl rounded-2xl shadow-xl active:scale-95 transition-all uppercase italic">開始次日經營 START ❯</button>
-            </div>
-        </div>
-
-        <!-- 行銷投放 Modal -->
-        <div id="modal-marketing" class="hidden fixed inset-0 z-[11000] bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-6">
-            <div class="glass-panel max-w-xl w-full p-10 rounded-[4rem] shadow-2xl animate-slide-up">
-                <div class="flex justify-between items-center mb-8 uppercase font-black text-slate-800 italic text-center">
-                    <h3 class="text-center w-full">市場開發投放</h3>
-                    <button onclick="document.getElementById('modal-marketing').classList.add('hidden')" class="text-slate-400 p-2"><i class="fa-solid fa-times"></i></button>
-                </div>
-                <div class="grid grid-cols-2 gap-4" id="marketing-list"></div>
-            </div>
-        </div>
 
     </main>
 
-    <!-- Firebase SDK 校準導入 (修正 GoogleAuthProvider 錯誤) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithPopup, GoogleAuthProvider, OAuthProvider, signInWithCustomToken, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // V5.16 配置
-        const firebaseConfig = {
-            apiKey: "AIzaSyCIKSbaZ5R6RTSRcH_-YYfqz_OnQQFr1gc", authDomain: "pure-skin-8640d.firebaseapp.com",
-            projectId: "pure-skin-8640d", storageBucket: "pure-skin-8640d.firebasestorage.app",
-            messagingSenderId: "890613609117", appId: "1:890613609117:web:ed044e453e6cc789b01a74", measurementId: "G-27E3XSTTBH"
-        };
+        // --- Firebase 環境 ---
+        const firebaseConfig = { apiKey: "AIzaSyCIKSbaZ5R6RTSRcH_-YYfqz_OnQQFr1gc", authDomain: "pure-skin-8640d.firebaseapp.com", projectId: "pure-skin-8640d", storageBucket: "pure-skin-8640d.firebasestorage.app", messagingSenderId: "890613609117", appId: "1:890613609117:web:ed044e453e6cc789b01a74", measurementId: "G-27E3XSTTBH" };
         const appId = 'pure-skin-studio-master';
         const fbApp = initializeApp(firebaseConfig);
         const auth = getAuth(fbApp);
         const db = getFirestore(fbApp);
 
-        // 核心數據池
+        // --- 常量與名單 ---
         const CAREERS = ["瀅白實習生", "初級技師", "資深除毛師", "首席技術官", "醫美顧問", "雷射物理專家", "皮膚臨床醫生", "抗老研究員", "生物纖維專家", "醫學美容院長", "婚禮造型師", "時尚雜誌顧問", "好萊塢特效護理", "明星御用大師", "人體美學家", "沙龍店長", "品牌經理", "連鎖店創始人", "美容集團 CEO", "全球美學教父"];
-        const TW_NAMES = Array.from({length: 300}, (_, i) => ["陳", "李", "王", "張", "劉", "黃", "林", "吳"][i % 8] + ["美玲", "子豪", "雅雯", "承翰", "雨柔", "俊廷", "詩婷", "威廉"][Math.floor(Math.random()*8)]);
-        const MARKETING_METHODS = [ { name: "社群推播", cost: 300, power: 0.15 }, { name: "區域簡訊", cost: 200, power: 0.1 }, { name: "網紅開箱", cost: 1200, power: 0.4 }, { name: "捷運燈箱", cost: 2000, power: 0.6 }, { name: "雜誌專訪", cost: 3500, power: 0.8 }, { name: "電視廣告", cost: 6000, power: 1.2 } ];
+        const TW_SURNAMES = ["陳", "李", "王", "張", "劉", "黃", "林", "吳", "郭", "徐"];
+        const TW_NAMES = ["美玲", "子豪", "雅雯", "承翰", "雨柔", "俊廷", "詩婷", "威廉", "欣儀", "建宏", "嘉欣", "宗佑", "志明", "雅婷", "春嬌", "凱特", "子軒", "佩珊", "宜庭"];
+        const FULL_NAMES = Array.from({length: 300}, (_, i) => TW_SURNAMES[i % 10] + TW_NAMES[Math.floor(Math.random()*18)]);
         const BODY_PARTS = { face: '臉部精雕', underarm: '腋下淨白', bikini: 'VIO私密', limbs: '四肢絲滑', back: '背部美學' };
-        const FEEDBACKS = Array.from({length: 80}, (_, i) => `專業評分 #${i+1}：這是目前見過最專業的瀅白技術，肌膚完全零瑕疵！`);
 
-        const bgm = new Audio("https://assets.mixkit.co/music/preview/mixkit-serene-view-443.mp3");
-        bgm.loop = true; bgm.volume = 0.3;
+        // --- V6.0 隨機對話池 ---
+        const COMM_CONTEXTS = [
+            { type: 'IM', trigger: "您好，我看到網路評價，想請問明天 14:00 有位置嗎？", opts: [{t: "有的，幫您排入！", r: "太好了，明天見。"}, {t: "不好意思那天滿了喔。", r: "好吧，那我再看看。"}] },
+            { type: 'IM', trigger: "瀅白之境你好，我下週要拍婚紗，腋下需要急救！", opts: [{t: "沒問題，保證讓您無瑕。基礎療程 200。", r: "錢不是問題，請排在最快時段！"}, {t: "目前排單較滿，要等喔。", r: "那我有空再問。"}] },
+            { type: 'CALL', trigger: "喂？教父嗎？我是運動員小明，我想處理小腿毛髮減少阻力！", opts: [{t: "專業運動員最推這項。11:00 方便嗎？", r: "OK！那我就過去囉。"}, {t: "喔好，你自己看時刻表空位。", r: "額...那我考慮一下。"}] }
+        ];
 
         const App = {
             state: {
-                user: null, data: { gold: 3000, level: 1, exp: 0, history: [], dailyLog: {}, isNewPlayer: true, appointments: {}, marketingSlots: {}, playerName: "", gameHour: 10, gameMinute: 0, gameDay: 1 },
-                view: 'loading', session: null, isAuthResolved: false, tutorialStep: 0, audio: { el: bgm, muted: true },
-                isLaserOn: false, startTime: 0, currentCompletion: 0
+                user: null, data: { gold: 3000, level: 1, exp: 0, history: [], dailyLog: {}, isNewPlayer: true, appointments: {}, marketingSlots: {}, playerName: "", gameHour: 10, gameMinute: 0, gameDay: 1, nameStats: {}, commEvents: [] },
+                view: 'loading', session: null, isAuthResolved: false, tutorialStep: 0, audio: { el: null, muted: true },
+                isLaserOn: false, startTime: 0, currentCompletion: 0, currentComm: null
             },
 
-            audio: {
-                toggle: function() {
-                    const audio = App.state.audio;
-                    if (audio.muted) {
-                        audio.el.play().catch(() => App.ui.notify("請點擊螢幕喚醒音訊系統", true));
-                        audio.muted = false; document.getElementById('lobby-music-text').innerText="開啟 ON";
-                    } else {
-                        audio.el.pause();
-                        audio.muted = true; document.getElementById('lobby-music-text').innerText="關閉 OFF";
+            // --- V6.0 通訊中心模組 ---
+            comm: {
+                triggerRandom: async () => {
+                    const d = App.state.data;
+                    if (Math.random() < 0.1) { // 10% 機率觸發訊息
+                        const ctx = COMM_CONTEXTS[Math.floor(Math.random()*COMM_CONTEXTS.length)];
+                        const guest = App.crm.generateUniqueCustomer();
+                        const event = { ...ctx, guest, id: Date.now(), status: 'unread' };
+                        
+                        if (ctx.type === 'CALL') {
+                            App.comm.incomingCall(event);
+                        } else {
+                            d.commEvents.push(event);
+                            document.getElementById('msg-badge').classList.remove('hidden');
+                            document.getElementById('msg-badge').innerText = d.commEvents.filter(e => e.status === 'unread').length;
+                            App.ui.notify("收到一則新預約訊息！");
+                        }
+                        await App.data.save();
                     }
+                },
+                incomingCall: (event) => {
+                    App.state.currentComm = event;
+                    document.getElementById('caller-name').innerText = `${event.guest.name} (${event.guest.visitCount}次)`;
+                    document.getElementById('phone-call-overlay').classList.remove('hidden');
+                },
+                acceptCall: () => {
+                    document.getElementById('phone-call-overlay').classList.add('hidden');
+                    App.comm.openChat(App.state.currentComm);
+                },
+                declineCall: () => {
+                    document.getElementById('phone-call-overlay').classList.add('hidden');
+                    App.ui.notify("已掛斷來電。");
+                },
+                openChat: (event) => {
+                    App.state.currentComm = event;
+                    App.router.go('dialogue');
+                    window.renderRPGChat(event);
                 }
             },
 
-            reports: {
-                lookup: () => {
-                    const date = document.getElementById('report-date-picker').value;
-                    const log = App.state.data.dailyLog?.[date] || { income: 0, guests: 0 };
-                    document.getElementById('report-income').innerText = log.income.toLocaleString();
-                    document.getElementById('report-guests').innerText = log.guests;
-                },
-                renderMonthlyChart: () => {
-                    const ctx = document.getElementById('monthlyChart').getContext('2d');
-                    const logs = App.state.data.dailyLog || {};
-                    const sortedDates = Object.keys(logs).sort().slice(-15);
-                    if (window.monthlyChartInstance) window.monthlyChartInstance.destroy();
-                    window.monthlyChartInstance = new Chart(ctx, { type: 'bar', data: { labels: sortedDates.map(d => d.slice(5)), datasets: [{ label: '每日營收', data: sortedDates.map(d => logs[d].income), backgroundColor: '#38bdf8', borderRadius: 10 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { display: false } }, x: { grid: { display: false } } } } });
+            crm: {
+                generateUniqueCustomer: () => {
+                    const d = App.state.data;
+                    const gameDay = d.gameDay;
+                    const availableNames = FULL_NAMES.filter(name => {
+                        const stats = d.nameStats[name];
+                        if (!stats) return true;
+                        return (gameDay - stats.lastDay) > 18;
+                    });
+                    const selectedName = availableNames.length > 0 ? availableNames[Math.floor(Math.random() * availableNames.length)] : FULL_NAMES[0];
+                    if (!d.nameStats[selectedName]) d.nameStats[selectedName] = { count: 0, lastDay: 0 };
+                    d.nameStats[selectedName].count++;
+                    d.nameStats[selectedName].lastDay = gameDay;
+                    return { name: selectedName, visitCount: d.nameStats[selectedName].count };
                 }
             },
 
@@ -464,15 +432,14 @@
                 tick: async () => {
                     let d = App.state.data;
                     const isVisible = !document.hidden;
-                    // V5.16 時空流速：開啟 1:5, 背景 720:1
                     const gameSecondsToAdd = isVisible ? 5 : (5 * 60) / 3600;
                     d.gameMinute += gameSecondsToAdd / 60;
                     if (d.gameMinute >= 60) {
                         d.gameMinute = 0; d.gameHour++;
-                        if (d.gameHour >= 21) { App.timer.performDailySettlement(); return; }
+                        if (d.gameHour >= 22) { App.timer.performDailySettlement(); return; }
+                        App.comm.triggerRandom(); // 每小時判定通訊
                     }
                     App.ui.updateClock();
-                    App.timer.processMarketing(isVisible);
                     if (App.state.view === 'appointments') App.ui.renderTimetable();
                 },
                 performDailySettlement: async () => {
@@ -486,7 +453,7 @@
                     });
                     const dateStr = new Date().toISOString().split('T')[0]; 
                     App.state.data.dailyLog[dateStr] = { income: dailyIncome, guests: dailyGuests };
-                    document.getElementById('closing-day-label').innerText = `第 ${day} 天 經營結算報告`;
+                    document.getElementById('closing-day-label').innerText = `Day ${day} 經營結算`;
                     document.getElementById('closing-income').innerText = dailyIncome.toLocaleString();
                     document.getElementById('closing-guests').innerText = dailyGuests;
                     document.getElementById('modal-closing').classList.remove('hidden');
@@ -496,25 +463,13 @@
                     App.state.data.gameHour = 10; App.state.data.gameMinute = 0; App.state.data.gameDay++;
                     document.getElementById('modal-closing').classList.add('hidden');
                     await App.data.save(); App.router.go('lobby');
-                },
-                processMarketing: async (isVisible) => {
-                    let d = App.state.data;
-                    Object.keys(d.marketingSlots || {}).forEach(async (sid) => {
-                        if (Math.random() < (isVisible ? 0.03 : 0.0005)) {
-                            if (!d.appointments[sid]) {
-                                d.appointments[sid] = { name: TW_NAMES[Math.floor(Math.random()*300)], part: 'face', gender: Math.random() > 0.5 ? 'male' : 'female', status: 'pending' };
-                                delete d.marketingSlots[sid]; App.ui.notify("引流成功！有新貴賓預約時段。"); await App.data.save();
-                            }
-                        }
-                    });
                 }
             },
 
             auth: {
                 init: async () => {
-                    const watchdog = setTimeout(() => { if (!App.state.isAuthResolved && App.state.view === 'loading') App.router.go('login'); }, 4000);
                     onAuthStateChanged(auth, async (user) => {
-                        App.state.isAuthResolved = true; clearTimeout(watchdog);
+                        App.state.isAuthResolved = true;
                         if (user && !user.isAnonymous) {
                             App.state.user = user; await App.data.sync(); 
                             if (!App.state.data.playerName) App.router.go('naming');
@@ -527,36 +482,10 @@
                         }
                     });
                 },
-                loginGoogle: () => signInWithPopup(auth, new GoogleAuthProvider()).catch(e => App.ui.notify("認證超時，請檢查網域授權。", true)),
-                loginGameCenter: () => App.ui.notify("此環境不支援 Game Center。", true),
-                confirmName: () => { 
-                    const n = document.getElementById('input-player-name').value.trim(); 
-                    if(!n) return App.ui.notify("請設定專家名稱", true);
-                    document.getElementById('modal-name-confirm').classList.remove('hidden'); 
-                    document.getElementById('display-confirm-name').innerText = n; 
-                },
-                submitName: async () => { 
-                    const n = document.getElementById('input-player-name').value.trim(); 
-                    App.state.data.playerName = n; App.state.data.isNewPlayer = true;
-                    document.getElementById('modal-name-confirm').classList.add('hidden'); 
-                    await App.data.save(); App.router.go('welcome'); 
-                },
+                loginGoogle: () => signInWithPopup(auth, new GoogleAuthProvider()).catch(()=>App.ui.notify("驗證異常", true)),
+                confirmName: () => { const n = document.getElementById('input-player-name').value.trim(); if(!n) return; document.getElementById('display-confirm-name').innerText = n; document.getElementById('modal-name-confirm').classList.remove('hidden'); },
+                submitName: async () => { const n = document.getElementById('input-player-name').value.trim(); App.state.data.playerName = n; App.state.data.isNewPlayer = true; document.getElementById('modal-name-confirm').classList.add('hidden'); await App.data.save(); App.router.go('welcome'); },
                 logout: async () => { localStorage.clear(); await signOut(auth); window.location.reload(); }
-            },
-
-            tutorial: {
-                steps: [
-                    { text: "您好，美學教父！我是 Elsa。左下角面板記錄營運時空，若跳離視窗時間會自動減速保護數據。", target: "fixed-clock" },
-                    { text: "預約表已優化為單頁矩陣，左右滑動可管理未來 7 天排程。呼吸框線標示著待確認的預約。", target: "frame-appt" },
-                    { text: "當預約時間接近目前的遊戲時間，格位會漸漸變紅提醒您儘速處理！開始經營吧。", target: "frame-chart" }
-                ],
-                start: () => { App.router.go('lobby'); App.state.tutorialStep = 0; document.getElementById('tutor-anchor').style.display = 'flex'; App.tutorial.render(); },
-                next: async () => { App.state.tutorialStep++; if (App.state.tutorialStep < App.tutorial.steps.length) App.tutorial.render(); else { document.getElementById('tutor-anchor').style.display = 'none'; App.state.data.isNewPlayer = false; if (App.state.user) localStorage.setItem(`tut_done_${App.state.user.uid}`, 'true'); await App.data.save(); App.ui.notify("祝您經營順利！"); } },
-                render: () => {
-                    const s = App.tutorial.steps[App.state.tutorialStep]; document.getElementById('tutor-text').innerText = s.text;
-                    const a = document.getElementById('tutor-anchor'); const t = document.getElementById(s.target);
-                    if (t) { const r = t.getBoundingClientRect(); a.style.bottom = (window.innerHeight - r.top + 10) + 'px'; a.style.left = (r.left + r.width/2 - 135) + 'px'; t.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
-                }
             },
 
             data: {
@@ -577,7 +506,7 @@
                 updateLobby: () => {
                     document.getElementById('lobby-gold').innerText = App.state.data.gold.toLocaleString();
                     document.getElementById('lobby-level').innerText = App.state.data.level;
-                    document.getElementById('user-display-name').innerText = App.state.data.playerName || "教父專家";
+                    document.getElementById('user-display-name').innerText = App.state.data.playerName || "認證教父";
                     document.getElementById('user-title').innerText = CAREERS[Math.min(Math.floor(App.state.data.level / 2), 19)];
                     if (window.revenueChartInstance) App.ui.renderChart();
                 },
@@ -589,47 +518,34 @@
                 },
                 renderTimetable: () => {
                     const container = document.getElementById('calendar-container'); if (!container) return;
-                    const hours = [10, 12, 14, 16, 18, 20]; const curDay = App.state.data.gameDay;
+                    const hours = [10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]; const curDay = App.state.data.gameDay;
                     const totalGameTime = App.state.data.gameHour + (App.state.data.gameMinute / 60);
-                    
-                    let html = `<table class="calendar-table"><thead><tr><th class="w-16">時段</th>`;
+                    let html = `<table class="calendar-table"><thead><tr><th class="w-16 italic">時段</th>`;
                     for(let i=0; i<7; i++) html += `<th>${curDay+i}日</th>`;
                     html += `</tr></thead><tbody>`;
                     hours.forEach(h => {
-                        html += `<tr><td class="text-center font-mono font-black text-slate-400 text-[10px]">${h}:00</td>`;
+                        html += `<tr><td class="text-center font-mono font-black text-slate-400 text-[9px]">${h}:00</td>`;
                         for(let i=0; i<7; i++) {
                             const sid = `${curDay+i}-${h}`; const appt = App.state.data.appointments[sid];
-                            const isMarketing = App.state.data.marketingSlots?.[sid];
-                            const isPast = (curDay+i < curDay) || (curDay+i === curDay && h < App.state.data.gameHour);
+                            const isPast = (curDay+i < curDay) || (curDay+i === curDay && h < Math.floor(totalGameTime));
                             const isToday = (curDay+i === curDay);
-                            
-                            let cellStyle = "";
-                            let breathClass = "";
-                            
+                            let cellStyle = "", breathClass = "", content = "", finalClass = "calendar-cell ";
                             if (appt) {
                                 const isFin = appt.status === 'finished';
-                                const colorClass = appt.gender === 'male' ? 'occupied-male' : 'occupied-female';
-                                const overdue = isPast && !isFin ? 'overdue' : '';
-                                
-                                // V5.16 漸漸變紅邏輯
-                                if (isToday && !isFin && !overdue) {
-                                    const diff = h - totalGameTime;
-                                    if (diff > 0 && diff <= 1) {
-                                        const intensity = (1 - diff).toFixed(2);
-                                        cellStyle = `background-color: rgba(239, 68, 68, ${intensity}); border-color: rgba(239, 68, 68, ${0.4 + intensity*0.6}); color: ${intensity > 0.6 ? 'white' : 'inherit'}`;
-                                    }
+                                finalClass += appt.gender === 'male' ? 'occupied-male ' : 'occupied-female ';
+                                if (isPast && !isFin) finalClass += "overdue ";
+                                if (isToday && !isFin && !isPast && (h - totalGameTime) < 1) {
+                                    const intensity = (1 - (h - totalGameTime)).toFixed(2);
+                                    cellStyle = `background-color: rgba(239, 68, 68, ${intensity}); border-color: rgba(239, 68, 68, ${0.4 + intensity*0.6}); color: ${intensity > 0.6 ? 'white' : 'inherit'}`;
                                 }
-                                
-                                // 呼吸框線標示尚未接受的預約
                                 if (appt.status === 'pending') breathClass = "pending-breath";
-                                
-                                const icon = appt.gender === 'male' ? '<i class="fa-solid fa-mars"></i>' : '<i class="fa-solid fa-venus"></i>';
-                                html += `<td class="calendar-cell ${colorClass} ${overdue} ${breathClass}" style="${cellStyle}" onclick="window.apptAction('${sid}')"><div class="flex flex-col items-center justify-center h-full text-[9px] font-black"><span class="truncate w-full text-center px-0.5">${icon} ${appt.name}</span><span class="text-[7px] opacity-70 italic uppercase">${isFin ? '完成' : (overdue ? '逾時' : '預約')}</span></div></td>`;
-                            } else if (isMarketing) {
-                                html += `<td class="calendar-cell marketing-active"><div class="marketing-pulse-wrapper"><div class="radar-circle animate-marketing-radar"></div><i class="fa-solid fa-tower-broadcast text-pure-500 text-xs relative z-10"></i></div></td>`;
-                            } else { 
-                                html += `<td class="calendar-cell empty flex items-center justify-center" onclick="window.openMarketing('${sid}')"><span class="text-[11px] text-slate-300 font-black hover:text-pure-500"><i class="fa-solid fa-plus opacity-30"></i></span></td>`; 
+                                content = `<div class="flex flex-col h-full text-[8px] font-black justify-center items-center"><span class="truncate w-full px-0.5">${appt.name}</span><span class="text-[7px] opacity-70">${isFin ? '完成' : (isPast ? '逾時' : `第${appt.visitCount}次`)}</span></div>`;
+                            } else if (isPast) {
+                                finalClass += "expired "; content = `<span class="text-[10px] font-black opacity-30">X</span>`;
+                            } else {
+                                finalClass += "empty "; content = `<span class="text-[11px] text-slate-300 font-black"><i class="fa-solid fa-plus opacity-30"></i></span>`;
                             }
+                            html += `<td class="${finalClass} ${breathClass}" style="${cellStyle}" onclick="window.apptAction('${sid}')">${content}</td>`;
                         }
                         html += `</tr>`;
                     });
@@ -644,117 +560,85 @@
                     App.state.view = viewId;
                     if (viewId === 'appointments') App.ui.renderTimetable();
                     if (viewId === 'lobby') App.ui.updateLobby();
-                    if (viewId === 'reports') { App.reports.renderMonthlyChart(); document.getElementById('report-date-picker').valueAsDate = new Date(); App.reports.lookup(); }
+                    if (viewId === 'comm') renderCommCenter();
                     if (viewId === 'game') window.initCanvas();
-                    document.getElementById('fixed-clock').style.display = (viewId === 'game' || viewId === 'welcome' || viewId === 'naming' || viewId === 'dialogue') ? 'none' : 'flex';
+                    document.getElementById('fixed-clock').style.display = (viewId === 'game') ? 'none' : 'flex';
                 }
             }
         };
 
-        window.app = App;
-
-        // --- 全域互動 ---
-        window.toggleLaser = () => {
-            App.state.isLaserOn = !App.state.isLaserOn;
-            const sw = document.getElementById('laser-power-switch'); const cur = document.getElementById('laser-cursor'); const st = document.getElementById('power-status-text');
-            if (App.state.isLaserOn) { sw.classList.add('on'); cur.classList.add('active-power'); st.innerText = "系統已啟動 ACTIVE"; st.className = "text-[8px] font-black text-pure-500 uppercase tracking-widest animate-pulse"; } 
-            else { sw.classList.remove('on'); cur.classList.remove('active-power'); st.innerText = "待機模式 STANDBY"; st.className = "text-[8px] font-bold text-slate-400 uppercase tracking-widest"; }
-        };
-
-        window.apptAction = (sid) => {
-            const appt = App.state.data.appointments[sid];
-            const [day, hour] = sid.split('-').map(Number);
-            const isPast = (day < App.state.data.gameDay) || (day === App.state.data.gameDay && hour < App.state.data.gameHour);
-            App.state.session = { ...appt, sid };
-            if (isPast && appt.status !== 'finished') window.rescheduleDialogue(sid);
-            else { App.router.go('dialogue'); window.renderDialogue(); }
-        };
-
-        window.openMarketing = (sid) => {
-            App.state.targetSlot = sid;
-            const modal = document.getElementById('modal-marketing');
-            document.getElementById('marketing-list').innerHTML = MARKETING_METHODS.map((m, i) => `
-                <button onclick="window.doMarketing(${i})" class="p-6 bg-white border-2 border-pure-100 rounded-[2rem] text-left shadow-sm active:scale-95 transition-all">
-                    <div class="font-black text-slate-700 text-sm italic">${m.name}</div>
-                    <div class="text-pure-500 font-bold text-xs mt-2 italic font-mono">💰 ${m.cost}</div>
-                </button>
+        // --- 全域 RPG 功能 ---
+        function renderCommCenter() {
+            const list = document.getElementById('comm-list');
+            const events = App.state.data.commEvents;
+            if (events.length === 0) {
+                list.innerHTML = `<div class="flex flex-col items-center justify-center h-full text-slate-300 italic"><i class="fa-solid fa-ghost text-4xl mb-4"></i>目前沒有未處理預約訊息</div>`;
+                return;
+            }
+            list.innerHTML = events.map(e => `
+                <div class="flex items-center gap-6 p-6 bg-white rounded-3xl border border-pure-100 shadow-sm hover:scale-[1.02] transition-all cursor-pointer" onclick="app.comm.openChat(${JSON.stringify(e).replace(/"/g, '&quot;')})">
+                    <div class="css-avatar w-14 h-14 bg-blue-50 border-none relative overflow-hidden flex items-center justify-center text-xl">👤</div>
+                    <div class="flex-1">
+                        <h5 class="font-black text-slate-800">${e.guest.name} <span class="text-[9px] text-pure-500 font-mono italic">CRM #${e.guest.visitCount}</span></h5>
+                        <p class="text-xs text-slate-400 line-clamp-1">${e.trigger}</p>
+                    </div>
+                    <div class="w-3 h-3 bg-red-500 rounded-full ${e.status==='unread'?'':'hidden'}"></div>
+                </div>
             `).join('');
-            document.getElementById('modal-marketing').classList.remove('hidden');
+        }
+
+        window.renderRPGChat = (event) => {
+            const box = document.getElementById('diag-avatar-container');
+            const color = event.guest.visitCount > 1 ? '#bae6fd' : '#fecdd3';
+            box.innerHTML = `<div class="css-avatar" style="border-color:${color};"><div style="position:absolute; top:20%; left:25%; width:50%; height:50%; background:#ffe4e6; border-radius:50%; z-index:10;"></div><div style="position:absolute; bottom:0; left:15%; width:70%; height:45%; background:${color}; border-radius:45% 45% 0 0; z-index:5;"></div></div>`;
+            document.getElementById('diag-name').innerText = `${event.guest.name} (來訪 ${event.guest.visitCount} 次)`;
+            document.getElementById('diag-text').innerText = event.trigger;
+            
+            const optDiv = document.getElementById('diag-options');
+            optDiv.innerHTML = event.opts.map((o, idx) => `
+                <button onclick="window.confirmCommOption(${idx})" class="w-full p-5 bg-white border-2 border-pure-50 rounded-3xl text-left font-black text-blue-600 hover:bg-pure-600 hover:text-white transition-all shadow-sm">● ${o.t}</button>
+            `).join('');
         };
 
-        window.doMarketing = async (idx) => {
-            const m = MARKETING_METHODS[idx]; const sid = App.state.targetSlot;
-            if (App.state.data.gold < m.cost) return App.ui.notify("資產不足啟動此方案", true);
-            App.state.data.gold -= m.cost;
-            if (!App.state.data.marketingSlots) App.state.data.marketingSlots = {};
-            App.state.data.marketingSlots[sid] = true;
-            document.getElementById('modal-marketing').classList.add('hidden');
-            await App.data.save(); App.ui.notify(`投放成功！廣告脈衝已啟動。`); App.ui.renderTimetable();
-        };
-
-        window.renderDialogue = () => {
-            const box = document.getElementById('customer-avatar-box');
-            const appt = App.state.session;
-            const color = appt.gender === 'male' ? '#bae6fd' : '#fecdd3';
-            box.innerHTML = `<div class="css-avatar" style="border-color:${color}"><div style="position:absolute; top:20%; left:25%; width:50%; height:50%; background:#ffe4e6; border-radius:50%; z-index:10;"></div><div style="position:absolute; bottom:0; left:15%; width:70%; height:45%; background:${color}; border-radius:45% 45% 0 0; z-index:5;"></div></div>`;
-            document.getElementById('diag-name').innerText = appt.name;
-            if (appt.status === 'pending') {
-                document.getElementById('diag-text').innerText = `您好，我是預約的貴賓。預約部位是『${BODY_PARTS[appt.part] || '全身'}』，請問您能接受預約嗎？`;
-                document.getElementById('diag-options').innerHTML = `<div class="flex gap-4 w-full"><button onclick="window.confirmAppt(true)" class="flex-1 py-5 bg-green-500 text-white rounded-[2rem] font-black shadow-lg active:scale-95 transition-all">接受預約</button><button onclick="window.confirmAppt(false)" class="flex-1 py-5 bg-slate-100 text-slate-400 rounded-[2rem] font-black active:scale-95 transition-all">婉拒</button></div>`;
-            } else if (appt.status === 'accepted') {
-                document.getElementById('diag-text').innerText = "我已經準備好進行療程了，麻煩教父啟動精密雷射。";
-                document.getElementById('diag-options').innerHTML = `<button onclick="app.router.go('game')" class="w-full py-6 bg-pure-600 text-white rounded-[2.5rem] font-black italic shadow-xl tracking-widest uppercase active:scale-95 transition-all">啟動專業雷射儀 ❯</button>`;
-            } else if (appt.status === 'finished') {
-                document.getElementById('diag-text').innerText = `顧客評價：${appt.feedback || '專業且絲滑。'}`;
-                document.getElementById('diag-options').innerHTML = `<button onclick="app.router.go('appointments')" class="w-full py-6 bg-slate-100 text-slate-400 rounded-[2.5rem] font-black">服務已結案</button>`;
-            }
-        };
-
-        window.confirmAppt = async (isAccept) => {
-            const sid = App.state.session.sid;
-            if (isAccept) App.state.data.appointments[sid].status = 'accepted';
-            else { delete App.state.data.appointments[sid]; App.state.data.gold -= 200; App.ui.notify("婉拒導致名聲損失 -200", true); }
-            await App.data.save(); App.router.go('appointments');
-        };
-
-        window.rescheduleDialogue = (sid) => {
-            App.router.go('dialogue');
-            document.getElementById('customer-avatar-box').innerHTML = `<div class="css-avatar"><div style="position:absolute; top:20%; left:25%; width:50%; height:50%; background:#ffe4e6; border-radius:50%;"></div></div>`;
-            document.getElementById('diag-name').innerText = "逾時貴賓";
-            document.getElementById('diag-text').innerText = "因為您逾時未開展療程。Elsa 導師建議我們將您的預約往後挪移。";
-            document.getElementById('diag-options').innerHTML = `<button onclick="window.processReschedule('${sid}')" class="w-full p-6 bg-pure-600 text-white rounded-[2.5rem] font-black shadow-xl active:scale-95 transition-all uppercase tracking-widest">進行排程協商 ❯</button>`;
-        };
-
-        window.processReschedule = async (oldSid) => {
-            const appt = App.state.data.appointments[oldSid];
-            const hours = [10, 12, 14, 16, 18, 20]; const curDay = App.state.data.gameDay;
-            let found = false;
-            for(let i=0; i<7; i++) {
+        window.confirmCommOption = async (idx) => {
+            const event = App.state.currentComm;
+            const opt = event.opts[idx];
+            document.getElementById('diag-text').innerText = opt.r;
+            
+            if (opt.t.includes("排入")) {
+                const hours = [10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21];
+                const curDay = App.state.data.gameDay;
+                let slotFound = false;
                 for(let h of hours) {
-                    const tsid = `${curDay+i}-${h}`;
-                    const isFut = (curDay+i > curDay) || (curDay+i === curDay && h > App.state.data.gameHour);
-                    if (isFut && !App.state.data.appointments[tsid]) { App.state.data.appointments[tsid] = { ...appt, status: 'accepted' }; delete App.state.data.appointments[oldSid]; found = true; break; }
+                    const sid = `${curDay}-${h}`;
+                    if (!App.state.data.appointments[sid] && h > App.state.data.gameHour) {
+                        App.state.data.appointments[sid] = { ...event.guest, status: 'pending', gender: 'female', part: 'face' };
+                        slotFound = true; break;
+                    }
                 }
-                if (found) break;
+                App.ui.notify(slotFound ? "已成功排入預約表" : "今日時段已滿，預約失敗", !slotFound);
             }
-            if (!found) return App.ui.notify("未來一週已滿", true);
-            await App.data.save(); App.router.go('appointments'); App.ui.notify("重新排程完成。");
+            
+            // 清理事件
+            App.state.data.commEvents = App.state.data.commEvents.filter(e => e.id !== event.id);
+            document.getElementById('msg-badge').innerText = App.state.data.commEvents.length;
+            if(App.state.data.commEvents.length === 0) document.getElementById('msg-badge').classList.add('hidden');
+
+            document.getElementById('diag-options').innerHTML = `<button onclick="app.router.go('lobby')" class="w-full py-5 bg-pure-800 text-white rounded-3xl font-black italic">結束對話並返回大廳 ❯</button>`;
+            await App.data.save();
         };
 
+        // --- 互動 Canvas 引擎 (維持旗艦版規格) ---
         let canvas, ctx;
         window.initCanvas = () => {
             canvas = document.getElementById('game-canvas'); ctx = canvas.getContext('2d');
             const container = canvas.parentElement; canvas.width = container.clientWidth; canvas.height = 360;
             const total = canvas.width * canvas.height; const laser = document.getElementById('laser-cursor');
-            App.state.isLaserOn = false; App.state.startTime = Date.now(); App.state.currentCompletion = 0;
-            document.getElementById('laser-power-switch').classList.remove('on'); laser.classList.remove('active-power');
+            App.state.isLaserOn = false; App.state.startTime = Date.now();
             document.getElementById('prog-bar').style.width = '0%'; document.getElementById('prog-text').innerText = '0.0%';
-            ctx.fillStyle = App.state.session.gender === 'male' ? '#f4d1c1' : '#fff0f0';
-            ctx.fillRect(0, 0, canvas.width, canvas.height); ctx.strokeStyle = '#4a3528'; ctx.lineWidth = 1;
-            for (let i = 0; i < 2400; i++) { const x = Math.random() * canvas.width; const y = Math.random() * canvas.height; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + (Math.random()-0.5)*4, y + 8); ctx.stroke(); }
+            ctx.fillStyle = '#fff0f0'; ctx.fillRect(0, 0, canvas.width, canvas.height); ctx.strokeStyle = "#4a3528"; ctx.lineWidth = 1;
+            for (let i = 0; i < 2400; i++) { const x = Math.random()*canvas.width; const y = Math.random()*canvas.height; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + (Math.random()-0.5)*4, y + 8); ctx.stroke(); }
             let isD = false;
-            const handleStart = (e) => { isD = true; handleMove(e); };
-            const handleEnd = () => isD = false;
             const handleMove = (e) => {
                 const rect = canvas.getBoundingClientRect();
                 const cx = (e.touches && e.touches[0]) ? e.touches[0].clientX : e.clientX;
@@ -762,50 +646,40 @@
                 laser.style.left = cx + 'px'; laser.style.top = cy + 'px'; laser.style.display = 'block';
                 if (isD && App.state.isLaserOn) {
                     ctx.globalCompositeOperation = 'destination-out'; ctx.beginPath(); ctx.arc(cx - rect.left, cy - rect.top, 28, 0, Math.PI*2); ctx.fill();
-                    window.triggerLaserFX(cx, cy);
                     const data = ctx.getImageData(0,0, canvas.width, canvas.height).data;
                     let em = 0; for(let i=3; i<data.length; i+=4) if(data[i]===0) em++;
                     const prog = (em/total); App.state.currentCompletion = prog * 100;
                     document.getElementById('prog-bar').style.width = `${prog*100}%`; document.getElementById('prog-text').innerText = `${(prog*100).toFixed(1)}%`;
                 }
             };
-            canvas.onmousedown = handleStart; canvas.ontouchstart = (e) => { e.preventDefault(); handleStart(e); };
-            window.onmouseup = handleEnd; window.ontouchend = handleEnd;
+            canvas.onmousedown = (e) => { isD = true; handleMove(e); };
+            canvas.ontouchstart = (e) => { e.preventDefault(); isD = true; handleMove(e); };
+            window.onmouseup = () => isD = false; window.ontouchend = () => isD = false;
             window.onmousemove = handleMove; window.ontouchmove = (e) => { e.preventDefault(); handleMove(e); };
         };
 
-        window.triggerLaserFX = (x, y) => {
-            for(let i=0; i<4; i++) {
-                const el = document.createElement('div'); const size = Math.random() * 5 + 3;
-                el.style.cssText = `position:fixed; left:${x}px; top:${y}px; width:${size}px; height:${size}px; background:#fff; border-radius:50%; pointer-events:none; z-index:9998; box-shadow: 0 0 10px #0ea5e9;`;
-                document.body.appendChild(el);
-                el.animate([{ opacity: 1, transform: 'translate(0, 0) scale(1)' }, { opacity: 0, transform: `translate(${(Math.random()-0.5)*70}px, ${(Math.random()-0.5)*70}px) scale(0)` }], { duration: 600, easing: 'ease-out' }).onfinish = () => el.remove();
-            }
+        window.toggleLaser = () => {
+            App.state.isLaserOn = !App.state.isLaserOn;
+            const sw = document.getElementById('laser-power-switch'); const cur = document.getElementById('laser-cursor'); const st = document.getElementById('power-status-text');
+            if (App.state.isLaserOn) { sw.classList.add('on'); cur.classList.add('active-power'); st.innerText = "雷射已啟動 ACTIVE"; } 
+            else { sw.classList.remove('on'); cur.classList.remove('active-power'); st.innerText = "待機模式 STANDBY"; }
         };
 
-        window.requestManualFinish = () => {
-            const timeElapsed = (Date.now() - App.state.startTime) / 1000; const completion = App.state.currentCompletion;
-            let rank = "S", stars = 5, rewardMult = 1.0, feedback = "完美的瀅白技術！簡直就是藝術。";
-            if (completion < 60 || timeElapsed < 10) { rank = "C"; stars = 1; rewardMult = 0.1; feedback = completion < 60 ? "這除毛也太草率了吧？我還有一半沒乾淨！" : "操作太快了，我懷疑這根本沒效果..."; } 
-            else if (completion < 85) { rank = "B"; stars = 3; rewardMult = 0.7; feedback = "還可以，但有些小細節沒注意到。"; } 
-            else if (completion < 95) { rank = "A"; stars = 4; rewardMult = 0.9; feedback = "非常專業的服務，感覺肌膚清爽多了。"; }
-            window.finalizeAesthetic(rank, stars, rewardMult, feedback);
+        window.requestManualFinish = async () => {
+            const reward = 800; App.state.data.gold += reward; App.state.data.level++;
+            App.state.data.history.push({ d: App.state.data.gameHour+":00", a: reward });
+            await App.data.save(); App.router.go('lobby');
         };
 
-        window.finalizeAesthetic = async (rank, stars, rewardMult, feedback) => {
-            const actualReward = Math.floor(800 * rewardMult); App.state.data.gold += actualReward; if (rank !== "C") App.state.data.level++;
-            App.state.data.history.push({ d: App.state.data.gameDay+"日"+App.state.data.gameHour+"時", a: actualReward });
-            const sid = App.state.session.sid; App.state.data.appointments[sid].status = 'finished'; App.state.data.appointments[sid].feedback = feedback; App.state.data.appointments[sid].actualReward = actualReward;
-            await App.data.save();
-            document.getElementById('reward-val').innerText = actualReward.toLocaleString();
-            document.getElementById('result-rank-title').innerText = rank === "C" ? "評價低迷" : "療程圓滿！";
-            document.getElementById('result-stars').innerHTML = "★".repeat(stars) + "☆".repeat(5-stars);
-            document.getElementById('result-feedback-text').innerText = feedback;
-            document.getElementById('modal-result').classList.add('flex'); document.getElementById('modal-result').classList.remove('hidden');
-            document.getElementById('laser-cursor').style.display = 'none';
+        window.apptAction = (sid) => {
+            const appt = App.state.data.appointments[sid];
+            if(!appt) return App.ui.notify("此時段尚未預約", true);
+            App.state.session = { ...appt, sid };
+            App.router.go('game');
         };
 
         App.auth.init();
+        window.app = App;
     </script>
 </body>
 </html>
