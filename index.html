@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>瀅白之境 Pure Skin - V3.4</title>
+    <title>瀅白之境 Pure Skin - V3.5</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
@@ -66,15 +66,17 @@
             state.isMuted = !state.isMuted;
             const icon = document.getElementById('music-icon');
             if (!state.isMuted) {
-                bgm.play().catch(e => console.log("等待點擊啟動"));
+                bgm.play().catch(e => console.log("Waiting for interaction..."));
                 icon.innerText = "🔊";
+                icon.parentElement.classList.add('animate-pulse');
             } else {
                 bgm.pause();
                 icon.innerText = "🔇";
+                icon.parentElement.classList.remove('animate-pulse');
             }
         };
 
-        // --- 特效：雷射閃光 ---
+        // --- 特效渲染 ---
         function triggerLaserFX(x, y) {
             const fx = document.createElement('div');
             fx.className = 'laser-flash';
@@ -83,61 +85,64 @@
             setTimeout(() => fx.remove(), 400);
         }
 
-        // --- 初始化：強制解決連線卡死 ---
+        // --- 初始化入口：V3.5 快速解鎖修復 ---
         async function init() {
-            console.log("瀅白之境：V3.4 核心啟動...");
+            console.log("瀅白之境：V3.5 認證中心啟動...");
             
-            // 安全出口：3秒超時強制進入
+            // Watchdog: 3秒極速出口，防止認證卡死
             const watchdog = setTimeout(() => {
                 if (state.view === 'loading') {
-                    console.warn("認證超時，啟動備援系統...");
+                    console.warn("認證回調逾時，強制跳轉至備援模式");
                     state.isDefinitionsLoaded = true;
                     switchView('login');
                 }
             }, 3000);
 
             onAuthStateChanged(auth, async (currUser) => {
-                clearTimeout(watchdog);
+                clearTimeout(watchdog); // 既然有了響應，清除計時器
                 if (currUser) {
                     state.user = currUser;
                     await syncDefinitions();
                     await syncUserData();
                     generateAppointments();
-                    if (state.view === 'loading') switchView('lobby');
+                    if (state.view === 'loading' || state.view === 'login') switchView('lobby');
                 } else {
                     state.user = null;
                     await syncDefinitions();
-                    switchView('login');
+                    if (state.view === 'loading') switchView('login');
                 }
             });
 
-            // 觸發 Auth
-            if (!auth.currentUser) {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    signInWithCustomToken(auth, __initial_auth_token).catch(() => fallbackStart());
-                } else {
-                    signInAnonymously(auth).catch(() => fallbackStart());
+            // 啟動連線
+            try {
+                if (!auth.currentUser) {
+                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                        await signInWithCustomToken(auth, __initial_auth_token);
+                    } else {
+                        await signInAnonymously(auth);
+                    }
                 }
+            } catch (err) {
+                console.error("Auth Fail", err);
+                state.isDefinitionsLoaded = true;
+                if (state.view === 'loading') switchView('login');
             }
 
+            // 監聽鼠標與互動
             const probe = document.getElementById('laser-probe');
             window.addEventListener('mousemove', (e) => { 
                 if (probe) { probe.style.left = `${e.clientX}px`; probe.style.top = `${e.clientY}px`; }
             });
 
-            // 音訊喚醒
+            // 首擊喚醒
             window.addEventListener('mousedown', () => {
-                if (!state.isMuted && bgm.paused) bgm.play();
+                if (!state.isMuted && bgm.paused) bgm.play().catch(()=>null);
             }, { once: true });
-        }
-
-        function fallbackStart() {
-            state.isDefinitionsLoaded = true;
-            if (state.view === 'loading') switchView('login');
         }
 
         async function syncDefinitions() {
             try {
+                // 確保 6 段路徑
                 const defRef = doc(db, 'artifacts', appId, 'public', 'data', 'definitions', 'config');
                 const snap = await getDoc(defRef);
                 if (snap.exists()) {
@@ -145,9 +150,10 @@
                     state.bodyParts = d.bodyParts || FALLBACK_DATA.bodyParts;
                     state.careerTitles = d.careerTitles || FALLBACK_DATA.careerTitles;
                     state.stories = d.stories || FALLBACK_DATA.stories;
+                    console.log("雲端定義同步成功");
                 }
             } catch (err) {
-                console.error("雲端連線失敗，已自動加載本地定義");
+                console.error("定義載入失敗，維持備援模式");
             } finally {
                 state.isDefinitionsLoaded = true;
                 updateUI();
@@ -161,7 +167,7 @@
             }, () => null);
         }
 
-        // --- 視覺渲染引擎 ---
+        // --- 視覺與邏輯渲染 ---
         function renderAvatar(gender, targetId) {
             const color = gender === 'male' ? '#bae6fd' : '#fecdd3';
             const hair = gender === 'male' 
@@ -238,13 +244,16 @@
             document.getElementById('diag-text').innerText = opt.response;
             document.getElementById('diag-options').innerHTML = `
                 <button onclick="switchView('selection')" class="w-full p-5 bg-blue-600 text-white rounded-3xl font-black shadow-xl hover:scale-[1.05] transition-transform">
-                    啟動客製化評估流程
+                    啟動雷射評估程序
                 </button>
             `;
         };
 
-        window.loginGoogle = () => signInWithPopup(auth, new GoogleAuthProvider()).catch(() => fallbackStart());
-        window.loginGuest = () => switchView('lobby');
+        window.loginGoogle = () => signInWithPopup(auth, new GoogleAuthProvider()).catch(() => showMessage("認證視窗已關閉", true));
+        window.loginGuest = () => {
+            showMessage("以訪客身份進入");
+            switchView('lobby');
+        };
         window.logout = () => signOut(auth).then(() => window.location.reload());
 
         function switchView(v) {
@@ -303,28 +312,28 @@
             for (let i=3; i<data.length; i+=4) if(data[i]>0) opaque++;
             const progress = 1 - (opaque / (340*440));
             document.getElementById('prog-bar').style.width = `${progress * 100}%`;
-            if (progress > 0.98) finalizeSession();
+            if (progress > 0.98) finishSession();
         }
 
-        async function finalizeSession() {
+        async function finishSession() {
             let reward = state.bodyParts[state.selectedPartId]?.cost || 50;
             if (state.selectedGender === 'male') reward *= 1.2;
             state.totalGold += Math.floor(reward);
             state.exp += 50;
             if (state.exp >= 100) { state.level++; state.exp = 0; state.careerIndex = Math.min(Math.floor(state.level / 2), 19); }
-            if (state.user) await setDoc(doc(db, 'artifacts', appId, 'users', state.user.uid, 'saveData', 'profile'), { totalGold: state.totalGold, level: state.level, careerIndex: state.careerIndex }, { merge: true });
+            if (state.user) await setDoc(doc(db, 'artifacts', appId, 'users', state.user.uid, 'saveData', 'profile'), { totalGold: state.totalGold, level: state.level, careerIndex: state.careerIndex }, { merge: true }).catch(()=>null);
             document.getElementById('reward-val').innerText = Math.floor(reward);
             document.getElementById('result-modal').style.display = 'flex';
         }
 
         function renderSelectionUI() {
-            const p = state.bodyParts[state.selectedPartId] || { name: '定制療程', icon: '❓', desc: '數據加載中...', cost: 0 };
+            const p = state.bodyParts[state.selectedPartId] || { name: '定制療程', icon: '❓', desc: '載入評估中...', cost: 0 };
             document.getElementById('selection-detail').innerHTML = `
-                <div class="p-8 bg-blue-50/70 rounded-[3rem] border border-blue-100 shadow-inner">
+                <div class="p-8 bg-blue-50/70 rounded-[3rem] border border-blue-100 shadow-inner animate-fade-in">
                     <div class="flex items-center gap-4 mb-3"><span class="text-4xl animate-pulse">${p.icon}</span><h3 class="text-2xl font-black text-blue-600">${p.name}</h3></div>
                     <p class="text-sm text-slate-500 font-medium leading-relaxed mb-6">${p.desc}</p>
                     <div class="mt-4 flex justify-between items-center border-t border-blue-100 pt-5">
-                        <span class="text-xs font-bold text-slate-400 uppercase tracking-widest text-center">Reward Balance</span>
+                        <span class="text-xs font-bold text-slate-400 uppercase tracking-widest text-center italic">Reward</span>
                         <span class="text-2xl font-black text-blue-800 font-mono">💰 ${p.cost}</span>
                     </div>
                 </div>
@@ -342,6 +351,7 @@
         body { font-family: 'Noto Sans TC', sans-serif; background: #fdfdfe; cursor: none; overflow: hidden; margin: 0; user-select: none; }
         .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(25px); border: 1px solid rgba(255, 255, 255, 0.6); }
         
+        /* 雷射探頭特效 */
         #laser-probe { 
             position: fixed; width: 54px; height: 54px; border: 3px solid #3b82f6; border-radius: 50%; pointer-events: none; z-index: 10000; transform: translate(-50%, -50%); 
             background: rgba(59, 130, 246, 0.1); box-shadow: 0 0 20px rgba(59, 130, 246, 0.4); transition: transform 0.1s ease-out; 
@@ -352,9 +362,9 @@
         #laser-probe.active { transform: translate(-50%, -50%) scale(0.75); background: rgba(59, 130, 246, 0.8); box-shadow: 0 0 60px #3b82f6; }
         #laser-probe::after { content: ''; position: absolute; top: 50%; left: 50%; width: 4px; height: 4px; background: white; border-radius: 50%; transform: translate(-50%, -50%); }
         
-        .laser-flash { position: fixed; width: 40px; height: 40px; background: radial-gradient(circle, rgba(96, 165, 250, 0.9) 0%, transparent 70%); border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%, -50%); animation: flash-fade 0.4s ease-out forwards; }
+        .laser-flash { position: fixed; width: 40px; height: 40px; background: radial-gradient(circle, rgba(96, 165, 250, 0.8) 0%, transparent 70%); border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%, -50%); animation: flash-fade 0.4s ease-out forwards; }
 
-        .brand-btn { background: linear-gradient(135deg, #a5f3fc 0%, #e0f2fe 100%); color: #0369a1; font-weight: 900; cursor: pointer; transition: 0.3s; }
+        .brand-btn { background: linear-gradient(135deg, #a5f3fc 0%, #e0f2fe 100%); color: #0369a1; font-weight: 900; cursor: pointer; transition: 0.3s; border: 1px solid rgba(186, 230, 253, 0.5); }
         .brand-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(186, 230, 253, 0.5); }
         
         .hotspot { fill: #f8fafc; stroke: #e2e8f0; cursor: pointer; transition: 0.3s; }
@@ -374,18 +384,21 @@
 
     <div id="laser-probe"></div>
 
-    <!-- 音樂控制鈕 -->
+    <div id="message-box" class="hidden fixed top-10 left-1/2 -translate-x-1/2 z-[20000] px-8 py-4 rounded-3xl text-white font-bold shadow-2xl items-center justify-center transition-all animate-bounce">
+        <span id="message-content"></span>
+    </div>
+
+    <!-- 氛圍音控制鈕 -->
     <div onclick="window.toggleMusic()" class="fixed bottom-6 right-6 z-[1000] w-14 h-14 glass rounded-full flex items-center justify-center cursor-pointer shadow-lg hover:scale-110 transition-transform border border-blue-50">
         <span id="music-icon" class="text-2xl">🔇</span>
     </div>
 
-    <!-- 頂部資訊看板 -->
     <div class="fixed top-6 w-full max-w-md px-6 flex justify-between items-center z-[100]">
         <div class="glass px-6 py-3 rounded-full flex items-center gap-3 shadow-lg border-blue-50">
             <span class="text-2xl">💰</span><span class="gold-val font-black text-slate-700 text-lg">0</span>
         </div>
         <div class="glass px-7 py-3 rounded-full flex flex-col items-center shadow-lg border-blue-50">
-            <span class="career-val text-[11px] font-black text-blue-600 uppercase tracking-tighter text-center">正在認證...</span>
+            <span class="career-val text-[11px] font-black text-blue-600 uppercase tracking-tighter text-center italic">Loading...</span>
             <span class="level-val text-[10px] font-bold text-slate-400 italic">Evolution</span>
         </div>
     </div>
@@ -402,8 +415,8 @@
         <h1 class="text-5xl font-black text-slate-800 mb-2 tracking-tighter">瀅白之境</h1>
         <p class="text-slate-400 text-xs mb-12 font-black tracking-[0.3em] uppercase">Identity Verification</p>
         <div class="space-y-4 w-72 flex flex-col items-center">
-            <button onclick="window.loginGoogle()" class="w-full py-5 bg-white border border-slate-100 rounded-3xl flex items-center justify-center gap-4 shadow-sm hover:bg-blue-50 transition-all font-black text-slate-600">Google 快速認證</button>
-            <button onclick="window.loginGuest()" class="w-full py-5 bg-blue-50 text-blue-600 font-black rounded-3xl hover:bg-blue-100 transition-all">訪客試玩模式</button>
+            <button onclick="window.loginGoogle()" class="w-full py-5 bg-white border border-slate-100 rounded-3xl flex items-center justify-center gap-4 shadow-sm hover:bg-blue-50 transition-all font-black text-slate-600 text-lg">Google 快速認證</button>
+            <button onclick="window.loginGuest()" class="w-full py-5 bg-blue-50 text-blue-600 font-black rounded-3xl hover:bg-blue-100 transition-all text-lg">訪客試玩模式</button>
             <p class="text-[10px] text-slate-400 mt-4 text-center px-4 leading-relaxed italic">※ 訪客模式之進度無法跨平台保存</p>
         </div>
     </div>
@@ -413,7 +426,8 @@
         <div class="w-36 h-36 bg-white rounded-[4rem] flex items-center justify-center mb-12 shadow-2xl border-4 border-blue-50 rotate-3 transition-transform hover:rotate-0"><span class="text-7xl">💎</span></div>
         <h1 class="text-6xl font-black text-slate-800 tracking-tighter mb-1">瀅白之境</h1>
         <p class="text-blue-400 font-black tracking-[0.5em] text-xs uppercase mb-12 italic">The Art of Pureness</p>
-        <div class="glass p-8 rounded-[3rem] mb-12 text-center min-w-[300px] border-blue-100/50 shadow-inner">
+        <div class="glass p-8 rounded-[3rem] mb-12 text-center min-w-[300px] border-blue-100/50 shadow-inner relative overflow-hidden">
+            <div class="absolute -top-10 -right-10 w-24 h-24 bg-blue-50 rounded-full opacity-30"></div>
             <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 italic">認證顧問</p>
             <p class="user-name font-black text-slate-700 text-2xl italic truncate px-2">---</p>
         </div>
@@ -462,7 +476,7 @@
                 <h3 class="text-5xl font-black text-slate-800 tracking-tighter italic">定制專業評估</h3>
                 <div id="selection-detail"></div>
                 <div class="space-y-4">
-                    <button onclick="confirmStart()" class="w-full py-7 brand-btn text-3xl rounded-[3rem] shadow-xl hover:scale-105 active:scale-95">啟動高效雷射</button>
+                    <button onclick="confirmStart()" class="w-full py-7 brand-btn text-3xl rounded-[3rem] shadow-xl hover:scale-105 active:scale-95 text-blue-700 italic font-black">啟動高效雷射</button>
                     <button onclick="switchView('appointments')" class="w-full text-slate-400 font-black text-sm uppercase italic hover:text-blue-500">重新檢視預約表</button>
                 </div>
             </div>
