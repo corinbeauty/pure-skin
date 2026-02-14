@@ -3,533 +3,682 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>瀅白之境 Pure Skin - V3.8</title>
+    <title>瀅白之境 Pure Skin V3.9</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js for Business Analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Font Awesome for Icons (replacing SVGs) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        pure: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Helvetica Neue', 'Arial', 'sans-serif'],
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'float': 'float 3s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-5px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom Scrollbar for Dashboard feel */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f0f9ff; }
+        ::-webkit-scrollbar-thumb { background: #bae6fd; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #7dd3fc; }
+
+        /* Glassmorphism Utilities */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+        }
+        
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 250px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Pure CSS Avatar Construction (No SVG) */
+        .css-avatar {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            background: #fff;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 3px solid #bae6fd;
+            margin: 0 auto;
+        }
+        .css-head {
+            position: absolute;
+            top: 25%; left: 25%;
+            width: 50%; height: 50%;
+            background: #ffe4e6;
+            border-radius: 50%;
+            z-index: 10;
+        }
+        .css-body {
+            position: absolute;
+            bottom: -10%; left: 15%;
+            width: 70%; height: 50%;
+            background: #bae6fd;
+            border-radius: 40% 40% 0 0;
+            z-index: 5;
+        }
+        .css-hair-male {
+            position: absolute;
+            top: 15%; left: 20%;
+            width: 60%; height: 25%;
+            background: #334155;
+            border-radius: 50% 50% 0 0;
+            z-index: 15;
+        }
+        .css-hair-female {
+            position: absolute;
+            top: 15%; left: 15%;
+            width: 70%; height: 70%;
+            background: #fca5a5;
+            border-radius: 50% 50% 40% 40%;
+            z-index: 4;
+        }
+
+        /* Laser Cursor */
+        #laser-cursor {
+            position: fixed;
+            width: 40px; height: 40px;
+            border: 2px solid #0ea5e9;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 9999;
+            transition: transform 0.1s ease;
+            display: none; /* Show only in game */
+        }
+        #laser-cursor.active {
+            transform: translate(-50%, -50%) scale(0.8);
+            background: rgba(14, 165, 233, 0.3);
+            box-shadow: 0 0 20px #0ea5e9;
+        }
+    </style>
+</head>
+<body class="bg-pure-50 text-slate-700 min-h-screen font-sans selection:bg-pure-200">
+
+    <!-- Global Laser Cursor -->
+    <div id="laser-cursor"></div>
+
+    <!-- Notifications -->
+    <div id="notification-toast" class="fixed top-5 left-1/2 -translate-x-1/2 z-50 transition-all duration-300 transform -translate-y-20 opacity-0 flex items-center gap-3 px-6 py-3 rounded-full shadow-lg bg-white/90 backdrop-blur-md border border-pure-100">
+        <i id="notif-icon" class="fa-solid fa-circle-info text-pure-500"></i>
+        <span id="notif-text" class="font-bold text-sm">System Ready</span>
+    </div>
+
+    <!-- Main App Container -->
+    <main id="app-root" class="w-full min-h-screen flex flex-col items-center justify-center relative overflow-hidden">
+        
+        <!-- Background Elements -->
+        <div class="absolute top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
+            <div class="absolute top-[-10%] left-[-10%] w-[40vw] h-[40vw] bg-pure-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse-slow"></div>
+            <div class="absolute bottom-[-10%] right-[-10%] w-[35vw] h-[35vw] bg-pink-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse-slow" style="animation-delay: 2s"></div>
+        </div>
+
+        <!-- VIEW: LOADING -->
+        <section id="view-loading" class="flex flex-col items-center gap-4 transition-opacity duration-500">
+            <div class="w-16 h-16 border-4 border-pure-100 border-t-pure-500 rounded-full animate-spin"></div>
+            <h1 class="text-2xl font-black tracking-widest text-slate-800 uppercase">Pure Skin</h1>
+            <p class="text-xs font-bold text-pure-400 tracking-[0.2em] animate-pulse">Initializing V3.9 System...</p>
+        </section>
+
+        <!-- VIEW: LOGIN (Identity Portal) -->
+        <section id="view-login" class="hidden w-full max-w-md px-6 animate-float">
+            <div class="glass-panel p-8 rounded-3xl text-center">
+                <div class="w-20 h-20 bg-pure-100 rounded-full mx-auto flex items-center justify-center mb-6 text-3xl text-pure-600">
+                    <i class="fa-solid fa-gem"></i>
+                </div>
+                <h2 class="text-3xl font-black mb-2 text-slate-800">瀅白之境</h2>
+                <p class="text-slate-400 text-xs font-bold tracking-widest uppercase mb-8">Professional Aesthetic Suite</p>
+                
+                <div class="space-y-3">
+                    <button onclick="app.auth.loginGoogle()" class="w-full py-4 bg-white border border-slate-200 rounded-xl font-bold text-slate-600 shadow-sm hover:bg-pure-50 transition-colors flex items-center justify-center gap-3">
+                        <i class="fa-brands fa-google"></i> Google 登入
+                    </button>
+                    <button onclick="app.auth.loginGameCenter()" class="w-full py-4 bg-slate-800 text-white rounded-xl font-bold shadow-lg hover:bg-slate-900 transition-transform hover:scale-[1.02] flex items-center justify-center gap-3">
+                        <i class="fa-brands fa-apple"></i> Game Center
+                    </button>
+                    <div class="relative py-2">
+                        <div class="absolute inset-0 flex items-center"><span class="w-full border-t border-slate-200"></span></div>
+                        <div class="relative flex justify-center text-xs uppercase"><span class="bg-white/0 px-2 text-slate-400 font-mono">Or</span></div>
+                    </div>
+                    <button onclick="app.auth.loginGuest()" class="w-full py-3 text-pure-500 font-bold text-sm hover:bg-pure-50 rounded-xl transition-colors">
+                        訪客試玩模式
+                    </button>
+                </div>
+                <p class="mt-6 text-[10px] text-slate-400">V3.9 Secure Build • Fallback Resilience Active</p>
+            </div>
+        </section>
+
+        <!-- VIEW: LOBBY (Dashboard) -->
+        <section id="view-lobby" class="hidden w-full max-w-4xl px-4 flex-col gap-6">
+            <!-- Header -->
+            <header class="flex justify-between items-center glass-panel p-4 rounded-2xl">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-pure-100 rounded-full flex items-center justify-center text-pure-600 font-black text-xl">
+                        <i class="fa-solid fa-user-doctor"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-black text-slate-700" id="user-display-name">Guest Specialist</h3>
+                        <p class="text-[10px] font-bold text-pure-500 uppercase tracking-wider" id="user-title">Trainee</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="text-xs text-slate-400 font-bold uppercase">Assets</p>
+                    <p class="text-xl font-black text-slate-700">💰 <span id="lobby-gold">0</span></p>
+                </div>
+            </header>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Analytics Panel -->
+                <div class="md:col-span-2 glass-panel p-6 rounded-3xl">
+                    <div class="flex justify-between items-center mb-4">
+                        <h4 class="font-bold text-slate-700"><i class="fa-solid fa-chart-line mr-2 text-pure-500"></i>營收分析</h4>
+                        <span class="text-[10px] bg-pure-100 text-pure-600 px-2 py-1 rounded">Real-time</span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="flex flex-col gap-4">
+                    <button onclick="app.router.go('appointments')" class="flex-1 bg-gradient-to-br from-pure-400 to-pure-600 text-white p-6 rounded-3xl shadow-xl shadow-pure-200 hover:shadow-2xl hover:scale-[1.02] transition-all text-left relative overflow-hidden group">
+                        <div class="absolute right-[-20px] bottom-[-20px] text-8xl text-white opacity-10 group-hover:scale-110 transition-transform"><i class="fa-solid fa-calendar-check"></i></div>
+                        <p class="text-pure-100 font-bold text-xs uppercase mb-1">Schedule</p>
+                        <h2 class="text-2xl font-black">預約管理</h2>
+                        <p class="mt-2 text-sm opacity-90">查看今日 8 位預約</p>
+                    </button>
+                    
+                    <div class="glass-panel p-6 rounded-3xl flex flex-col justify-center">
+                        <p class="text-xs font-bold text-slate-400 uppercase mb-2">System</p>
+                        <button onclick="app.auth.logout()" class="flex items-center gap-2 text-slate-600 font-bold hover:text-red-500 transition-colors">
+                            <i class="fa-solid fa-right-from-bracket"></i> 登出系統
+                        </button>
+                        <button onclick="app.audio.toggle()" class="flex items-center gap-2 text-slate-600 font-bold hover:text-pure-500 transition-colors mt-3">
+                            <i id="lobby-music-icon" class="fa-solid fa-volume-xmark"></i> <span id="lobby-music-text">啟用環境音</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW: APPOINTMENTS (Data Grid) -->
+        <section id="view-appointments" class="hidden w-full max-w-2xl px-4 flex-col h-[80vh]">
+            <div class="glass-panel p-6 rounded-t-3xl flex justify-between items-center z-10">
+                <h2 class="text-2xl font-black text-slate-800">今日預約表</h2>
+                <button onclick="app.router.go('lobby')" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center hover:bg-slate-200 transition-colors"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="glass-panel border-t-0 p-6 rounded-b-3xl flex-1 overflow-y-auto space-y-3" id="appointment-list">
+                <!-- JS Generated Items -->
+            </div>
+        </section>
+
+        <!-- VIEW: CONSULTATION (RPG) -->
+        <section id="view-dialogue" class="hidden w-full max-w-lg px-4">
+            <div class="glass-panel p-8 rounded-[3rem] relative">
+                <!-- CSS Avatar Render Target -->
+                <div id="customer-avatar-container" class="mb-6 animate-float"></div>
+                
+                <div class="bg-white/60 p-6 rounded-2xl border border-white mb-6">
+                    <h3 class="font-black text-pure-600 mb-1" id="diag-name">Customer</h3>
+                    <p class="text-slate-700 font-medium leading-relaxed" id="diag-text">...</p>
+                </div>
+
+                <div id="diag-options" class="space-y-3">
+                    <!-- JS Generated Options -->
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW: GAME (Canvas) -->
+        <section id="view-game" class="hidden w-full max-w-md px-4 flex-col items-center">
+            <div class="w-full glass-panel p-4 rounded-full mb-6 flex items-center gap-4">
+                <div class="flex-1 bg-slate-100 h-3 rounded-full overflow-hidden">
+                    <div id="prog-bar" class="h-full bg-pure-500 w-0 transition-all duration-300"></div>
+                </div>
+                <span class="text-xs font-black text-pure-600 whitespace-nowrap">CLEANING</span>
+            </div>
+            
+            <div class="relative rounded-[3rem] overflow-hidden shadow-2xl border-4 border-white">
+                <canvas id="game-canvas" class="bg-pure-50 cursor-none touch-none"></canvas>
+            </div>
+            
+            <p class="mt-6 text-slate-400 text-xs font-bold uppercase tracking-widest animate-pulse">Laser Protocol Active</p>
+        </section>
+
+        <!-- MODAL: RESULT -->
+        <div id="modal-result" class="hidden fixed inset-0 z-[100] bg-pure-900/40 backdrop-blur-sm flex items-center justify-center p-4">
+            <div class="glass-panel p-10 rounded-[3rem] text-center max-w-sm w-full animate-bounce-slow">
+                <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl text-green-500">
+                    <i class="fa-solid fa-check"></i>
+                </div>
+                <h2 class="text-3xl font-black text-slate-800 mb-2">療程完成</h2>
+                <p class="text-slate-500 text-sm mb-8">數據已同步至雲端儀表板</p>
+                
+                <div class="bg-white p-4 rounded-2xl border border-pure-100 mb-8">
+                    <span class="text-xs text-slate-400 font-bold uppercase">Revenue Generated</span>
+                    <p class="text-3xl font-black text-pure-600 font-mono">+<span id="result-gold">0</span></p>
+                </div>
+
+                <button onclick="window.location.reload()" class="w-full py-4 bg-pure-600 text-white font-bold rounded-2xl shadow-lg hover:bg-pure-700 transition-colors">
+                    返回儀表板
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- MODULES & LOGIC -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { 
-            getAuth, signInAnonymously, signInWithPopup, GoogleAuthProvider, OAuthProvider, signInWithCustomToken,
+            getAuth, signInAnonymously, signInWithPopup, GoogleAuthProvider, OAuthProvider, 
             onAuthStateChanged, setPersistence, browserLocalPersistence, signOut 
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // --- Firebase 初始化 ---
+        // --- Configuration ---
         const firebaseConfig = JSON.parse(__firebase_config);
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'pure-skin-studio-master';
+        const appInfo = { id: (typeof __app_id !== 'undefined' ? __app_id : 'pure-skin-v3-9') };
+        
+        // --- Firebase Init ---
+        const fbApp = initializeApp(firebaseConfig);
+        const auth = getAuth(fbApp);
+        const db = getFirestore(fbApp);
 
-        // --- 本地備援數據 ---
-        const FALLBACK_DATA = {
+        // --- Data Models ---
+        const FALLBACK_DB = {
             bodyParts: {
-                face: { name: '臉部療程', icon: '👤', cost: 100, desc: '精細處理面部雜毛。' },
-                underarm: { name: '腋下護理', icon: '✨', cost: 150, desc: '掃除黑頭沉積。' },
-                bikini: { name: 'VIO 私密', icon: '👙', cost: 480, desc: '極致親膚技術。' },
-                limbs: { name: '四肢除毛', icon: '🦵', cost: 220, desc: '打造大面積絲滑肌。' }
+                face: { name: 'Face Treatment', cost: 120, desc: 'Precision facial hair removal.' },
+                legs: { name: 'Leg Sculpting', cost: 250, desc: 'Full leg smooth finish.' },
+                arms: { name: 'Arm Polishing', cost: 180, desc: 'Gentle arm hair removal.' },
+                bikini: { name: 'VIO Sensitive', cost: 450, desc: 'Specialized sensitive area care.' }
             },
-            careerTitles: ["瀅白實習生", "初級技師", "資深除毛師", "首席技術官", "醫美顧問", "雷射物理專家", "皮膚臨床醫生", "抗老研究員", "生物纖維專家", "醫學美容院長", "婚禮造型師", "時尚雜誌顧問", "好萊塢特效護理", "明星御用大師", "人體美學家", "沙龍店長", "品牌經理", "連鎖店創始人", "美容集團 CEO", "全球美學教父"],
-            stories: Array.from({length: 20}, (_, i) => ({
-                id: i,
-                title: `美容案例 #${i + 1}`,
-                text: [
-                    `你好，我的皮膚很敏感，雷射會痛嗎？`,
-                    `我下週要去參加婚禮，想處理腋下雜毛。`,
-                    `這是我第一次嘗試 VIO，真的很緊張...`,
-                    `聽說瀅白之境是業界最專業的，我想試試看。`,
-                    `我希望皮膚能看起來更透亮，有推薦的部位嗎？`
-                ][i % 5],
-                options: [
-                    { text: "我們會使用溫和的脈衝冷卻系統，請放心。", response: "太棒了，那就交給你了！" },
-                    { text: "專業的操作需要一點時間，請先放鬆心情。", response: "好的，我相信您的專業。" }
-                ]
-            }))
+            titles: ["Intern", "Junior", "Senior", "Expert", "Master", "Director", "Visionary", "Legend"],
+            stories: [
+                { text: "I'm worried about pain.", opts: [{t: "We use cooling tech.", r: "Great!"}, {t: "It's very quick.", r: "Okay."}] },
+                { text: "I have a wedding soon.", opts: [{t: "We'll make you glow.", r: "Perfect!"}, {t: "Let's start now.", r: "Thanks."}] }
+            ]
         };
 
-        const CUSTOMER_NAMES = ["艾米莉", "傑克", "露西", "索菲亞", "馬克斯", "奧莉薇亞", "湯姆", "凱特", "丹尼爾", "克洛伊"];
+        // --- Application State ---
+        const App = {
+            state: {
+                user: null,
+                data: { gold: 0, level: 1, exp: 0, titleIdx: 0, history: [] }, // history for chart
+                config: FALLBACK_DB,
+                view: 'loading',
+                session: { customer: null, part: null, gender: 'female' },
+                audio: { muted: true, ctx: null }
+            },
 
-        // --- 狀態管理 ---
-        let state = {
-            user: null, totalGold: 0, level: 1, exp: 0, careerIndex: 0,
-            view: 'loading',
-            bodyParts: FALLBACK_DATA.bodyParts, careerTitles: FALLBACK_DATA.careerTitles, stories: FALLBACK_DATA.stories,
-            appointments: [], currentCustomer: null, currentStory: null,
-            isCleaning: false, isMuted: true, isDefinitionsLoaded: false,
-            isAuthReady: false
-        };
+            // --- 1. Router & View Management ---
+            router: {
+                go: (viewId) => {
+                    document.querySelectorAll('section').forEach(el => {
+                        el.classList.add('hidden');
+                        if(el.id === `view-${viewId}`) {
+                            el.classList.remove('hidden');
+                            if(viewId === 'lobby') App.ui.renderChart();
+                            if(viewId === 'game') App.game.init();
+                        }
+                    });
+                    App.state.view = viewId;
+                    
+                    // Specific Logic
+                    if(viewId === 'appointments') App.ui.renderAppointments();
+                }
+            },
 
-        // --- 音頻中心 ---
-        const bgm = new Audio("https://assets.mixkit.co/music/preview/mixkit-serene-view-443.mp3");
-        bgm.loop = true;
-        bgm.volume = 0.4;
+            // --- 2. Auth Module (The V3.9 Fix) ---
+            auth: {
+                init: async () => {
+                    // Watchdog: If auth takes too long, force UI unlock
+                    const watchdog = setTimeout(() => {
+                        if(App.state.view === 'loading') {
+                            App.ui.notify("Network slow. Switching to offline mode.", true);
+                            App.router.go('login');
+                        }
+                    }, 2000); // 2 Seconds max wait
 
-        window.toggleMusic = () => {
-            state.isMuted = !state.isMuted;
-            const icon = document.getElementById('music-icon');
-            if (!state.isMuted) {
-                bgm.play().catch(() => console.log("等待點擊觸發音訊"));
-                icon.innerText = "🔊";
-                icon.parentElement.classList.add('animate-pulse');
-            } else {
-                bgm.pause();
-                icon.innerText = "🔇";
-                icon.parentElement.classList.remove('animate-pulse');
+                    try {
+                        await setPersistence(auth, browserLocalPersistence);
+                    } catch(e) { console.warn("Persistence N/A"); }
+
+                    onAuthStateChanged(auth, async (user) => {
+                        clearTimeout(watchdog);
+                        if (user) {
+                            App.state.user = user;
+                            await App.data.sync();
+                            App.router.go('lobby');
+                            App.ui.notify(`Welcome back, ${user.displayName || 'Specialist'}`);
+                        } else {
+                            App.router.go('login');
+                        }
+                    });
+                },
+                loginGoogle: () => {
+                    App.ui.notify("Contacting Google...");
+                    signInWithPopup(auth, new GoogleAuthProvider()).catch(e => App.ui.notify("Popup Blocked/Closed", true));
+                },
+                loginGameCenter: () => {
+                    App.ui.notify("Connecting Game Center...");
+                    signInWithPopup(auth, new OAuthProvider('apple.com')).catch(e => App.ui.notify("iOS Environment Required", true));
+                },
+                loginGuest: () => {
+                    signInAnonymously(auth).catch(() => {
+                        // Fallback purely local
+                        App.state.user = { uid: 'guest', isAnonymous: true };
+                        App.router.go('lobby');
+                    });
+                },
+                logout: () => signOut(auth).then(() => window.location.reload())
+            },
+
+            // --- 3. Data & Cloud Sync ---
+            data: {
+                sync: async () => {
+                    if(!App.state.user) return;
+                    try {
+                        // 1. Get Config (Public)
+                        const cfgRef = doc(db, 'artifacts', appInfo.id, 'public', 'data', 'definitions', 'config');
+                        const cfgSnap = await getDoc(cfgRef);
+                        if(cfgSnap.exists()) App.state.config = cfgSnap.data();
+
+                        // 2. Get User Data (Private)
+                        const userRef = doc(db, 'artifacts', appInfo.id, 'users', App.state.user.uid, 'saveData', 'profile');
+                        onSnapshot(userRef, (snap) => {
+                            if(snap.exists()) {
+                                App.state.data = { ...App.state.data, ...snap.data() };
+                                App.ui.updateLobby();
+                            }
+                        });
+                    } catch(e) {
+                        console.log("Offline Mode Active");
+                    }
+                },
+                save: async () => {
+                    if(App.state.user && !App.state.user.isAnonymous) {
+                        const userRef = doc(db, 'artifacts', appInfo.id, 'users', App.state.user.uid, 'saveData', 'profile');
+                        // Push revenue to history for chart
+                        const newHistory = [...(App.state.data.history || [])];
+                        newHistory.push({ date: new Date().toISOString(), amount: App.state.data.lastReward });
+                        if(newHistory.length > 7) newHistory.shift(); // Keep last 7
+
+                        await setDoc(userRef, { 
+                            gold: App.state.data.gold, 
+                            level: App.state.data.level,
+                            history: newHistory
+                        }, { merge: true });
+                    }
+                }
+            },
+
+            // --- 4. UI & Chart.js ---
+            ui: {
+                notify: (msg, isErr) => {
+                    const el = document.getElementById('notification-toast');
+                    document.getElementById('notif-text').innerText = msg;
+                    document.getElementById('notif-icon').className = isErr ? "fa-solid fa-circle-exclamation text-red-500" : "fa-solid fa-circle-info text-pure-500";
+                    el.classList.remove('-translate-y-20', 'opacity-0');
+                    setTimeout(() => el.classList.add('-translate-y-20', 'opacity-0'), 3000);
+                },
+                updateLobby: () => {
+                    document.getElementById('lobby-gold').innerText = App.state.data.gold.toLocaleString();
+                    document.getElementById('user-display-name').innerText = App.state.user?.displayName || (App.state.user?.isAnonymous ? 'Guest Specialist' : 'Certified Expert');
+                    
+                    const titleIdx = Math.min(Math.floor(App.state.data.level / 2), App.state.config.titles.length - 1);
+                    document.getElementById('user-title').innerText = `${App.state.config.titles[titleIdx]} (Lv.${App.state.data.level})`;
+                    
+                    if(window.myChart) App.ui.renderChart();
+                },
+                renderChart: () => {
+                    const ctx = document.getElementById('revenueChart').getContext('2d');
+                    const history = App.state.data.history || [{amount: 100}, {amount: 150}, {amount: 120}, {amount: 200}, {amount: 180}]; // Mock data if empty
+                    
+                    if(window.myChart) window.myChart.destroy();
+
+                    window.myChart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: history.map((_, i) => `Day ${i+1}`),
+                            datasets: [{
+                                label: 'Revenue (Gold)',
+                                data: history.map(h => h.amount),
+                                borderColor: '#0ea5e9',
+                                backgroundColor: 'rgba(14, 165, 233, 0.1)',
+                                tension: 0.4,
+                                fill: true,
+                                pointBackgroundColor: '#ffffff',
+                                pointBorderColor: '#0284c7',
+                                pointBorderWidth: 2
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { legend: { display: false } },
+                            scales: {
+                                y: { display: false, beginAtZero: true },
+                                x: { grid: { display: false } }
+                            }
+                        }
+                    });
+                },
+                renderAppointments: () => {
+                    const list = document.getElementById('appointment-list');
+                    const parts = Object.keys(App.state.config.bodyParts);
+                    const names = ["Alice", "Bob", "Charlie", "Diana", "Evan", "Fiona"];
+                    
+                    list.innerHTML = Array.from({length: 6}).map((_, i) => {
+                        const name = names[i];
+                        const gender = i % 2 === 0 ? 'female' : 'male';
+                        const partKey = parts[i % parts.length];
+                        const part = App.state.config.bodyParts[partKey];
+                        
+                        return `
+                        <div onclick="window.startSession('${name}', '${gender}', '${partKey}')" class="flex items-center justify-between p-4 bg-white/50 rounded-2xl border border-pure-100 hover:bg-pure-50 cursor-pointer transition-all hover:scale-[1.01]">
+                            <div class="flex items-center gap-4">
+                                <div class="w-10 h-10 rounded-full bg-pure-100 flex items-center justify-center text-lg">
+                                    ${gender === 'male' ? '👨' : '👩'}
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-slate-700">${name}</h4>
+                                    <p class="text-xs text-slate-400 font-mono">${part.name}</p>
+                                </div>
+                            </div>
+                            <span class="text-xs font-bold text-pure-600 bg-pure-100 px-3 py-1 rounded-full">Ready</span>
+                        </div>`;
+                    }).join('');
+                }
+            },
+
+            // --- 5. Game Logic & Canvas ---
+            game: {
+                init: () => {
+                    const canvas = document.getElementById('game-canvas');
+                    const ctx = canvas.getContext('2d');
+                    const container = canvas.parentElement;
+                    canvas.width = container.clientWidth;
+                    canvas.height = 400;
+
+                    let cleaned = 0;
+                    const totalPixels = canvas.width * canvas.height;
+                    const laser = document.getElementById('laser-cursor');
+
+                    // Draw Skin
+                    ctx.fillStyle = App.state.session.gender === 'male' ? '#ffedd5' : '#fff1f2';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    
+                    // Draw Hairs
+                    ctx.strokeStyle = '#475569';
+                    ctx.lineWidth = 1;
+                    const density = App.state.session.part === 'bikini' ? 3000 : 1500;
+                    for(let i=0; i<density; i++) {
+                        const x = Math.random() * canvas.width;
+                        const y = Math.random() * canvas.height;
+                        ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + (Math.random()-0.5)*5, y+8); ctx.stroke();
+                    }
+
+                    // Interaction
+                    let isDragging = false;
+                    const handleMove = (e) => {
+                        const rect = canvas.getBoundingClientRect();
+                        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                        
+                        laser.style.left = clientX + 'px';
+                        laser.style.top = clientY + 'px';
+
+                        if(isDragging) {
+                            const x = clientX - rect.left;
+                            const y = clientY - rect.top;
+                            ctx.globalCompositeOperation = 'destination-out';
+                            ctx.beginPath(); ctx.arc(x, y, 30, 0, Math.PI*2); ctx.fill();
+                            laser.classList.add('active');
+                        } else {
+                            laser.classList.remove('active');
+                        }
+                    };
+
+                    const checkEnd = () => {
+                        isDragging = false;
+                        laser.classList.remove('active');
+                        const data = ctx.getImageData(0,0, canvas.width, canvas.height).data;
+                        let alphaCount = 0;
+                        for(let i=3; i<data.length; i+=4) if(data[i] === 0) alphaCount++;
+                        
+                        document.getElementById('prog-bar').style.width = `${(alphaCount/totalPixels)*100}%`;
+
+                        if(alphaCount / totalPixels > 0.95) {
+                            App.game.finish();
+                        }
+                    };
+
+                    canvas.onmousedown = () => isDragging = true;
+                    canvas.ontouchstart = () => isDragging = true;
+                    window.onmouseup = checkEnd;
+                    window.ontouchend = checkEnd;
+                    window.onmousemove = handleMove;
+                    window.ontouchmove = handleMove;
+                    
+                    // Show laser cursor only in game
+                    laser.style.display = 'block';
+                },
+                finish: async () => {
+                    document.getElementById('laser-cursor').style.display = 'none';
+                    const reward = App.state.config.bodyParts[App.state.session.part].cost;
+                    
+                    App.state.data.gold += reward;
+                    App.state.data.exp += 50;
+                    if(App.state.data.exp >= 100) {
+                        App.state.data.level++;
+                        App.state.data.exp = 0;
+                    }
+                    App.state.data.lastReward = reward; // For chart
+
+                    await App.data.save();
+                    
+                    document.getElementById('result-gold').innerText = reward;
+                    document.getElementById('modal-result').classList.remove('hidden');
+                }
+            },
+
+            audio: {
+                toggle: () => {
+                    const bgm = new Audio("https://assets.mixkit.co/music/preview/mixkit-serene-view-443.mp3");
+                    bgm.loop = true;
+                    bgm.volume = 0.3;
+                    if(App.state.audio.muted) {
+                        bgm.play().catch(()=>App.ui.notify("Click page to enable audio"));
+                        App.state.audio.ctx = bgm;
+                        App.state.audio.muted = false;
+                        document.getElementById('lobby-music-icon').className = "fa-solid fa-volume-high";
+                        document.getElementById('lobby-music-text').innerText = "Music On";
+                    } else {
+                        App.state.audio.ctx.pause();
+                        App.state.audio.muted = true;
+                        document.getElementById('lobby-music-icon').className = "fa-solid fa-volume-xmark";
+                        document.getElementById('lobby-music-text').innerText = "Enable Music";
+                    }
+                }
             }
         };
 
-        // --- UI 訊息工具 (修復 ReferenceError) ---
-        function showMessage(text, isError = false) {
-            const box = document.getElementById('message-box');
-            const content = document.getElementById('message-content');
-            if (!box || !content) return;
+        // --- Global Access for HTML ---
+        window.app = App;
+        window.startSession = (name, gender, partKey) => {
+            App.state.session = { name, gender, part: partKey };
             
-            content.innerText = text;
-            box.classList.remove('hidden');
-            box.classList.add('flex');
-            box.className = isError 
-                ? "fixed top-10 left-1/2 -translate-x-1/2 z-[20000] px-8 py-4 rounded-3xl text-white font-bold shadow-2xl bg-red-500/90 items-center justify-center transition-all animate-bounce" 
-                : "fixed top-10 left-1/2 -translate-x-1/2 z-[20000] px-8 py-4 rounded-3xl text-white font-bold shadow-2xl bg-blue-600/90 items-center justify-center transition-all animate-bounce";
-
-            setTimeout(() => {
-                box.classList.add('hidden');
-                box.classList.remove('flex');
-            }, 5000);
-        }
-
-        // --- 特效：雷射閃光 ---
-        function triggerLaserFX(x, y) {
-            const fx = document.createElement('div');
-            fx.className = 'laser-flash';
-            fx.style.left = `${x}px`; fx.style.top = `${y}px`;
-            document.body.appendChild(fx);
-            setTimeout(() => fx.remove(), 400);
-        }
-
-        // --- 初始化入口：V3.8 韌性強化 ---
-        async function init() {
-            console.log("瀅白之境：V3.8 核心引擎載入...");
-
-            // 極速安全計時器 (3秒)
-            const watchdog = setTimeout(() => {
-                if (state.view === 'loading') {
-                    console.warn("認證逾時，解鎖介面");
-                    state.isDefinitionsLoaded = true;
-                    switchView('login');
-                }
-            }, 3000);
-
-            // 優先設定認證監聽
-            onAuthStateChanged(auth, async (currUser) => {
-                if (state.isAuthReady) return;
-                clearTimeout(watchdog);
-                
-                if (currUser) {
-                    state.user = currUser;
-                    state.isAuthReady = true;
-                    await syncDefinitions();
-                    await syncUserData();
-                    generateAppointments();
-                    if (state.view === 'loading' || state.view === 'login') switchView('lobby');
-                } else {
-                    state.user = null;
-                    await syncDefinitions();
-                    if (state.view === 'loading') switchView('login');
-                }
-            });
-
-            // 執行登入嘗試
-            try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else if (!auth.currentUser) {
-                    await signInAnonymously(auth);
-                }
-            } catch (err) {
-                console.error("Auth Fail", err);
-                state.isDefinitionsLoaded = true;
-                if (state.view === 'loading') switchView('login');
-            }
-
-            // 探頭座標追蹤
-            const probe = document.getElementById('laser-probe');
-            window.addEventListener('mousemove', (e) => { 
-                if (probe) { probe.style.left = `${e.clientX}px`; probe.style.top = `${e.clientY}px`; }
-            });
-
-            // 首擊啟動
-            window.addEventListener('mousedown', () => {
-                if (!state.isMuted && bgm.paused) bgm.play().catch(()=>null);
-            }, { once: true });
-        }
-
-        async function syncDefinitions() {
-            try {
-                const defRef = doc(db, 'artifacts', appId, 'public', 'data', 'definitions', 'config');
-                const snap = await getDoc(defRef);
-                if (snap.exists()) {
-                    const d = snap.data();
-                    state.bodyParts = d.bodyParts || FALLBACK_DATA.bodyParts;
-                    state.careerTitles = d.careerTitles || FALLBACK_DATA.careerTitles;
-                    state.stories = d.stories || FALLBACK_DATA.stories;
-                    console.log("雲端數據載入成功");
-                }
-            } catch (err) {
-                console.warn("無法取得雲端配置，進入備援模式");
-            } finally {
-                state.isDefinitionsLoaded = true;
-                updateUI();
-            }
-        }
-
-        async function syncUserData() {
-            if (!state.user) return;
-            const profileRef = doc(db, 'artifacts', appId, 'users', state.user.uid, 'saveData', 'profile');
-            onSnapshot(profileRef, (snap) => {
-                if (snap.exists()) { Object.assign(state, snap.data()); updateUI(); }
-            }, () => null);
-        }
-
-        // --- 視覺渲染與互動 ---
-        function renderAvatar(gender, targetId) {
-            const color = gender === 'male' ? '#bae6fd' : '#fecdd3';
-            const hair = gender === 'male' 
-                ? 'M20,45 Q50,15 80,45 L80,35 Q50,5 20,35 Z' 
-                : 'M10,50 Q50,-10 90,50 L95,100 L5,100 Z';
-            const svg = `
-                <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-xl animate-float">
-                    <circle cx="50" cy="55" r="40" fill="white" stroke="${color}" stroke-width="2"/>
-                    <path d="${hair}" fill="${color}" opacity="0.9"/>
-                    <circle cx="38" cy="55" r="3" fill="#334155"/>
-                    <circle cx="62" cy="55" r="3" fill="#334155"/>
-                    <path d="M42,75 Q50,82 58,75" fill="none" stroke="#334155" stroke-width="2" stroke-linecap="round"/>
-                    <circle cx="32" cy="65" r="4" fill="#fecaca" opacity="0.6"/>
-                    <circle cx="68" cy="65" r="4" fill="#fecaca" opacity="0.6"/>
-                </svg>
-            `;
-            const container = document.getElementById(targetId);
-            if (container) container.innerHTML = svg;
-        }
-
-        function generateAppointments() {
-            const keys = Object.keys(state.bodyParts);
-            state.appointments = Array.from({length: 8}, (_, i) => ({
-                id: i,
-                name: CUSTOMER_NAMES[Math.floor(Math.random() * CUSTOMER_NAMES.length)],
-                time: `${10 + i}:00`,
-                gender: Math.random() > 0.5 ? 'female' : 'male',
-                part: keys[Math.floor(Math.random() * keys.length)],
-                status: i < 2 ? 'READY' : 'WAITING'
-            }));
-            if (state.view === 'appointments') renderAppointmentList();
-        }
-
-        function renderAppointmentList() {
-            const list = document.getElementById('appointment-list');
-            if (!list) return;
-            list.innerHTML = state.appointments.map((app, idx) => `
-                <div class="flex items-center justify-between p-5 bg-white/70 rounded-[2.5rem] border border-blue-50 hover:bg-blue-100 hover:scale-[1.03] transition-all cursor-pointer shadow-sm mb-4 animate-slide-in" style="animation-delay: ${idx * 0.1}s" onclick="window.pickCustomer(${app.id})">
-                    <div class="flex items-center gap-4">
-                        <div class="w-14 h-14 bg-white rounded-3xl flex items-center justify-center text-2xl shadow-inner border border-blue-50">${app.gender === 'male' ? '👦' : '👧'}</div>
-                        <div>
-                            <p class="font-black text-slate-700 text-lg">${app.name}</p>
-                            <p class="text-[11px] font-bold text-blue-400 uppercase tracking-widest">${app.time} · ${state.bodyParts[app.part]?.name || '全身'}</p>
-                        </div>
-                    </div>
-                    <span class="text-[10px] font-black px-4 py-2 rounded-full ${app.status === 'READY' ? 'bg-green-100 text-green-600' : 'bg-slate-100 text-slate-400'}">${app.status}</span>
+            // Build CSS Avatar
+            const container = document.getElementById('customer-avatar-container');
+            const hairClass = gender === 'male' ? 'css-hair-male' : 'css-hair-female';
+            container.innerHTML = `
+                <div class="css-avatar">
+                    <div class="css-head"></div>
+                    <div class="css-body"></div>
+                    <div class="${hairClass}"></div>
                 </div>
-            `).join('');
-        }
-
-        window.pickCustomer = (id) => {
-            state.currentCustomer = state.appointments[id];
-            state.selectedGender = state.currentCustomer.gender;
-            state.selectedPartId = state.currentCustomer.part;
-            switchView('dialogue');
-            startDialogue();
-        };
-
-        function startDialogue() {
-            const story = state.stories[Math.floor(Math.random() * state.stories.length)];
-            state.currentStory = story;
-            document.getElementById('diag-name').innerText = state.currentCustomer.name;
+            `;
+            
+            // Text
+            document.getElementById('diag-name').innerText = name;
+            const story = App.state.config.stories[Math.floor(Math.random()*App.state.config.stories.length)];
             document.getElementById('diag-text').innerText = story.text;
-            renderAvatar(state.currentCustomer.gender, 'diag-avatar-box');
             
-            document.getElementById('diag-options').innerHTML = story.options.map((opt, i) => `
-                <button onclick="window.chooseOption(${i})" class="w-full p-4 bg-white/90 rounded-3xl border border-blue-50 font-bold text-blue-600 hover:bg-blue-600 hover:text-white transition-all text-sm mb-3 shadow-sm text-left px-6">
-                    ● ${opt.text}
+            // Options
+            const optDiv = document.getElementById('diag-options');
+            optDiv.innerHTML = story.options.map(opt => `
+                <button onclick="app.router.go('game')" class="w-full text-left p-4 bg-pure-50 rounded-xl text-sm font-bold text-slate-600 hover:bg-pure-100 hover:pl-6 transition-all border border-pure-100">
+                    ${opt.t} <span class="block text-[10px] text-pure-400 font-normal mt-1">Response: "${opt.r}"</span>
                 </button>
             `).join('');
-        }
 
-        window.chooseOption = (idx) => {
-            const opt = state.currentStory.options[idx];
-            document.getElementById('diag-text').innerText = opt.response;
-            document.getElementById('diag-options').innerHTML = `
-                <button onclick="switchView('selection')" class="w-full p-5 bg-blue-600 text-white rounded-3xl font-black shadow-xl hover:scale-[1.05] transition-transform">
-                    啟動雷射評估程序
-                </button>
-            `;
+            App.router.go('dialogue');
         };
 
-        window.loginGoogle = () => signInWithPopup(auth, new GoogleAuthProvider()).catch(() => showMessage("認證視窗已關閉", true));
-        window.loginGuest = () => switchView('lobby');
-        window.logout = () => signOut(auth).then(() => window.location.reload());
+        // Start
+        App.auth.init();
 
-        function switchView(v) {
-            state.view = v;
-            ['loading', 'login', 'lobby', 'appointments', 'dialogue', 'selection', 'game'].forEach(id => {
-                const el = document.getElementById(`view-${id}`);
-                if (el) {
-                    el.classList.toggle('hidden', state.view !== id);
-                    el.classList.toggle('flex', state.view === id);
-                }
-            });
-            if (v === 'game') setTimeout(initCanvas, 100);
-            if (v === 'appointments') renderAppointmentList();
-            updateUI();
-        }
-
-        function updateUI() {
-            document.querySelectorAll('.gold-val').forEach(el => el.innerText = state.totalGold);
-            document.querySelectorAll('.level-val').forEach(el => el.innerText = `Lv.${state.level}`);
-            const careerName = state.careerTitles[state.careerIndex] || "瀅白學員";
-            document.querySelectorAll('.career-val').forEach(el => el.innerText = careerName);
-            document.querySelectorAll('.user-name').forEach(el => el.innerText = state.user?.displayName || "認證顧問");
-            if (state.view === 'selection') renderSelectionUI();
-        }
-
-        let canvas, ctx;
-        function initCanvas() {
-            canvas = document.getElementById('game-canvas');
-            if (!canvas) return;
-            ctx = canvas.getContext('2d');
-            canvas.width = 340; canvas.height = 440;
-            canvas.onmousedown = (e) => { state.isCleaning = true; document.getElementById('laser-probe').classList.add('active'); clean(e); };
-            canvas.onmousemove = (e) => { if (state.isCleaning) { clean(e); triggerLaserFX(e.clientX, e.clientY); } };
-            window.onmouseup = () => { state.isCleaning = false; document.getElementById('laser-probe').classList.remove('active'); checkProgress(); };
-            drawSkin();
-        }
-
-        function clean(e) {
-            const r = canvas.getBoundingClientRect();
-            ctx.globalCompositeOperation = 'destination-out';
-            ctx.beginPath(); ctx.arc(e.clientX - r.left, e.clientY - r.top, 25, 0, Math.PI * 2); ctx.fill();
-        }
-
-        function drawSkin() {
-            ctx.globalCompositeOperation = 'source-over';
-            ctx.fillStyle = state.selectedGender === 'male' ? '#f4d1c1' : '#fff0f0';
-            ctx.fillRect(0, 0, 340, 440);
-            ctx.strokeStyle = "#4a3a2a"; ctx.lineWidth = 0.8;
-            for (let i = 0; i < 2800; i++) {
-                const x = Math.random()*340; const y = Math.random()*440;
-                ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + (Math.random()-0.5)*2, y + 6); ctx.stroke();
-            }
-        }
-
-        function checkProgress() {
-            const data = ctx.getImageData(0,0,340,440).data;
-            let opaque = 0;
-            for (let i=3; i<data.length; i+=4) if(data[i]>0) opaque++;
-            const progress = 1 - (opaque / (340*440));
-            document.getElementById('prog-bar').style.width = `${progress * 100}%`;
-            if (progress > 0.98) finalizeSession();
-        }
-
-        async function finalizeSession() {
-            let reward = state.bodyParts[state.selectedPartId]?.cost || 50;
-            if (state.selectedGender === 'male') reward *= 1.2;
-            state.totalGold += Math.floor(reward);
-            state.exp += 50;
-            if (state.exp >= 100) { state.level++; state.exp = 0; state.careerIndex = Math.min(Math.floor(state.level / 2), 19); }
-            if (state.user) await setDoc(doc(db, 'artifacts', appId, 'users', state.user.uid, 'saveData', 'profile'), { totalGold: state.totalGold, level: state.level, careerIndex: state.careerIndex }, { merge: true }).catch(()=>null);
-            document.getElementById('reward-val').innerText = Math.floor(reward);
-            document.getElementById('result-modal').style.display = 'flex';
-        }
-
-        function renderSelectionUI() {
-            const p = state.bodyParts[state.selectedPartId] || { name: '定制療程', icon: '❓', desc: '載入中...', cost: 0 };
-            document.getElementById('selection-detail').innerHTML = `
-                <div class="p-8 bg-blue-50/70 rounded-[3rem] border border-blue-100 shadow-inner">
-                    <div class="flex items-center gap-4 mb-3"><span class="text-4xl animate-pulse">${p.icon}</span><h3 class="text-2xl font-black text-blue-600">${p.name}</h3></div>
-                    <p class="text-sm text-slate-500 font-medium leading-relaxed mb-6 italic">${p.desc}</p>
-                    <div class="mt-4 flex justify-between items-center border-t border-blue-100 pt-5">
-                        <span class="text-xs font-bold text-slate-400 uppercase tracking-widest text-center">Reward</span>
-                        <span class="text-2xl font-black text-blue-800 font-mono">💰 ${p.cost}</span>
-                    </div>
-                </div>
-            `;
-            document.querySelectorAll('.hotspot').forEach(el => el.classList.toggle('active', el.dataset.id === state.selectedPartId));
-        }
-
-        window.onload = init;
-        window.switchView = switchView;
-        window.selectPart = (id) => { state.selectedPartId = id; renderSelectionUI(); };
-        window.confirmStart = () => switchView('game');
     </script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap');
-        body { font-family: 'Noto Sans TC', sans-serif; background: #fdfdfe; cursor: none; overflow: hidden; margin: 0; user-select: none; }
-        .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(25px); border: 1px solid rgba(255, 255, 255, 0.6); }
-        
-        #laser-probe { 
-            position: fixed; width: 54px; height: 54px; border: 3px solid #3b82f6; border-radius: 50%; pointer-events: none; z-index: 10000; transform: translate(-50%, -50%); 
-            background: rgba(59, 130, 246, 0.1); box-shadow: 0 0 20px rgba(59, 130, 246, 0.4); transition: transform 0.1s ease-out; 
-        }
-        #laser-probe::before {
-            content: ''; position: absolute; top: -10px; left: -10px; right: -10px; bottom: -10px; border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 50%; animation: pulse-fx 2s infinite;
-        }
-        #laser-probe.active { transform: translate(-50%, -50%) scale(0.75); background: rgba(59, 130, 246, 0.8); box-shadow: 0 0 60px #3b82f6; }
-        #laser-probe::after { content: ''; position: absolute; top: 50%; left: 50%; width: 4px; height: 4px; background: white; border-radius: 50%; transform: translate(-50%, -50%); }
-        
-        .laser-flash { position: fixed; width: 40px; height: 40px; background: radial-gradient(circle, rgba(96, 165, 250, 0.8) 0%, transparent 70%); border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%, -50%); animation: flash-fade 0.4s ease-out forwards; }
-
-        .brand-btn { background: linear-gradient(135deg, #a5f3fc 0%, #e0f2fe 100%); color: #0369a1; font-weight: 900; cursor: pointer; transition: 0.3s; border: 1px solid rgba(186, 230, 253, 0.5); }
-        .brand-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(186, 230, 253, 0.5); }
-        
-        .hotspot { fill: #f8fafc; stroke: #e2e8f0; cursor: pointer; transition: 0.3s; }
-        .hotspot.active { fill: #3b82f6; stroke: #1d4ed8; stroke-width: 2.5; filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.5)); }
-        
-        canvas { border-radius: 4.5rem; border: 12px solid white; box-shadow: 0 30px 70px rgba(186, 230, 253, 0.2); background: white; }
-
-        @keyframes pulse-fx { 0% { transform: scale(1); opacity: 0.8; } 100% { transform: scale(1.6); opacity: 0; } }
-        @keyframes flash-fade { 0% { transform: translate(-50%, -50%) scale(0.5); opacity: 1; } 100% { transform: translate(-50%, -50%) scale(2); opacity: 0; } }
-        @keyframes slide-in { from { transform: translateY(25px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        @keyframes float { 0% { transform: translateY(0); } 50% { transform: translateY(-10px); } 100% { transform: translateY(0); } }
-        .animate-float { animation: float 3.5s ease-in-out infinite; }
-        .animate-slide-in { animation: slide-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
-    </style>
-</head>
-<body class="min-h-screen flex items-center justify-center">
-
-    <div id="laser-probe"></div>
-
-    <!-- 訊息中心 (補全 showMessage) -->
-    <div id="message-box" class="hidden fixed top-10 left-1/2 -translate-x-1/2 z-[20000] px-8 py-4 rounded-3xl text-white font-bold shadow-2xl items-center justify-center transition-all animate-bounce">
-        <span id="message-content"></span>
-    </div>
-
-    <!-- 氛圍音控制鈕 -->
-    <div onclick="window.toggleMusic()" class="fixed bottom-6 right-6 z-[1000] w-14 h-14 glass rounded-full flex items-center justify-center cursor-pointer shadow-lg hover:scale-110 transition-transform border border-blue-50">
-        <span id="music-icon" class="text-2xl">🔇</span>
-    </div>
-
-    <!-- 頂部資訊看板 -->
-    <div class="fixed top-6 w-full max-w-md px-6 flex justify-between items-center z-[100]">
-        <div class="glass px-6 py-3 rounded-full flex items-center gap-3 shadow-lg border-blue-50">
-            <span class="text-2xl">💰</span><span class="gold-val font-black text-slate-700 text-lg">0</span>
-        </div>
-        <div class="glass px-7 py-3 rounded-full flex flex-col items-center shadow-lg border-blue-50">
-            <span class="career-val text-[11px] font-black text-blue-600 uppercase tracking-tighter text-center italic">載入中...</span>
-            <span class="level-val text-[10px] font-bold text-slate-400 italic">Evolution</span>
-        </div>
-    </div>
-
-    <!-- 0. Loading 視圖 (登入中) -->
-    <div id="view-loading" class="flex flex-col items-center">
-        <div class="w-16 h-16 border-4 border-blue-100 border-t-blue-500 rounded-full animate-spin mb-8"></div>
-        <p class="text-slate-400 font-black text-sm tracking-[0.4em] uppercase text-center leading-relaxed italic animate-pulse">登入中...</p>
-    </div>
-
-    <!-- 1. Login 視圖 -->
-    <div id="view-login" class="hidden flex flex-col items-center">
-        <div class="w-28 h-28 bg-white rounded-[3rem] flex items-center justify-center mb-12 shadow-xl border border-blue-50"><span class="text-7xl">🧊</span></div>
-        <h1 class="text-5xl font-black text-slate-800 mb-2 tracking-tighter text-center">瀅白之境</h1>
-        <p class="text-slate-400 text-xs mb-12 font-black tracking-[0.3em] uppercase">Identity Verification</p>
-        <div class="space-y-4 w-72 flex flex-col items-center text-center">
-            <button onclick="window.loginGoogle()" class="w-full py-5 bg-white border border-slate-100 rounded-3xl flex items-center justify-center gap-4 shadow-sm hover:bg-blue-50 transition-all font-black text-slate-600">Google 快速認證</button>
-            <button onclick="window.loginGuest()" class="w-full py-5 bg-blue-50 text-blue-600 font-black rounded-3xl hover:bg-blue-100 transition-all">訪客試玩模式</button>
-            <p class="text-[10px] text-slate-400 mt-4 px-4 leading-relaxed italic">※ 訪客模式進度將無法跨裝置保存</p>
-        </div>
-    </div>
-
-    <!-- 2. Lobby 視圖 -->
-    <div id="view-lobby" class="hidden flex flex-col items-center text-center">
-        <div class="w-36 h-36 bg-white rounded-[4rem] flex items-center justify-center mb-12 shadow-2xl border-4 border-blue-50 rotate-3 transition-transform hover:rotate-0"><span class="text-7xl">💎</span></div>
-        <h1 class="text-6xl font-black text-slate-800 tracking-tighter mb-1">瀅白之境</h1>
-        <p class="text-blue-400 font-black tracking-[0.5em] text-xs uppercase mb-12 italic">Total Aesthetic Evolution</p>
-        <div class="glass p-8 rounded-[3rem] mb-12 text-center min-w-[300px] border-blue-100/50 shadow-inner">
-            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 italic">認證顧問</p>
-            <p class="user-name font-black text-slate-700 text-2xl italic truncate px-2">---</p>
-        </div>
-        <button onclick="switchView('appointments')" class="w-80 py-7 brand-btn text-3xl rounded-[2.5rem] shadow-2xl hover:scale-105 active:scale-95">預約排程管理</button>
-        <button onclick="window.logout()" class="mt-8 text-slate-300 font-black text-sm tracking-widest hover:text-red-400">Logout System</button>
-    </div>
-
-    <!-- 2.5 今日預約表 -->
-    <div id="view-appointments" class="hidden flex-col items-center w-full max-w-lg p-6">
-        <div class="glass w-full p-10 rounded-[4.5rem] shadow-2xl border border-blue-50">
-            <div class="flex items-end justify-between mb-8"><h2 class="text-3xl font-black text-slate-800 tracking-tighter underline decoration-blue-200 decoration-4">今日預約表</h2><span class="text-[10px] font-black text-blue-300 uppercase mb-1 italic">Schedule</span></div>
-            <div id="appointment-list" class="space-y-4 max-h-[450px] overflow-y-auto pr-4 custom-scrollbar"></div>
-            <button onclick="switchView('lobby')" class="w-full mt-10 py-5 text-slate-400 font-black text-sm uppercase italic hover:text-blue-500">返回大廳</button>
-        </div>
-    </div>
-
-    <!-- 3. RPG 對話視圖 -->
-    <div id="view-dialogue" class="hidden fixed inset-0 flex flex-col items-center justify-end p-10 bg-slate-900/15 backdrop-blur-md">
-        <div class="glass w-full max-w-2xl p-12 rounded-[5rem] shadow-2xl flex items-start gap-12 border-blue-50 animate-slide-in">
-            <div id="diag-avatar-box" class="w-36 h-36 bg-white rounded-[3.5rem] flex-shrink-0 border border-blue-100 p-3 shadow-inner"></div>
-            <div class="flex-1">
-                <h4 id="diag-name" class="font-black text-blue-500 text-xl mb-2 italic underline decoration-blue-100 decoration-4">顧客</h4>
-                <p id="diag-text" class="text-slate-700 font-bold leading-relaxed text-2xl min-h-[4.5em] mb-10 italic">...</p>
-                <div id="diag-options" class="flex flex-col gap-2"></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 4. 定制評估視圖 -->
-    <div id="view-selection" class="hidden flex-col items-center w-full max-w-5xl px-4 text-center">
-        <div class="glass p-16 rounded-[6rem] flex flex-col md:flex-row gap-20 items-center shadow-2xl border-blue-50 animate-slide-in">
-            <div class="w-72 h-[550px]">
-                <svg viewBox="0 0 200 500" class="w-full h-full drop-shadow-2xl">
-                    <circle cx="100" cy="55" r="45" class="hotspot" data-id="face" onclick="selectPart('face')" />
-                    <circle cx="55" cy="125" r="28" class="hotspot" data-id="underarm" onclick="selectPart('underarm')" />
-                    <circle cx="145" cy="125" r="28" class="hotspot" data-id="underarm" onclick="selectPart('underarm')" />
-                    <rect x="75" y="160" width="50" height="120" rx="25" class="hotspot" data-id="others" onclick="selectPart('others')" />
-                    <path d="M75 285 L125 285 L100 340 Z" class="hotspot" data-id="bikini" onclick="selectPart('bikini')" />
-                    <rect x="25" y="130" width="24" height="185" rx="12" class="hotspot" data-id="limbs" onclick="selectPart('limbs')" />
-                    <rect x="150" y="130" width="24" height="185" rx="12" class="hotspot" data-id="limbs" onclick="selectPart('limbs')" />
-                    <rect x="70" y="345" width="28" height="200" rx="14" class="hotspot" data-id="limbs" onclick="selectPart('limbs')" />
-                    <rect x="102" y="345" width="28" height="200" rx="14" class="hotspot" data-id="limbs" onclick="selectPart('limbs')" />
-                </svg>
-            </div>
-            <div class="w-full max-w-md space-y-10 md:text-left">
-                <h3 class="text-5xl font-black text-slate-800 tracking-tighter italic">定制專業評估</h3>
-                <div id="selection-detail"></div>
-                <div class="space-y-4">
-                    <button onclick="confirmStart()" class="w-full py-7 brand-btn text-3xl rounded-[3rem] shadow-xl hover:scale-105 active:scale-95 text-blue-700 italic font-black">啟動雷射儀器</button>
-                    <button onclick="switchView('appointments')" class="w-full text-slate-400 font-black text-sm uppercase italic hover:text-blue-500">檢視預約表</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 5. 除毛互動互動視圖 -->
-    <div id="view-game" class="hidden flex flex-col items-center animate-slide-in">
-        <div class="mb-12 w-96 text-center">
-            <div class="w-full h-5 bg-white rounded-full overflow-hidden shadow-inner border-4 border-blue-50">
-                <div id="prog-bar" class="h-full bg-gradient-to-r from-blue-400 to-cyan-400 transition-all duration-300" style="width: 0%"></div>
-            </div>
-            <p class="text-[11px] font-black text-blue-500 mt-4 uppercase tracking-[0.5em] animate-pulse">Laser Protocol Active</p>
-        </div>
-        <canvas id="game-canvas" class="cursor-none"></canvas>
-    </div>
-
-    <!-- 結算彈窗 -->
-    <div id="result-modal" class="hidden fixed inset-0 z-[200] items-center justify-center bg-blue-900/70 backdrop-blur-xl px-4 animate-slide-in">
-        <div class="bg-white rounded-[6rem] p-20 text-center shadow-2xl max-md w-full border-4 border-blue-50 relative overflow-hidden">
-            <div class="absolute -top-10 -left-10 w-40 h-40 bg-blue-50 rounded-full opacity-50 blur-3xl"></div>
-            <div class="text-9xl mb-12">🧊</div>
-            <h3 class="text-5xl font-black text-slate-800 mb-4 tracking-tighter text-center">極致瀅白！</h3>
-            <p class="text-slate-400 font-bold mb-12 leading-relaxed text-lg px-6 italic text-center">數據同步完成，邁向極致純淨。</p>
-            <div class="bg-blue-50 p-8 rounded-[3.5rem] border border-blue-100 flex justify-between items-center mb-14 shadow-inner">
-                <span class="font-black text-slate-500 uppercase tracking-widest text-xs">Reward Balance</span>
-                <span class="font-black text-blue-600 text-5xl tracking-tighter font-mono">💰 <span id="reward-val">0</span></span>
-            </div>
-            <button onclick="location.reload()" class="w-full py-7 brand-btn text-2xl rounded-[3rem] shadow-xl font-black hover:scale-105 active:scale-95 transition-transform">下一位貴賓</button>
-        </div>
-    </div>
-
 </body>
 </html>
