@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>瀅白之境 Pure Skin - V3.1</title>
+    <title>瀅白之境 Pure Skin - V3.2</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
@@ -20,28 +20,28 @@
         const db = getFirestore(app);
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'pure-skin-studio-master';
 
-        // --- 備援配置與故事庫 ---
+        // --- 備援配置與 20 種 RPG 故事集 ---
         const FALLBACK_DATA = {
             bodyParts: {
-                face: { name: '臉部療程', icon: '👤', cost: 100, desc: '上唇、下巴精細護理。' },
-                underarm: { name: '腋下護理', icon: '✨', cost: 150, desc: '掃除黑頭沉積。' },
-                bikini: { name: 'VIO 私密', icon: '👙', cost: 480, desc: '極致親膚溫柔呵護。' },
-                limbs: { name: '四肢除毛', icon: '🦵', cost: 220, desc: '打造大面積絲滑肌。' }
+                face: { name: '臉部療程', icon: '👤', cost: 100, desc: '上唇、下巴精細護理，讓妝感更透亮。' },
+                underarm: { name: '腋下護理', icon: '✨', cost: 150, desc: '掃除黑頭沉積，夏日清爽首選。' },
+                bikini: { name: 'VIO 私密', icon: '👙', cost: 480, desc: '極致親膚技術，溫柔呵護敏感地帶。' },
+                limbs: { name: '四肢除毛', icon: '🦵', cost: 220, desc: '打造大面積絲滑肌，展現自信線條。' }
             },
             careerTitles: ["瀅白實習生", "初級技師", "資深除毛師", "首席技術官", "醫美顧問", "雷射物理專家", "皮膚臨床醫生", "抗老研究員", "生物纖維專家", "醫學美容院長", "婚禮造型師", "時尚雜誌顧問", "好萊塢特效護理", "明星御用大師", "人體美學家", "沙龍店長", "品牌經理", "連鎖店創始人", "美容集團 CEO", "全球美學教父"],
             stories: Array.from({length: 20}, (_, i) => ({
                 id: i,
-                title: `案例 #${i + 1}`,
+                title: `客訴/需求案例 #${i + 1}`,
                 text: [
-                    `你好！我是第 ${i+1} 號預約者。我的皮膚比較敏感，不知道雷射會不會痛？`,
-                    `其實我下週有個重要的品牌活動，想讓肌膚看起來更淨白。`,
-                    `這是我第一次嘗試全身除毛，瀅白之境的評價真的很高。`,
-                    `教父你好，我想處理腋下的部分，夏天快到了，希望能徹底清潔。`,
-                    `最近覺得毛髮長得有點快，想嘗試看看專業的雷射技術。`
+                    `你好！我是預約者。我的皮膚非常敏感，雷射能量可以幫我調低一點嗎？`,
+                    `我下週要去海邊拍自助婚紗，希望能幫我把腋下處理得乾乾淨淨。`,
+                    `這是我第一次嘗試 VIO 療程，我真的很緊張...`,
+                    `聽說你們這裡的「瀅白技術」是全球頂尖的？我想見識看看。`,
+                    `教父，我最近覺得毛髮長得有點不均勻，需要您專業的評估。`
                 ][i % 5],
                 options: [
-                    { text: "我們會使用最溫和的冷感脈衝技術，請放心。", response: "太棒了！那我就放心交給你了。" },
-                    { text: "追求極致瀅白是需要一點勇氣的，我會儘快完成。", response: "很有道理，專業人士果然就是不一樣。" }
+                    { text: "我們會使用最先進的冷感冷卻系統，完全不痛。", response: "哇！那真的太專業了，謝謝你。" },
+                    { text: "瀅白之美需要精準的操作，請完全放心地交給我。", response: "好的，感受到您的專業氣場了。" }
                 ]
             }))
         };
@@ -57,70 +57,58 @@
             isCleaning: false, isMuted: true, isDefinitionsLoaded: false
         };
 
-        // --- 音頻中心 ---
+        // --- 音頻中心 (解決 BGM 不播放與卡死問題) ---
         const bgm = new Audio("https://assets.mixkit.co/music/preview/mixkit-serene-view-443.mp3");
         bgm.loop = true;
+        bgm.volume = 0.4;
 
         window.toggleMusic = () => {
             state.isMuted = !state.isMuted;
-            if (!state.isMuted) bgm.play().catch(e => console.log("等待交互"));
-            else bgm.pause();
-            document.getElementById('music-icon').innerText = state.isMuted ? "🔇" : "🔊";
+            const icon = document.getElementById('music-icon');
+            if (!state.isMuted) {
+                bgm.play().catch(e => console.log("等待點擊啟動音樂"));
+                icon.innerText = "🔊";
+                icon.parentElement.classList.add('animate-pulse');
+            } else {
+                bgm.pause();
+                icon.innerText = "🔇";
+                icon.parentElement.classList.remove('animate-pulse');
+            }
         };
 
-        // --- UI 工具 ---
-        function showMessage(text, isError = false) {
-            const box = document.getElementById('message-box');
-            document.getElementById('message-content').innerText = text;
-            box.classList.remove('hidden'); box.classList.add('flex');
-            box.className = isError 
-                ? "fixed top-10 left-1/2 -translate-x-1/2 z-[20000] px-8 py-4 rounded-3xl text-white font-bold shadow-2xl bg-red-500/90" 
-                : "fixed top-10 left-1/2 -translate-x-1/2 z-[20000] px-8 py-4 rounded-3xl text-white font-bold shadow-2xl bg-blue-600/90";
-            setTimeout(() => { box.classList.add('hidden'); box.classList.remove('flex'); }, 5000);
+        // --- 特效：雷射閃光特效 ---
+        function triggerLaserFX(x, y) {
+            const fx = document.createElement('div');
+            fx.className = 'laser-flash';
+            fx.style.left = `${x}px`;
+            fx.style.top = `${y}px`;
+            document.body.appendChild(fx);
+            setTimeout(() => fx.remove(), 400);
         }
 
-        // --- 視覺引擎：SVG 人物生成 ---
-        function renderAvatar(gender, targetId) {
-            const color = gender === 'male' ? '#bae6fd' : '#fecdd3';
-            const hair = gender === 'male' 
-                ? 'M20,45 Q50,15 80,45 L80,35 Q50,5 20,35 Z' 
-                : 'M10,50 Q50,-10 90,50 L95,100 L5,100 Z';
-            const svg = `
-                <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-lg">
-                    <circle cx="50" cy="55" r="40" fill="white" stroke="${color}" stroke-width="2"/>
-                    <path d="${hair}" fill="${color}" opacity="0.9"/>
-                    <circle cx="38" cy="55" r="3" fill="#334155"/>
-                    <circle cx="62" cy="55" r="3" fill="#334155"/>
-                    <path d="M42,75 Q50,82 58,75" fill="none" stroke="#334155" stroke-width="2" stroke-linecap="round"/>
-                    <circle cx="32" cy="65" r="4" fill="#fecaca" opacity="0.6"/>
-                    <circle cx="68" cy="65" r="4" fill="#fecaca" opacity="0.6"/>
-                </svg>
-            `;
-            const container = document.getElementById(targetId);
-            if (container) container.innerHTML = svg;
-        }
-
-        // --- 初始化與連線修復邏輯 ---
+        // --- 初始化入口：5秒自動跳轉修復 ---
         async function init() {
-            // 超時出口：8秒內沒連上強制開啟
-            const safetyTimeout = setTimeout(() => {
+            console.log("瀅白之境系統啟動中...");
+            
+            // 超時安全出口：若 Firebase 5 秒內無回應，強行進入備援模式
+            const watchdog = setTimeout(() => {
                 if (state.view === 'loading') {
-                    console.warn("連線超時，啟動本地備援模式");
+                    console.warn("Firebase 連線緩慢，自動切換至備援大廳...");
                     state.isDefinitionsLoaded = true;
-                    switchView('login');
+                    switchView('lobby');
                 }
-            }, 8000);
+            }, 5000);
 
             try { await setPersistence(auth, browserLocalPersistence); } catch(e){}
 
             onAuthStateChanged(auth, async (currUser) => {
-                clearTimeout(safetyTimeout);
+                clearTimeout(watchdog);
                 if (currUser) {
                     state.user = currUser;
                     await syncDefinitions();
                     await syncUserData();
                     generateAppointments();
-                    if (state.view === 'loading' || state.view === 'login') switchView('lobby');
+                    if (state.view === 'loading') switchView('lobby');
                 } else {
                     state.user = null;
                     await syncDefinitions();
@@ -128,11 +116,15 @@
                 }
             });
 
+            // 確保觸發連線狀態變化
             if (!auth.currentUser) {
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                     signInWithCustomToken(auth, __initial_auth_token);
                 } else {
-                    signInAnonymously(auth).catch(e => console.warn("匿名連線異常"));
+                    signInAnonymously(auth).catch(() => {
+                        state.isDefinitionsLoaded = true;
+                        switchView('login');
+                    });
                 }
             }
 
@@ -140,11 +132,16 @@
             window.addEventListener('mousemove', (e) => { 
                 if (probe) { probe.style.left = `${e.clientX}px`; probe.style.top = `${e.clientY}px`; }
             });
+
+            // 解決自動播放：第一次點擊頁面時嘗試啟動 BGM
+            window.addEventListener('mousedown', () => {
+                if (!state.isMuted && bgm.paused) bgm.play();
+            }, { once: true });
         }
 
         async function syncDefinitions() {
             try {
-                // 修正路徑段落：/definitions/config (6段)
+                // 修正：必須使用 6 段路徑 (集合/文件/集合/文件/集合/文件)
                 const defRef = doc(db, 'artifacts', appId, 'public', 'data', 'definitions', 'config');
                 const snap = await getDoc(defRef);
                 if (snap.exists()) {
@@ -152,11 +149,12 @@
                     state.bodyParts = d.bodyParts || FALLBACK_DATA.bodyParts;
                     state.careerTitles = d.careerTitles || FALLBACK_DATA.careerTitles;
                     state.stories = d.stories || FALLBACK_DATA.stories;
+                    console.log("雲端配置同步成功");
                 } else {
-                    await setDoc(defRef, FALLBACK_DATA).catch(()=>null);
+                    setDoc(defRef, FALLBACK_DATA).catch(()=>null);
                 }
             } catch (err) {
-                console.error("雲端同步失敗，已載入預設本地數據");
+                console.error("Firebase 連線或權限異常，已套用本地備援數據。");
             } finally {
                 state.isDefinitionsLoaded = true;
                 updateUI();
@@ -170,13 +168,13 @@
             }, () => null);
         }
 
-        // --- 業務邏輯 ---
+        // --- 業務邏輯與視覺渲染 ---
         function generateAppointments() {
             const keys = Object.keys(state.bodyParts);
             state.appointments = Array.from({length: 8}, (_, i) => ({
                 id: i,
                 name: CUSTOMER_NAMES[Math.floor(Math.random() * CUSTOMER_NAMES.length)],
-                time: `${10 + i}:30`,
+                time: `${10 + i}:00`,
                 gender: Math.random() > 0.5 ? 'female' : 'male',
                 part: keys[Math.floor(Math.random() * keys.length)],
                 status: i < 2 ? 'READY' : 'WAITING'
@@ -184,16 +182,36 @@
             if (state.view === 'appointments') renderAppointmentList();
         }
 
+        function renderAvatar(gender, targetId) {
+            const color = gender === 'male' ? '#bae6fd' : '#fecdd3';
+            const hair = gender === 'male' 
+                ? 'M20,45 Q50,15 80,45 L80,35 Q50,5 20,35 Z' 
+                : 'M10,50 Q50,-10 90,50 L95,100 L5,100 Z';
+            const svg = `
+                <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-xl animate-float">
+                    <circle cx="50" cy="55" r="40" fill="white" stroke="${color}" stroke-width="2"/>
+                    <path d="${hair}" fill="${color}" opacity="0.9"/>
+                    <circle cx="38" cy="55" r="3" fill="#334155"/>
+                    <circle cx="62" cy="55" r="3" fill="#334155"/>
+                    <path d="M42,75 Q50,82 58,75" fill="none" stroke="#334155" stroke-width="2" stroke-linecap="round"/>
+                    <circle cx="32" cy="65" r="4" fill="#fecaca" opacity="0.6"/>
+                    <circle cx="68" cy="65" r="4" fill="#fecaca" opacity="0.6"/>
+                </svg>
+            `;
+            const container = document.getElementById(targetId);
+            if (container) container.innerHTML = svg;
+        }
+
         function renderAppointmentList() {
             const list = document.getElementById('appointment-list');
             if (!list) return;
-            list.innerHTML = state.appointments.map(app => `
-                <div class="flex items-center justify-between p-5 bg-white/70 rounded-[2.5rem] border border-blue-50 hover:bg-blue-100 hover:scale-[1.02] transition-all cursor-pointer shadow-sm mb-4" onclick="window.pickCustomer(${app.id})">
+            list.innerHTML = state.appointments.map((app, idx) => `
+                <div class="flex items-center justify-between p-5 bg-white/70 rounded-[2.5rem] border border-blue-50 hover:bg-blue-100 hover:scale-[1.03] transition-all cursor-pointer shadow-sm mb-4 animate-slide-in" style="animation-delay: ${idx * 0.1}s" onclick="window.pickCustomer(${app.id})">
                     <div class="flex items-center gap-4">
                         <div class="w-14 h-14 bg-white rounded-3xl flex items-center justify-center text-2xl shadow-inner border border-blue-50">${app.gender === 'male' ? '👦' : '👧'}</div>
                         <div>
                             <p class="font-black text-slate-700 text-lg">${app.name}</p>
-                            <p class="text-[11px] font-bold text-blue-400 uppercase tracking-widest">${app.time} · ${state.bodyParts[app.part]?.name || '全身療程'}</p>
+                            <p class="text-[11px] font-bold text-blue-400 uppercase tracking-widest">${app.time} · ${state.bodyParts[app.part]?.name || '特殊療程'}</p>
                         </div>
                     </div>
                     <span class="text-[10px] font-black px-4 py-2 rounded-full ${app.status === 'READY' ? 'bg-green-100 text-green-600' : 'bg-slate-100 text-slate-400'}">${app.status}</span>
@@ -215,6 +233,7 @@
             document.getElementById('diag-name').innerText = state.currentCustomer.name;
             document.getElementById('diag-text').innerText = story.text;
             renderAvatar(state.currentCustomer.gender, 'diag-avatar-box');
+            
             document.getElementById('diag-options').innerHTML = story.options.map((opt, i) => `
                 <button onclick="window.chooseOption(${i})" class="w-full p-4 bg-white/90 rounded-3xl border border-blue-50 font-bold text-blue-600 hover:bg-blue-600 hover:text-white transition-all text-sm mb-3 shadow-sm text-left px-6">
                     ● ${opt.text}
@@ -227,12 +246,12 @@
             document.getElementById('diag-text').innerText = opt.response;
             document.getElementById('diag-options').innerHTML = `
                 <button onclick="switchView('selection')" class="w-full p-5 bg-blue-600 text-white rounded-3xl font-black shadow-xl hover:scale-[1.05] transition-transform">
-                    確定，進入定制評估
+                    啟動雷射儀器評估
                 </button>
             `;
         };
 
-        window.loginGoogle = () => signInWithPopup(auth, new GoogleAuthProvider()).catch(e => showMessage("驗證異常", true));
+        window.loginGoogle = () => signInWithPopup(auth, new GoogleAuthProvider()).catch(e => alert("驗證異常"));
         window.loginGuest = () => switchView('lobby');
         window.logout = () => signOut(auth).then(() => window.location.reload());
 
@@ -240,8 +259,10 @@
             state.view = v;
             ['loading', 'login', 'lobby', 'appointments', 'dialogue', 'selection', 'game'].forEach(id => {
                 const el = document.getElementById(`view-${id}`);
-                if (el) el.classList.toggle('hidden', state.view !== id);
-                if (el) el.classList.toggle('flex', state.view === id);
+                if (el) {
+                    el.classList.toggle('hidden', state.view !== id);
+                    el.classList.toggle('flex', state.view === id);
+                }
             });
             if (v === 'game') setTimeout(initCanvas, 100);
             if (v === 'appointments') renderAppointmentList();
@@ -253,7 +274,7 @@
             document.querySelectorAll('.level-val').forEach(el => el.innerText = `Lv.${state.level}`);
             const careerName = state.careerTitles[state.careerIndex] || "瀅白學員";
             document.querySelectorAll('.career-val').forEach(el => el.innerText = careerName);
-            document.querySelectorAll('.user-name').forEach(el => el.innerText = state.user?.displayName || "美學顧問");
+            document.querySelectorAll('.user-name').forEach(el => el.innerText = state.user?.displayName || "專家顧問");
             if (state.view === 'selection') renderSelectionUI();
         }
 
@@ -263,9 +284,17 @@
             if (!canvas) return;
             ctx = canvas.getContext('2d');
             canvas.width = 340; canvas.height = 440;
-            canvas.onmousedown = (e) => { state.isCleaning = true; document.getElementById('laser-probe').classList.add('active'); clean(e); };
-            canvas.onmousemove = (e) => { if (state.isCleaning) clean(e); };
-            window.onmouseup = () => { state.isCleaning = false; document.getElementById('laser-probe').classList.remove('active'); checkProgress(); };
+            canvas.onmousedown = (e) => { 
+                state.isCleaning = true; 
+                document.getElementById('laser-probe').classList.add('active'); 
+                clean(e); 
+            };
+            canvas.onmousemove = (e) => { if (state.isCleaning) { clean(e); triggerLaserFX(e.clientX, e.clientY); } };
+            window.onmouseup = () => { 
+                state.isCleaning = false; 
+                document.getElementById('laser-probe').classList.remove('active'); 
+                checkProgress(); 
+            };
             drawSkin();
         }
 
@@ -307,13 +336,13 @@
         }
 
         function renderSelectionUI() {
-            const p = state.bodyParts[state.selectedPartId] || { name: '定制療程', icon: '❓', desc: '正在評估載入中...', cost: 0 };
+            const p = state.bodyParts[state.selectedPartId] || { name: '定制療程', icon: '❓', desc: '評估數據同步中...', cost: 0 };
             document.getElementById('selection-detail').innerHTML = `
                 <div class="p-8 bg-blue-50/70 rounded-[3rem] border border-blue-100 shadow-inner">
-                    <div class="flex items-center gap-4 mb-3"><span class="text-4xl">${p.icon}</span><h3 class="text-2xl font-black text-blue-600">${p.name}</h3></div>
+                    <div class="flex items-center gap-4 mb-3"><span class="text-4xl animate-pulse">${p.icon}</span><h3 class="text-2xl font-black text-blue-600">${p.name}</h3></div>
                     <p class="text-sm text-slate-500 font-medium leading-relaxed mb-6">${p.desc}</p>
                     <div class="mt-4 flex justify-between items-center border-t border-blue-100 pt-5">
-                        <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Reward</span>
+                        <span class="text-xs font-bold text-slate-400 uppercase tracking-widest text-center">Reward Balance</span>
                         <span class="text-2xl font-black text-blue-800 font-mono">💰 ${p.cost}</span>
                     </div>
                 </div>
@@ -330,14 +359,34 @@
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap');
         body { font-family: 'Noto Sans TC', sans-serif; background: #fdfdfe; cursor: none; overflow: hidden; margin: 0; user-select: none; }
         .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(25px); border: 1px solid rgba(255, 255, 255, 0.6); }
-        #laser-probe { position: fixed; width: 54px; height: 54px; border: 3px solid #3b82f6; border-radius: 50%; pointer-events: none; z-index: 10000; transform: translate(-50%, -50%); background: rgba(59, 130, 246, 0.1); box-shadow: 0 0 20px rgba(59, 130, 246, 0.3); transition: transform 0.1s ease-out; }
-        #laser-probe.active { transform: translate(-50%, -50%) scale(0.8); background: rgba(59, 130, 246, 0.6); box-shadow: 0 0 40px #3b82f6; }
+        
+        /* 雷射探頭特效組件 */
+        #laser-probe { 
+            position: fixed; width: 54px; height: 54px; border: 3px solid #3b82f6; border-radius: 50%; pointer-events: none; z-index: 10000; transform: translate(-50%, -50%); 
+            background: rgba(59, 130, 246, 0.1); box-shadow: 0 0 20px rgba(59, 130, 246, 0.4); transition: transform 0.1s ease-out; 
+        }
+        #laser-probe::before {
+            content: ''; position: absolute; top: -10px; left: -10px; right: -10px; bottom: -10px; border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 50%; animation: pulse-fx 2s infinite;
+        }
+        #laser-probe.active { transform: translate(-50%, -50%) scale(0.75); background: rgba(59, 130, 246, 0.8); box-shadow: 0 0 60px #3b82f6; }
         #laser-probe::after { content: ''; position: absolute; top: 50%; left: 50%; width: 4px; height: 4px; background: white; border-radius: 50%; transform: translate(-50%, -50%); }
+        
+        .laser-flash { position: fixed; width: 40px; height: 40px; background: radial-gradient(circle, rgba(96, 165, 250, 0.8) 0%, transparent 70%); border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%, -50%); animation: flash-fade 0.4s ease-out forwards; }
+
         .brand-btn { background: linear-gradient(135deg, #a5f3fc 0%, #e0f2fe 100%); color: #0369a1; font-weight: 900; cursor: pointer; transition: 0.3s; }
         .brand-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(186, 230, 253, 0.5); }
+        
         .hotspot { fill: #f8fafc; stroke: #e2e8f0; cursor: pointer; transition: 0.3s; }
         .hotspot.active { fill: #3b82f6; stroke: #1d4ed8; stroke-width: 2.5; filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.5)); }
+        
         canvas { border-radius: 4.5rem; border: 12px solid white; box-shadow: 0 30px 70px rgba(186, 230, 253, 0.2); background: white; }
+
+        @keyframes pulse-fx { 0% { transform: scale(1); opacity: 0.8; } 100% { transform: scale(1.6); opacity: 0; } }
+        @keyframes flash-fade { 0% { transform: translate(-50%, -50%) scale(0.5); opacity: 1; } 100% { transform: translate(-50%, -50%) scale(2); opacity: 0; } }
+        @keyframes slide-in { from { transform: translateY(25px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes float { 0% { transform: translateY(0); } 50% { transform: translateY(-10px); } 100% { transform: translateY(0); } }
+        .animate-float { animation: float 3.5s ease-in-out infinite; }
+        .animate-slide-in { animation: slide-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center">
@@ -348,6 +397,7 @@
         <span id="message-content"></span>
     </div>
 
+    <!-- 氛圍音控制按鈕 -->
     <div onclick="window.toggleMusic()" class="fixed bottom-6 right-6 z-[1000] w-14 h-14 glass rounded-full flex items-center justify-center cursor-pointer shadow-lg hover:scale-110 transition-transform border border-blue-50">
         <span id="music-icon" class="text-2xl">🔇</span>
     </div>
@@ -357,66 +407,67 @@
             <span class="text-2xl">💰</span><span class="gold-val font-black text-slate-700 text-lg">0</span>
         </div>
         <div class="glass px-7 py-3 rounded-full flex flex-col items-center shadow-lg border-blue-50">
-            <span class="career-val text-[11px] font-black text-blue-600 uppercase tracking-tighter text-center">Loading...</span>
-            <span class="level-val text-[10px] font-bold text-slate-400">Loading</span>
+            <span class="career-val text-[11px] font-black text-blue-600 uppercase tracking-tighter text-center italic">Loading...</span>
+            <span class="level-val text-[10px] font-bold text-slate-400">Pure Level</span>
         </div>
     </div>
 
-    <!-- 0. Loading -->
+    <!-- 0. Loading 視圖 -->
     <div id="view-loading" class="flex flex-col items-center">
         <div class="w-16 h-16 border-4 border-blue-100 border-t-blue-500 rounded-full animate-spin mb-8"></div>
-        <p class="text-slate-400 font-black text-sm tracking-[0.4em] uppercase text-center leading-relaxed">Pure Skin Evolution<br><span class="text-blue-300 mt-2 block text-xs tracking-widest">建立雲端安全連線</span></p>
+        <p class="text-slate-400 font-black text-sm tracking-[0.4em] uppercase text-center leading-relaxed">Pure Skin Evolution<br><span class="text-blue-300 mt-2 block text-xs tracking-widest">建立雲端美學安全連線</span></p>
     </div>
 
-    <!-- 1. Login -->
+    <!-- 1. Login 視圖 -->
     <div id="view-login" class="hidden flex flex-col items-center">
         <div class="w-28 h-28 bg-white rounded-[3rem] flex items-center justify-center mb-12 shadow-xl border border-blue-50"><span class="text-7xl">🧊</span></div>
         <h1 class="text-5xl font-black text-slate-800 mb-2 tracking-tighter">瀅白之境</h1>
-        <p class="text-slate-400 text-xs mb-12 font-black tracking-[0.3em] uppercase">Identity Center</p>
+        <p class="text-slate-400 text-xs mb-12 font-black tracking-[0.3em] uppercase">Identity Verification</p>
         <div class="space-y-4 w-72 flex flex-col items-center">
-            <button onclick="window.loginGoogle()" class="w-full py-5 bg-white border border-slate-100 rounded-3xl flex items-center justify-center gap-4 shadow-sm hover:bg-blue-50 transition-all"><img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/action/google.svg" width="22"><span class="font-black text-slate-600">Google 快速登入</span></button>
-            <button onclick="window.loginGuest()" class="w-full py-5 bg-blue-50 text-blue-600 font-black rounded-3xl hover:bg-blue-100 transition-all">訪客試玩模式</button>
-            <p class="text-[10px] text-slate-400 mt-4 text-center px-4 leading-relaxed">※ 訪客模式僅供單次體驗，進度無法跨裝置同步</p>
+            <button onclick="window.loginGoogle()" class="w-full py-5 bg-white border border-slate-100 rounded-3xl flex items-center justify-center gap-4 shadow-sm hover:bg-blue-50 transition-all"><img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/action/google.svg" width="22"><span class="font-black text-slate-600 text-lg">Google 快速認證</span></button>
+            <button onclick="window.loginGuest()" class="w-full py-5 bg-blue-50 text-blue-600 font-black rounded-3xl hover:bg-blue-100 transition-all text-lg">訪客試玩模式</button>
+            <p class="text-[10px] text-slate-400 mt-4 text-center px-4 leading-relaxed">※ 訪客模式之職涯數據無法跨平台同步保存</p>
         </div>
     </div>
 
-    <!-- 2. Lobby -->
+    <!-- 2. Lobby 視圖 -->
     <div id="view-lobby" class="hidden flex flex-col items-center">
         <div class="w-36 h-36 bg-white rounded-[4rem] flex items-center justify-center mb-12 shadow-2xl border-4 border-blue-50 rotate-3 transition-transform hover:rotate-0"><span class="text-7xl">💎</span></div>
         <h1 class="text-6xl font-black text-slate-800 tracking-tighter mb-1">瀅白之境</h1>
-        <p class="text-blue-400 font-black tracking-[0.5em] text-xs uppercase mb-12 italic">Pure Skin Evolution</p>
-        <div class="glass p-8 rounded-[3rem] mb-12 text-center min-w-[280px] border-blue-100/50 shadow-inner">
-            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">當前認證專家</p>
-            <p class="user-name font-black text-slate-700 text-2xl italic truncate max-w-[220px]">---</p>
+        <p class="text-blue-400 font-black tracking-[0.5em] text-xs uppercase mb-12 italic">Total Aesthetic Evolution</p>
+        <div class="glass p-8 rounded-[3rem] mb-12 text-center min-w-[300px] border-blue-100/50 shadow-inner relative overflow-hidden">
+            <div class="absolute -top-10 -right-10 w-24 h-24 bg-blue-50 rounded-full opacity-30"></div>
+            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 italic">瀅白認證顧問</p>
+            <p class="user-name font-black text-slate-700 text-2xl italic truncate px-2">---</p>
         </div>
-        <button onclick="switchView('appointments')" class="w-80 py-7 brand-btn text-3xl rounded-[2.5rem] shadow-2xl hover:scale-105 active:scale-95">開啟預約管理</button>
-        <button onclick="window.logout()" class="mt-8 text-slate-300 font-bold text-sm tracking-widest">Logout System</button>
+        <button onclick="switchView('appointments')" class="w-80 py-7 brand-btn text-3xl rounded-[2.5rem] shadow-2xl hover:scale-105 active:scale-95">預約排程管理</button>
+        <button onclick="window.logout()" class="mt-8 text-slate-300 font-black text-sm tracking-widest hover:text-red-400 transition-colors">系統登出退出</button>
     </div>
 
-    <!-- 2.5 Appointments List -->
+    <!-- 2.5 今日預約表視圖 -->
     <div id="view-appointments" class="hidden flex-col items-center w-full max-w-lg p-6">
         <div class="glass w-full p-10 rounded-[4.5rem] shadow-2xl border border-blue-50">
-            <div class="flex items-end justify-between mb-8"><h2 class="text-3xl font-black text-slate-800 tracking-tighter underline decoration-blue-200">今日預約表</h2><span class="text-[10px] font-black text-blue-300 uppercase mb-1">Schedule</span></div>
-            <div id="appointment-list" class="space-y-4 max-h-[450px] overflow-y-auto pr-4"></div>
-            <button onclick="switchView('lobby')" class="w-full mt-10 py-5 text-slate-400 font-black text-sm tracking-widest border-t border-blue-50 pt-8">返回大廳</button>
+            <div class="flex items-end justify-between mb-8"><h2 class="text-3xl font-black text-slate-800 tracking-tighter underline decoration-blue-200">今日預約表</h2><span class="text-[10px] font-black text-blue-300 uppercase mb-1 italic">Salon Schedule</span></div>
+            <div id="appointment-list" class="space-y-4 max-h-[450px] overflow-y-auto pr-4 custom-scrollbar"></div>
+            <button onclick="switchView('lobby')" class="w-full mt-10 py-5 text-slate-400 font-black text-sm tracking-widest border-t border-blue-50 pt-8 hover:text-blue-500 transition-colors uppercase">返回沙龍中心</button>
         </div>
     </div>
 
-    <!-- 3. Dialogue -->
-    <div id="view-dialogue" class="hidden fixed inset-0 flex flex-col items-center justify-end p-10 bg-slate-900/10 backdrop-blur-sm">
-        <div class="glass w-full max-w-2xl p-12 rounded-[5rem] shadow-2xl flex items-start gap-12 border-blue-50">
-            <div id="diag-avatar-box" class="w-36 h-36 bg-gradient-to-br from-white to-blue-50 rounded-[3rem] flex-shrink-0 border border-blue-50 p-3 shadow-inner"></div>
+    <!-- 3. RPG 對話視圖 -->
+    <div id="view-dialogue" class="hidden fixed inset-0 flex flex-col items-center justify-end p-10 bg-slate-900/15 backdrop-blur-md">
+        <div class="glass w-full max-w-2xl p-12 rounded-[5rem] shadow-2xl flex items-start gap-12 border-blue-50 animate-slide-in relative">
+            <div id="diag-avatar-box" class="w-36 h-36 bg-gradient-to-br from-white to-blue-50 rounded-[3.5rem] flex-shrink-0 border border-blue-100 p-3 shadow-inner"></div>
             <div class="flex-1">
-                <h4 id="diag-name" class="font-black text-blue-500 text-xl mb-2 italic underline decoration-blue-100">顧客</h4>
-                <p id="diag-text" class="text-slate-700 font-bold leading-relaxed text-2xl min-h-[4em] mb-10">...</p>
+                <h4 id="diag-name" class="font-black text-blue-500 text-xl mb-2 italic underline decoration-blue-100 decoration-4">顧客</h4>
+                <p id="diag-text" class="text-slate-700 font-bold leading-relaxed text-2xl min-h-[4.5em] mb-10 italic">...</p>
                 <div id="diag-options" class="flex flex-col"></div>
             </div>
         </div>
     </div>
 
-    <!-- 4. Selection -->
+    <!-- 4. 定制評估視圖 -->
     <div id="view-selection" class="hidden flex-col items-center w-full max-w-5xl px-4">
-        <div class="glass p-16 rounded-[6rem] flex flex-col md:flex-row gap-20 items-center shadow-2xl border-blue-50">
+        <div class="glass p-16 rounded-[6rem] flex flex-col md:flex-row gap-20 items-center shadow-2xl border-blue-50 animate-slide-in">
             <div class="w-72 h-[550px]">
                 <svg viewBox="0 0 200 500" class="w-full h-full drop-shadow-2xl">
                     <circle cx="100" cy="55" r="45" class="hotspot" data-id="face" onclick="selectPart('face')" />
@@ -431,36 +482,39 @@
                 </svg>
             </div>
             <div class="w-full max-w-md space-y-10 text-center md:text-left">
-                <h3 class="text-5xl font-black text-slate-800 tracking-tighter italic">定制評估</h3>
+                <h3 class="text-5xl font-black text-slate-800 tracking-tighter italic">定制專業評估</h3>
                 <div id="selection-detail"></div>
                 <div class="space-y-4">
-                    <button onclick="confirmStart()" class="w-full py-7 brand-btn text-3xl rounded-[3rem] shadow-xl">啟動雷射儀器</button>
-                    <button onclick="switchView('appointments')" class="w-full text-slate-400 font-black text-sm uppercase">重新檢視預約表</button>
+                    <button onclick="confirmStart()" class="w-full py-7 brand-btn text-3xl rounded-[3rem] shadow-xl hover:scale-105 active:scale-95">啟動高效雷射</button>
+                    <button onclick="switchView('appointments')" class="w-full text-slate-400 font-black text-sm uppercase italic tracking-widest hover:text-blue-500 transition-colors">重新確認預約表</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- 5. Game -->
-    <div id="view-game" class="hidden flex flex-col items-center">
+    <!-- 5. 除毛互動互動互動視圖 -->
+    <div id="view-game" class="hidden flex flex-col items-center animate-slide-in">
         <div class="mb-12 w-96 text-center">
-            <div class="w-full h-5 bg-white rounded-full overflow-hidden shadow-inner border-4 border-blue-50"><div id="prog-bar" class="h-full bg-gradient-to-r from-blue-400 to-blue-600 transition-all duration-300" style="width: 0%"></div></div>
-            <p class="text-[11px] font-black text-blue-500 mt-4 uppercase tracking-[0.5em] animate-pulse">Laser Protocol Active</p>
+            <div class="w-full h-5 bg-white rounded-full overflow-hidden shadow-inner border-4 border-blue-50">
+                <div id="prog-bar" class="h-full bg-gradient-to-r from-blue-400 to-cyan-400 transition-all duration-300" style="width: 0%"></div>
+            </div>
+            <p class="text-[11px] font-black text-blue-500 mt-4 uppercase tracking-[0.5em] animate-pulse">Laser Protocol Active: Operation 98% Purity</p>
         </div>
         <canvas id="game-canvas" class="cursor-none"></canvas>
     </div>
 
-    <!-- Result -->
-    <div id="result-modal" class="hidden fixed inset-0 z-[200] items-center justify-center bg-blue-900/60 backdrop-blur-xl px-4">
+    <!-- 結算彈窗 -->
+    <div id="result-modal" class="hidden fixed inset-0 z-[200] items-center justify-center bg-blue-900/70 backdrop-blur-xl px-4 animate-slide-in">
         <div class="bg-white rounded-[6rem] p-20 text-center shadow-2xl max-w-md w-full border-4 border-blue-50 relative overflow-hidden">
+            <div class="absolute -top-10 -left-10 w-40 h-40 bg-blue-50 rounded-full opacity-50 blur-3xl"></div>
             <div class="text-9xl mb-12">🧊</div>
             <h3 class="text-5xl font-black text-slate-800 mb-4 tracking-tighter">極致瀅白！</h3>
-            <p class="text-slate-400 font-bold mb-12 leading-relaxed">專業數據已同步至雲端美學中心。</p>
+            <p class="text-slate-400 font-bold mb-12 leading-relaxed text-lg px-6 italic">本次療程圓滿結算，專業數據已即時同步至雲端系統。</p>
             <div class="bg-blue-50 p-8 rounded-[3.5rem] border border-blue-100 flex justify-between items-center mb-14 shadow-inner">
-                <span class="font-black text-slate-500 uppercase tracking-widest text-xs">Settled Bonus</span>
+                <span class="font-black text-slate-500 uppercase tracking-widest text-xs">Aesthetic Settled</span>
                 <span class="font-black text-blue-600 text-5xl tracking-tighter font-mono">💰 <span id="reward-val">0</span></span>
             </div>
-            <button onclick="location.reload()" class="w-full py-7 brand-btn text-2xl rounded-[3rem] shadow-xl font-black">接待下一位預約</button>
+            <button onclick="location.reload()" class="w-full py-7 brand-btn text-2xl rounded-[3rem] shadow-xl font-black hover:scale-105 active:scale-95 transition-transform">接待下一位貴賓</button>
         </div>
     </div>
 
