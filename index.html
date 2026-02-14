@@ -6,7 +6,7 @@
     <title>瀅白之境 Pure Skin</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script type="module">
-        // --- Firebase SDK 導入 ---
+        // --- Firebase SDK 模組化導入 ---
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { 
             getAuth, 
@@ -37,7 +37,29 @@
         const db = getFirestore(app);
         const appId = "pure-skin-studio-master";
 
-        // --- 遊戲狀態管理 ---
+        // --- 韌性載入：本地備援配置 (FALLBACK_CONFIG) ---
+        const FALLBACK_CONFIG = {
+            bodyParts: {
+                face: { name: '臉部療程', icon: '👤', cost: 100, desc: '細緻處理面部雜毛，提升妝感透亮度。' },
+                underarm: { name: '腋下護理', icon: '✨', cost: 150, desc: '掃除黑頭沉積，重現淨白清爽。' },
+                bikini: { name: 'VIO 私密', icon: '👙', cost: 480, desc: '極致親膚技術，溫柔呵護敏感地帶。' },
+                limbs: { name: '四肢除毛', icon: '🦵', cost: 220, desc: '高效能量輸出，打造大面積絲滑肌。' },
+                back: { name: '背部淨白', icon: '👗', cost: 300, desc: '解決視覺盲點，展現完美無瑕背影。' },
+                others: { name: '細節美學', icon: '🎀', cost: 120, desc: '後頸髮際線與腹部下肚線精準微雕。' }
+            },
+            careerTitles: [
+                "瀅白實習生", "初級技師", "資深除毛師", "首席技術官", "醫美顧問", 
+                "雷射物理專家", "皮膚臨床醫生", "抗老研究員", "生物纖維專家", "醫學美容院長",
+                "婚禮造型師", "時尚雜誌顧問", "好萊塢特效護理", "明星御用大師", "人體美學家",
+                "沙龍店長", "品牌經理", "連鎖店創始人", "美容集團 CEO", "全球美學教父"
+            ],
+            stories: [
+                { name: "海邊遊客", avatar: "👩", text: ["瀅白之境你好，我下週要去潛水...", "可是 VIO 的部位讓我很害羞。", "請務必幫我處理得乾乾淨淨！"] },
+                { name: "健身職人", avatar: "👨", text: ["教父，我又來了。這次幫我處理小腿。", "毛髮太多會影響肌肉線條的視覺效果。", "報酬我已經準備好了。"] }
+            ]
+        };
+
+        // --- 全局狀態管理 ---
         let state = {
             user: null,
             totalGold: 0,
@@ -47,9 +69,10 @@
             view: 'loading', 
             selectedGender: 'female',
             selectedPartId: 'face',
-            bodyParts: {},
-            careerTitles: [],
-            stories: [],
+            // 雲端驅動數據
+            bodyParts: FALLBACK_CONFIG.bodyParts,
+            careerTitles: FALLBACK_CONFIG.careerTitles,
+            stories: FALLBACK_CONFIG.stories,
             isCleaning: false,
             currentStory: null,
             dialogueStep: 0,
@@ -57,21 +80,21 @@
             isMuted: true
         };
 
-        // --- 音頻控制 ---
+        // --- 音頻中心 ---
         const bgm = new Audio("https://assets.mixkit.co/music/preview/mixkit-serene-view-443.mp3");
         bgm.loop = true;
 
         window.toggleMusic = () => {
             state.isMuted = !state.isMuted;
             if (!state.isMuted) {
-                bgm.play().catch(e => console.log("等待使用者點擊以播放音訊"));
+                bgm.play().catch(() => console.log("等待互動以播放"));
             } else {
                 bgm.pause();
             }
             document.getElementById('music-icon').innerText = state.isMuted ? "🔇" : "🔊";
         };
 
-        // --- 系統訊息提示 ---
+        // --- 系統訊息介面 ---
         function showMessage(text, isError = false) {
             const box = document.getElementById('message-box');
             const content = document.getElementById('message-content');
@@ -89,22 +112,25 @@
 
         // --- 初始化入口 ---
         async function init() {
-            // 設置持久化認證 (RULE: 登入一次後不需再驗證)
-            await setPersistence(auth, browserLocalPersistence);
+            // 設置持久化：登入一次後不需再驗證
+            try {
+                await setPersistence(auth, browserLocalPersistence);
+            } catch (e) { console.warn("Persistence Error", e); }
 
             onAuthStateChanged(auth, async (currUser) => {
                 if (currUser) {
                     state.user = currUser;
-                    await syncDefinitions();
-                    await syncUserData();
+                    await syncDefinitions(); // 異步抓取雲端定義
+                    await syncUserData();    // 監聽個人進度
                     switchView('lobby');
                 } else {
                     state.user = null;
+                    await syncDefinitions(); // 訪客也需嘗試載入配置
                     switchView('login');
                 }
             });
 
-            // 探頭視覺座標跟隨
+            // 雷射探頭座標校準
             const probe = document.getElementById('laser-probe');
             window.addEventListener('mousemove', (e) => {
                 probe.style.left = `${e.clientX}px`;
@@ -112,7 +138,7 @@
             });
         }
 
-        // --- 雲端數據同步 ---
+        // --- 韌性數據同步 (V2.6 核心修改) ---
         async function syncDefinitions() {
             try {
                 const defRef = doc(db, 'artifacts', appId, 'public', 'data', 'definitions');
@@ -120,41 +146,22 @@
                 
                 if (snap.exists()) {
                     const cloud = snap.data();
-                    state.bodyParts = cloud.bodyParts || {};
-                    state.careerTitles = cloud.careerTitles || [];
-                    state.stories = cloud.stories || [];
+                    state.bodyParts = cloud.bodyParts || FALLBACK_CONFIG.bodyParts;
+                    state.careerTitles = cloud.careerTitles || FALLBACK_CONFIG.careerTitles;
+                    state.stories = cloud.stories || FALLBACK_CONFIG.stories;
+                    console.log("雲端配置載入成功");
                 } else {
-                    // 初始化公共定義集
-                    const defaults = {
-                        bodyParts: {
-                            face: { name: '臉部療程', icon: '👤', cost: 100, desc: '細緻處理面部雜毛，提升妝感透亮度。' },
-                            underarm: { name: '腋下護理', icon: '✨', cost: 150, desc: '掃除黑頭沉積，重現淨白清爽。' },
-                            bikini: { name: 'VIO 私密', icon: '👙', cost: 480, desc: '極致親膚技術，溫柔呵護敏感地帶。' },
-                            limbs: { name: '四肢除毛', icon: '🦵', cost: 220, desc: '高效能量輸出，打造大面積絲滑肌。' },
-                            back: { name: '背部淨白', icon: '👗', cost: 300, desc: '解決視覺盲點，展現完美無瑕背影。' },
-                            others: { name: '細節美學', icon: '🎀', cost: 120, desc: '後頸髮際線與腹部下肚線精準微雕。' }
-                        },
-                        careerTitles: [
-                            "瀅白實習生", "初級技師", "資深除毛師", "首席技術官", "醫美顧問", 
-                            "雷射物理專家", "皮膚臨床醫生", "抗老研究員", "生物纖維專家", "醫學美容院長",
-                            "婚禮造型師", "時尚雜誌顧問", "好萊塢特效護理", "明星御用大師", "人體美學家",
-                            "沙龍店長", "品牌經理", "連鎖店創始人", "美容集團 CEO", "全球美學教父"
-                        ],
-                        stories: [
-                            { name: "海邊遊客", avatar: "👩", text: ["瀅白之境你好，我下週要去潛水...", "可是 VIO 的部位讓我很害羞。", "請務必幫我處理得乾乾淨淨！"] },
-                            { name: "健身職人", avatar: "👨", text: ["教父，我又來了。這次幫我處理小腿。", "毛髮太多會影響肌肉線條的視覺效果。", "報酬我已經準備好了。"] }
-                        ]
-                    };
-                    await setDoc(defRef, defaults);
-                    state.bodyParts = defaults.bodyParts;
-                    state.careerTitles = defaults.careerTitles;
-                    state.stories = defaults.stories;
+                    // 若雲端文件不存在，嘗試初始化寫入預設集
+                    await setDoc(defRef, FALLBACK_CONFIG).catch(() => {
+                        console.warn("寫入權限受限，將維持本地模式運行。");
+                    });
                 }
+            } catch (err) {
+                console.warn("無法取得雲端配置，已啟用本地備援數據：", err.message);
+                // 發生錯誤 (如 Permission Denied) 時，已在 state 預設 FALLBACK_CONFIG，故無需額外處理
+            } finally {
                 state.isDefinitionsLoaded = true;
                 updateUI();
-            } catch (err) {
-                console.error("Definitions Sync Failed", err);
-                showMessage("雲端配置載入失敗，請確認資料庫權限。", true);
             }
         }
 
@@ -169,30 +176,34 @@
                     state.careerIndex = d.careerIndex || 0;
                     updateUI();
                 }
-            });
+            }, (err) => console.error("Firestore Listen Error:", err));
         }
 
-        // --- 認證功能 ---
+        // --- 身分認證模組 ---
         window.loginGoogle = async () => {
+            showMessage("正在嘗試啟動 Google 認證...");
             const provider = new GoogleAuthProvider();
             try { await signInWithPopup(auth, provider); }
-            catch (e) { showMessage(`驗證失敗: ${e.message}`, true); }
+            catch (e) { 
+                if (e.code === 'auth/popup-blocked') showMessage("彈窗被攔截，請允許此網域開啟視窗。", true);
+                else showMessage(`驗證異常: ${e.code}`, true);
+            }
         };
 
         window.loginGameCenter = async () => {
             const provider = new OAuthProvider('apple.com'); 
             try { await signInWithPopup(auth, provider); }
-            catch (e) { showMessage("Game Center 登入目前僅支援原生 iOS 環境。", true); }
+            catch (e) { showMessage("Game Center 目前僅支援 Apple 原生環境。", true); }
         };
 
         window.loginGuest = async () => {
             try { await signInAnonymously(auth); }
-            catch (e) { showMessage("匿名驗證失敗。", true); }
+            catch (e) { showMessage("系統連線繁忙，請稍後再試。", true); }
         };
 
         window.logout = () => signOut(auth);
 
-        // --- 視圖管理 ---
+        // --- 視圖與導航邏輯 ---
         function switchView(v) {
             state.view = v;
             const views = ['loading', 'login', 'lobby', 'dialogue', 'selection', 'game'];
@@ -211,17 +222,20 @@
             if (!state.isDefinitionsLoaded) return;
             document.querySelectorAll('.gold-val').forEach(el => el.innerText = state.totalGold);
             document.querySelectorAll('.level-val').forEach(el => el.innerText = `Lv.${state.level}`);
-            const careerName = state.careerTitles[state.careerIndex] || "瀅白學員";
+            
+            // 動態職稱：每 2 級晉升一次
+            const careerName = state.careerTitles[state.careerIndex] || "瀅白新人";
             document.querySelectorAll('.career-val').forEach(el => el.innerText = careerName);
-            document.querySelectorAll('.user-name').forEach(el => el.innerText = state.user?.displayName || (state.user?.isAnonymous ? "訪客專家" : "瀅白顧問"));
+            
+            document.querySelectorAll('.user-name').forEach(el => el.innerText = state.user?.displayName || (state.user?.isAnonymous ? "訪客學員" : "瀅白顧問"));
+            
             if (state.view === 'selection') renderSelectionUI();
         }
 
-        // --- RPG 故事互動 (修正按鈕無反應問題) ---
+        // --- RPG 服務啟動邏輯 ---
         window.startService = () => {
-            console.log("正在啟動預約客服務...");
-            if (!state.stories || state.stories.length === 0) {
-                showMessage("尚未載入故事集，請稍候。", true);
+            if (!state.isDefinitionsLoaded || state.stories.length === 0) {
+                showMessage("數據載入中，請稍候再點擊。", true);
                 return;
             }
             state.currentStory = state.stories[Math.floor(Math.random() * state.stories.length)];
@@ -229,7 +243,6 @@
             state.dialogueStep = 0;
             switchView('dialogue');
             showDialogue();
-            // 互動後嘗試播放音樂 (瀏覽器限制)
             if (!state.isMuted) bgm.play();
         };
 
@@ -249,9 +262,11 @@
         let canvas, ctx;
         function initCanvas() {
             canvas = document.getElementById('game-canvas');
+            if (!canvas) return;
             ctx = canvas.getContext('2d');
             canvas.width = 340;
             canvas.height = 440;
+            
             canvas.onmousedown = (e) => { 
                 state.isCleaning = true; 
                 document.getElementById('laser-probe').classList.add('active');
@@ -268,8 +283,10 @@
 
         function clean(e) {
             const r = canvas.getBoundingClientRect();
-            const x = e.clientX - r.left;
-            const y = e.clientY - r.top;
+            // 修正內嵌視窗的座標偏移
+            const x = (e.clientX - r.left);
+            const y = (e.clientY - r.top);
+            
             ctx.globalCompositeOperation = 'destination-out';
             ctx.beginPath();
             ctx.arc(x, y, 25, 0, Math.PI * 2);
@@ -282,8 +299,8 @@
             ctx.fillRect(0, 0, 340, 440);
             ctx.strokeStyle = "#4a3a2a";
             ctx.lineWidth = 0.8;
-            const count = state.selectedPartId === 'bikini' ? 3800 : 2500;
-            for (let i = 0; i < count; i++) {
+            const density = state.selectedPartId === 'bikini' ? 3800 : 2500;
+            for (let i = 0; i < density; i++) {
                 const x = Math.random() * 340;
                 const y = Math.random() * 440;
                 ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + (Math.random()-0.5)*2, y + 6); ctx.stroke();
@@ -303,29 +320,33 @@
             const part = state.bodyParts[state.selectedPartId];
             let reward = part.cost;
             if (state.selectedGender === 'male') reward *= 1.2;
+            
             state.totalGold += Math.floor(reward);
             state.exp += 50;
+            
             if (state.exp >= 100) {
                 state.level++;
                 state.exp = 0;
                 state.careerIndex = Math.min(Math.floor(state.level / 2), 19);
             }
+
             if (state.user) {
                 const ref = doc(db, 'artifacts', appId, 'users', state.user.uid, 'saveData', 'profile');
                 await setDoc(ref, { totalGold: state.totalGold, level: state.level, careerIndex: state.careerIndex }, { merge: true });
             }
+
             document.getElementById('reward-val').innerText = Math.floor(reward);
             document.getElementById('result-modal').style.display = 'flex';
         }
 
         function renderSelectionUI() {
-            const p = state.bodyParts[state.selectedPartId] || { name: 'Loading', icon: '🧊', desc: '...', cost: 0 };
+            const p = state.bodyParts[state.selectedPartId];
             document.getElementById('selection-detail').innerHTML = `
                 <div class="p-6 bg-blue-50/60 rounded-[2.5rem] border border-blue-100 shadow-inner">
                     <h3 class="text-2xl font-black text-blue-600 mb-1">${p.icon} ${p.name}</h3>
                     <p class="text-xs text-slate-500 font-medium leading-relaxed">${p.desc}</p>
                     <div class="mt-4 flex justify-between items-center border-t border-blue-100 pt-4">
-                        <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Session Cost</span>
+                        <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">報酬預覽</span>
                         <span class="text-xl font-black text-blue-800 font-mono">💰 ${p.cost}</span>
                     </div>
                 </div>
@@ -342,14 +363,24 @@
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap');
         body { font-family: 'Noto Sans TC', sans-serif; background: #fcfdfe; cursor: none; overflow: hidden; margin: 0; user-select: none; }
         .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(25px); border: 1px solid rgba(255, 255, 255, 0.6); }
-        #laser-probe { position: fixed; width: 54px; height: 54px; border: 3px solid #3b82f6; border-radius: 50%; pointer-events: none; z-index: 10000; transform: translate(-50%, -50%); background: rgba(59, 130, 246, 0.1); box-shadow: 0 0 20px rgba(59, 130, 246, 0.3); transition: transform 0.1s ease-out; }
+        
+        /* 專業雷射探頭 */
+        #laser-probe {
+            position: fixed; width: 54px; height: 54px; border: 3px solid #3b82f6; border-radius: 50%;
+            pointer-events: none; z-index: 10000; transform: translate(-50%, -50%);
+            background: rgba(59, 130, 246, 0.1); box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+            transition: transform 0.1s ease-out;
+        }
         #laser-probe.active { transform: translate(-50%, -50%) scale(0.8); background: rgba(59, 130, 246, 0.6); box-shadow: 0 0 40px #3b82f6; }
         #laser-probe::after { content: ''; position: absolute; top: 50%; left: 50%; width: 4px; height: 4px; background: white; border-radius: 50%; transform: translate(-50%, -50%); }
+
         .brand-btn { background: linear-gradient(135deg, #a5f3fc 0%, #e0f2fe 100%); color: #0369a1; font-weight: 900; cursor: pointer; transition: 0.3s; }
         .brand-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(186, 230, 253, 0.5); filter: brightness(1.05); }
+
         .hotspot { fill: #f1f5f9; stroke: #e2e8f0; cursor: pointer; transition: 0.3s; }
         .hotspot:hover { fill: #dcfce7; }
         .hotspot.active { fill: #3b82f6; stroke: #1d4ed8; stroke-width: 2.5; filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.5)); }
+
         canvas { border-radius: 4.5rem; border: 10px solid white; box-shadow: 0 30px 70px rgba(186, 230, 253, 0.2); }
         .fade-in { animation: fadeIn 0.6s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
@@ -364,36 +395,39 @@
         <span id="message-content"></span>
     </div>
 
-    <!-- 音樂切換鈕 -->
-    <div onclick="window.toggleMusic()" class="fixed bottom-6 right-6 z-[1000] w-12 h-12 glass rounded-full flex items-center justify-center cursor-pointer shadow-lg hover:scale-110 transition-transform">
+    <!-- 音樂控制按鈕 -->
+    <div onclick="window.toggleMusic()" class="fixed bottom-6 right-6 z-[1000] w-12 h-12 glass rounded-full flex items-center justify-center cursor-pointer shadow-lg hover:scale-110 transition-transform border border-blue-50">
         <span id="music-icon" class="text-xl">🔇</span>
     </div>
 
-    <!-- 頂部資訊看板 -->
+    <!-- 頂部狀態列 -->
     <div class="fixed top-6 w-full max-w-md px-6 flex justify-between items-center z-[100]">
         <div class="glass px-5 py-2 rounded-full flex items-center gap-3 shadow-lg border-blue-50">
             <span class="text-xl">💰</span>
             <span class="gold-val font-black text-slate-700">0</span>
         </div>
         <div class="glass px-6 py-2 rounded-full flex flex-col items-center shadow-lg border-blue-50">
-            <span class="career-val text-[11px] font-black text-blue-500 uppercase italic tracking-tighter text-center">Loading...</span>
+            <span class="career-val text-[11px] font-black text-blue-500 uppercase italic tracking-tighter text-center">瀅白學員</span>
             <span class="level-val text-[9px] font-bold text-slate-400">Lv.1</span>
         </div>
     </div>
 
-    <!-- 0. 系統初始化 (LOADING) -->
+    <!-- 0. 系統載入視圖 -->
     <div id="view-loading" class="flex flex-col items-center">
         <div class="w-16 h-16 border-4 border-blue-100 border-t-blue-500 rounded-full animate-spin mb-6"></div>
-        <p class="text-slate-400 font-bold text-xs tracking-[0.3em] uppercase">Pure Skin Initializing...</p>
+        <p class="text-slate-400 font-bold text-xs tracking-[0.3em] uppercase text-center leading-relaxed">
+            Pure Skin Evolution<br>正在同步雲端美學配置...
+        </p>
     </div>
 
-    <!-- 1. 認證中心 (LOGIN) -->
+    <!-- 1. 登入視圖 -->
     <div id="view-login" class="hidden flex flex-col items-center fade-in">
         <div class="w-24 h-24 bg-blue-50 rounded-[2.5rem] flex items-center justify-center mb-10 shadow-inner">
             <span class="text-6xl text-blue-300">🧊</span>
         </div>
         <h1 class="text-4xl font-black text-slate-800 mb-2 tracking-tighter">瀅白之境</h1>
-        <p class="text-slate-400 text-xs mb-10 font-bold tracking-[0.3em] uppercase">Pure Skin Identity Center</p>
+        <p class="text-slate-400 text-xs mb-10 font-bold tracking-[0.3em] uppercase">Identity Verification</p>
+        
         <div class="space-y-4 w-64 flex flex-col items-center">
             <button onclick="window.loginGoogle()" class="w-full py-4 bg-white border border-slate-100 rounded-2xl flex items-center justify-center gap-3 shadow-sm hover:bg-blue-50 transition-all">
                 <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/action/google.svg" width="20">
@@ -410,24 +444,26 @@
         </div>
     </div>
 
-    <!-- 2. 沙龍中心 (LOBBY) -->
+    <!-- 2. 沙龍大廳 -->
     <div id="view-lobby" class="hidden flex flex-col items-center fade-in">
         <div class="w-32 h-32 bg-white rounded-[3.5rem] flex items-center justify-center mb-10 shadow-2xl border-4 border-blue-50 rotate-3">
             <span class="text-6xl">💎</span>
         </div>
         <h1 class="text-5xl font-black text-slate-800 tracking-tighter mb-1">瀅白之境</h1>
         <p class="text-blue-400 font-black tracking-[0.5em] text-[10px] uppercase mb-12">Pure Skin Evolution</p>
+        
         <div class="glass p-6 rounded-[2.5rem] mb-10 text-center min-w-[260px] border-blue-100/50">
-            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">當前顧問</p>
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">認證顧問</p>
             <p class="user-name font-black text-slate-700 text-xl italic truncate max-w-[220px]">---</p>
         </div>
+
         <div class="flex flex-col gap-4 w-64">
             <button onclick="window.startService()" class="w-full py-6 brand-btn text-2xl rounded-full shadow-2xl">接待預約客</button>
             <button onclick="window.logout()" class="w-full py-3 text-slate-400 font-bold text-sm hover:text-red-400">退出系統</button>
         </div>
     </div>
 
-    <!-- 3. RPG 對話系統 (DIALOGUE) -->
+    <!-- 3. RPG 劇情對話 -->
     <div id="view-dialogue" class="hidden fixed inset-0 flex flex-col items-center justify-end p-10 bg-slate-900/5">
         <div class="glass w-full max-w-2xl p-10 rounded-[4rem] shadow-2xl flex items-center gap-10 fade-in border-blue-100">
             <div id="diag-avatar" class="text-8xl bg-white w-28 h-28 rounded-3xl flex items-center justify-center shadow-inner border border-blue-50">👩</div>
@@ -439,7 +475,7 @@
         </div>
     </div>
 
-    <!-- 4. 全身部位選擇 (SELECTION) -->
+    <!-- 4. 全身部位導覽 -->
     <div id="view-selection" class="hidden flex flex-col items-center w-full max-w-4xl px-4 fade-in">
         <div class="glass p-12 rounded-[5.5rem] flex flex-col md:flex-row gap-16 items-center shadow-2xl border-blue-50">
             <div class="w-64 h-[500px]">
@@ -466,13 +502,13 @@
         </div>
     </div>
 
-    <!-- 5. 互動除毛關卡 (GAME) -->
+    <!-- 5. 除毛互動場景 -->
     <div id="view-game" class="hidden flex flex-col items-center fade-in">
         <div class="mb-10 w-80 text-center">
             <div class="w-full h-4 bg-slate-100 rounded-full overflow-hidden shadow-inner border-4 border-white">
                 <div id="prog-bar" class="h-full brand-btn transition-all duration-300" style="width: 0%"></div>
             </div>
-            <p class="text-[10px] font-black text-blue-400 mt-2 uppercase tracking-[0.3em]">Pure Laser Protocol - Purity Level</p>
+            <p class="text-[10px] font-black text-blue-400 mt-2 uppercase tracking-[0.3em]">Pure Laser Protocol Active</p>
         </div>
         <canvas id="game-canvas"></canvas>
     </div>
