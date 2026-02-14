@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>瀅白之境 Pure Skin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module">
+        // --- Firebase SDK 導入 ---
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { 
+            getAuth, 
+            signInAnonymously, 
+            signInWithPopup, 
+            GoogleAuthProvider, 
+            OAuthProvider, 
+            onAuthStateChanged,
+            signOut 
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // --- Firebase 專案配置 (pure-skin-8640d) ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyCIKSbaZ5R6RTSRcH_-YYfqz_OnQQFr1gc",
+            authDomain: "pure-skin-8640d.firebaseapp.com",
+            projectId: "pure-skin-8640d",
+            storageBucket: "pure-skin-8640d.firebasestorage.app",
+            messagingSenderId: "890613609117",
+            appId: "1:890613609117:web:ed044e453e6cc789b01a74",
+            measurementId: "G-27E3XSTTBH"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = "pure-skin-studio-master";
+
+        // --- 遊戲狀態管理 ---
+        let state = {
+            user: null,
+            totalGold: 0,
+            level: 1,
+            exp: 0,
+            careerIndex: 0,
+            view: 'loading', 
+            selectedGender: 'female',
+            selectedPartId: 'face',
+            bodyParts: {},
+            careerTitles: [],
+            stories: [],
+            isCleaning: false,
+            currentStory: null,
+            dialogueStep: 0,
+            isDefinitionsLoaded: false
+        };
+
+        // --- 顯示系統訊息提示 ---
+        function showMessage(text, isError = false) {
+            const box = document.getElementById('message-box');
+            const content = document.getElementById('message-content');
+            content.innerText = text;
+            box.classList.remove('hidden');
+            box.classList.add('flex');
+            box.style.backgroundColor = isError ? 'rgba(239, 68, 68, 0.95)' : 'rgba(37, 99, 235, 0.95)';
+            setTimeout(() => {
+                box.classList.add('hidden');
+                box.classList.remove('flex');
+            }, 4000);
+        }
+
+        // --- 初始化系統 ---
+        async function init() {
+            onAuthStateChanged(auth, async (currUser) => {
+                if (currUser) {
+                    state.user = currUser;
+                    await syncDefinitions();
+                    await syncUserData();
+                    switchView('lobby');
+                } else {
+                    state.user = null;
+                    switchView('login');
+                }
+            });
+
+            // 雷射探頭視覺跟隨
+            const probe = document.getElementById('laser-probe');
+            window.addEventListener('mousemove', (e) => {
+                probe.style.left = `${e.clientX}px`;
+                probe.style.top = `${e.clientY}px`;
+            });
+        }
+
+        // --- 雲端數據同步 (部位、職業、故事) ---
+        async function syncDefinitions() {
+            try {
+                const defRef = doc(db, 'artifacts', appId, 'public', 'data', 'definitions');
+                const snap = await getDoc(defRef);
+                
+                if (snap.exists()) {
+                    const data = snap.data();
+                    state.bodyParts = data.bodyParts;
+                    state.careerTitles = data.careerTitles;
+                    state.stories = data.stories;
+                } else {
+                    // 若無資料則初始化預設集
+                    const defaults = {
+                        bodyParts: {
+                            face: { name: '臉部 (Face)', icon: '👤', cost: 100, desc: '處理上唇小鬍子、下巴，讓妝感更服貼。' },
+                            underarm: { name: '腋下 (Underarm)', icon: '✨', cost: 150, desc: '解決濃密毛髮與黑頭問題。' },
+                            bikini: { name: '私密處 (VIO)', icon: '👙', cost: 450, desc: '精準解決敏感部位，提升穿衣自信。' },
+                            limbs: { name: '四肢 (Limbs)', icon: '🦵', cost: 220, desc: '打造絲滑小腿與手臂的基礎療程。' },
+                            back: { name: '背部 (Back)', icon: '👗', cost: 320, desc: '解決視覺死角，完美展現美背。' },
+                            others: { name: '細節美學', icon: '🎀', cost: 130, desc: '後頸髮際線與腹部線條微雕。' }
+                        },
+                        careerTitles: ["瀅白實習生", "初級技師", "資深除毛師", "首席技術官", "醫美顧問", "雷射物理專家", "皮膚臨床醫生", "抗老研究員", "生物纖維專家", "醫學美容院長", "婚禮造型師", "時尚雜誌顧問", "好萊塢特效護理", "明星御用大師", "人體美學家", "沙龍店長", "品牌經理", "連鎖店創始人", "美容集團 CEO", "全球美學教父"],
+                        stories: [
+                            { name: "預約客", avatar: "👩", text: ["你好，我下週要去參加婚禮...", "我想處理臉部與後頸，想讓當天的妝容更精緻。", "請幫我用最頂級的雷射處理！"] },
+                            { name: "運動家", avatar: "👨", text: ["嘿！我需要處理四肢與腋下的毛髮。", "在游泳比賽中減少阻力是非常關鍵的。", "麻煩你了，教父！"] }
+                        ]
+                    };
+                    await setDoc(defRef, defaults);
+                    state.bodyParts = defaults.bodyParts;
+                    state.careerTitles = defaults.careerTitles;
+                    state.stories = defaults.stories;
+                }
+                state.isDefinitionsLoaded = true;
+                updateUI();
+            } catch (err) {
+                console.error("Sync Error:", err);
+            }
+        }
+
+        // --- 同步玩家進度 ---
+        async function syncUserData() {
+            if (!state.user) return;
+            const profileRef = doc(db, 'artifacts', appId, 'users', state.user.uid, 'saveData', 'profile');
+            onSnapshot(profileRef, (snap) => {
+                if (snap.exists()) {
+                    const d = snap.data();
+                    state.totalGold = d.totalGold || 0;
+                    state.level = d.level || 1;
+                    state.careerIndex = d.careerIndex || 0;
+                    updateUI();
+                }
+            });
+        }
+
+        // --- 認證行為 ---
+        window.loginGoogle = async () => {
+            showMessage("正在啟動 Google 認證...");
+            const provider = new GoogleAuthProvider();
+            try {
+                await signInWithPopup(auth, provider);
+            } catch (error) {
+                if (error.code === 'auth/popup-blocked') {
+                    showMessage("登入視窗被攔截，請允許彈窗權限。", true);
+                } else {
+                    showMessage("登入失敗：" + error.message, true);
+                }
+            }
+        };
+
+        window.loginGameCenter = async () => {
+            const provider = new OAuthProvider('apple.com'); 
+            try {
+                await signInWithPopup(auth, provider);
+            } catch (error) {
+                showMessage("Game Center 登入需在原生 iOS 環境執行。", true);
+            }
+        };
+
+        window.loginGuest = async () => {
+            try {
+                await signInAnonymously(auth);
+            } catch (err) {
+                showMessage("匿名登入失敗。", true);
+            }
+        };
+
+        window.logout = () => signOut(auth);
+
+        // --- 視圖管理 ---
+        function switchView(v) {
+            state.view = v;
+            const views = ['loading', 'login', 'lobby', 'dialogue', 'selection', 'game'];
+            views.forEach(id => {
+                const el = document.getElementById(`view-${id}`);
+                if (el) {
+                    el.classList.toggle('hidden', state.view !== id);
+                    el.classList.toggle('flex', state.view === id);
+                }
+            });
+            if (v === 'game') setTimeout(initCanvas, 100);
+            updateUI();
+        }
+
+        function updateUI() {
+            if (!state.isDefinitionsLoaded) return;
+            document.querySelectorAll('.gold-val').forEach(el => el.innerText = state.totalGold);
+            document.querySelectorAll('.level-val').forEach(el => el.innerText = `Lv.${state.level}`);
+            const careerName = state.careerTitles[state.careerIndex] || "瀅白學員";
+            document.querySelectorAll('.career-val').forEach(el => el.innerText = careerName);
+            document.querySelectorAll('.user-name').forEach(el => el.innerText = state.user?.displayName || (state.user?.isAnonymous ? "訪客專家" : "瀅白專家"));
+            if (state.view === 'selection') renderSelectionUI();
+        }
+
+        // --- RPG 對話系統 ---
+        window.startService = () => {
+            if (!state.stories.length) return;
+            state.currentStory = state.stories[Math.floor(Math.random() * state.stories.length)];
+            state.selectedGender = state.currentStory.avatar === "👨" ? "male" : "female";
+            state.dialogueStep = 0;
+            switchView('dialogue');
+            showDialogue();
+        };
+
+        function showDialogue() {
+            document.getElementById('diag-name').innerText = state.currentStory.name;
+            document.getElementById('diag-avatar').innerText = state.currentStory.avatar;
+            document.getElementById('diag-text').innerText = state.currentStory.text[state.dialogueStep];
+        }
+
+        window.nextDialogue = () => {
+            state.dialogueStep++;
+            if (state.dialogueStep < state.currentStory.text.length) showDialogue();
+            else switchView('selection');
+        };
+
+        // --- 畫布互動引擎 ---
+        let canvas, ctx;
+        function initCanvas() {
+            canvas = document.getElementById('game-canvas');
+            ctx = canvas.getContext('2d');
+            canvas.width = 340;
+            canvas.height = 440;
+            canvas.onmousedown = (e) => { 
+                state.isCleaning = true; 
+                document.getElementById('laser-probe').classList.add('active');
+                clean(e);
+            };
+            canvas.onmousemove = (e) => { if (state.isCleaning) clean(e); };
+            window.onmouseup = () => { 
+                state.isCleaning = false; 
+                document.getElementById('laser-probe').classList.remove('active'); 
+                checkProgress(); 
+            };
+            drawInitialSkin();
+        }
+
+        function clean(e) {
+            const r = canvas.getBoundingClientRect();
+            const x = e.clientX - r.left;
+            const y = e.clientY - r.top;
+            ctx.globalCompositeOperation = 'destination-out';
+            ctx.beginPath();
+            ctx.arc(x, y, 25, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        function drawInitialSkin() {
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.fillStyle = state.selectedGender === 'male' ? '#f4d1c1' : '#fff0f0';
+            ctx.fillRect(0, 0, 340, 440);
+            ctx.strokeStyle = "#4a3a2a";
+            ctx.lineWidth = 0.8;
+            const density = state.selectedPartId === 'bikini' ? 3800 : 2500;
+            for (let i = 0; i < density; i++) {
+                const x = Math.random() * 340;
+                const y = Math.random() * 440;
+                ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + (Math.random()-0.5)*2, y + 6); ctx.stroke();
+            }
+        }
+
+        function checkProgress() {
+            const data = ctx.getImageData(0, 0, 340, 440).data;
+            let opaque = 0;
+            for (let i = 3; i < data.length; i += 4) if (data[i] > 0) opaque++;
+            const progress = 1 - (opaque / (340 * 440));
+            document.getElementById('prog-bar').style.width = `${progress * 100}%`;
+            if (progress > 0.98) finishSession();
+        }
+
+        async function finishSession() {
+            const part = state.bodyParts[state.selectedPartId];
+            let reward = part.cost;
+            if (state.selectedGender === 'male') reward *= 1.2;
+            state.totalGold += Math.floor(reward);
+            state.exp += 50;
+            if (state.exp >= 100) {
+                state.level++;
+                state.exp = 0;
+                state.careerIndex = Math.min(Math.floor(state.level / 2), 19);
+            }
+            if (state.user) {
+                const ref = doc(db, 'artifacts', appId, 'users', state.user.uid, 'saveData', 'profile');
+                await setDoc(ref, { totalGold: state.totalGold, level: state.level, careerIndex: state.careerIndex }, { merge: true });
+            }
+            document.getElementById('reward-val').innerText = Math.floor(reward);
+            document.getElementById('result-modal').style.display = 'flex';
+        }
+
+        function renderSelectionUI() {
+            const p = state.bodyParts[state.selectedPartId];
+            document.getElementById('selection-detail').innerHTML = `
+                <div class="p-6 bg-blue-50/50 rounded-[2.5rem] border border-blue-100 shadow-inner">
+                    <h3 class="text-2xl font-black text-blue-600 mb-1">${p.icon} ${p.name}</h3>
+                    <p class="text-xs text-slate-500 font-medium leading-relaxed">${p.desc}</p>
+                    <div class="mt-4 flex justify-between items-center border-t border-blue-100 pt-4">
+                        <span class="text-xs font-bold text-slate-400">專業療程報酬</span>
+                        <span class="text-xl font-black text-blue-800">💰 ${p.cost}</span>
+                    </div>
+                </div>
+            `;
+            document.querySelectorAll('.hotspot').forEach(el => el.classList.toggle('active', el.dataset.id === state.selectedPartId));
+        }
+
+        window.onload = init;
+        window.switchView = switchView;
+        window.selectPart = (id) => { state.selectedPartId = id; renderSelectionUI(); };
+        window.confirmStart = () => switchView('game');
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap');
+        body { font-family: 'Noto Sans TC', sans-serif; background: #fdfdfe; cursor: none; overflow: hidden; margin: 0; user-select: none; }
+        .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.5); }
+        #laser-probe { position: fixed; width: 54px; height: 54px; border: 3px solid #60a5fa; border-radius: 50%; pointer-events: none; z-index: 10000; transform: translate(-50%, -50%); background: rgba(96, 165, 250, 0.1); box-shadow: 0 0 20px rgba(96, 165, 250, 0.2); transition: transform 0.1s ease-out; }
+        #laser-probe.active { transform: translate(-50%, -50%) scale(0.8); background: rgba(96, 165, 250, 0.7); box-shadow: 0 0 40px #60a5fa; }
+        #laser-probe::after { content: ''; position: absolute; top: 50%; left: 50%; width: 4px; height: 4px; background: white; border-radius: 50%; transform: translate(-50%, -50%); }
+        .pure-btn { background: linear-gradient(135deg, #bae6fd 0%, #e0f2fe 100%); color: #0369a1; font-weight: 900; transition: 0.3s; cursor: pointer; }
+        .pure-btn:hover { transform: translateY(-3px); filter: brightness(1.05); box-shadow: 0 10px 20px rgba(186, 230, 253, 0.3); }
+        .hotspot { fill: #f1f5f9; stroke: #e2e8f0; cursor: pointer; transition: 0.3s; }
+        .hotspot:hover { fill: #dcfce7; }
+        .hotspot.active { fill: #60a5fa; stroke: #2563eb; stroke-width: 2.5; filter: drop-shadow(0 0 8px rgba(96, 165, 250, 0.6)); }
+        canvas { border-radius: 4rem; border: 8px solid white; box-shadow: 0 30px 60px rgba(186, 230, 253, 0.2); }
+        .fade-in { animation: fadeIn 0.6s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center">
+
+    <div id="laser-probe"></div>
+
+    <!-- 自定義系統訊息提示 -->
+    <div id="message-box" class="hidden fixed top-10 left-1/2 -translate-x-1/2 z-[20000] px-8 py-4 rounded-full text-white font-bold shadow-2xl backdrop-blur-md items-center justify-center transition-all animate-bounce">
+        <span id="message-content"></span>
+    </div>
+
+    <!-- 頂部資訊欄 -->
+    <div class="fixed top-6 w-full max-w-md px-6 flex justify-between items-center z-[100]">
+        <div class="glass px-5 py-2 rounded-full flex items-center gap-3 shadow-lg">
+            <span class="text-xl">💰</span>
+            <span class="gold-val font-black text-slate-700">0</span>
+        </div>
+        <div class="glass px-6 py-2 rounded-full flex flex-col items-center shadow-lg">
+            <span class="career-val text-[11px] font-black text-blue-500 uppercase italic tracking-tighter">瀅白學員</span>
+            <span class="level-val text-[9px] font-bold text-slate-400">Lv.1</span>
+        </div>
+    </div>
+
+    <!-- 0. 載入視圖 -->
+    <div id="view-loading" class="flex flex-col items-center">
+        <div class="w-16 h-16 border-4 border-blue-100 border-t-blue-500 rounded-full animate-spin mb-6"></div>
+        <p class="text-slate-400 font-bold text-sm tracking-widest uppercase">Pure Skin Initializing...</p>
+    </div>
+
+    <!-- 1. 登入視圖 -->
+    <div id="view-login" class="hidden flex flex-col items-center fade-in">
+        <div class="w-24 h-24 bg-blue-50 rounded-[2rem] flex items-center justify-center mb-10 shadow-inner">
+            <span class="text-6xl text-blue-400">🧊</span>
+        </div>
+        <h2 class="text-4xl font-black text-slate-800 mb-2 tracking-tighter">進入瀅白之境</h2>
+        <p class="text-slate-400 text-sm mb-12 font-bold tracking-widest uppercase">Pure Identity Center</p>
+        
+        <div class="space-y-4 w-64 flex flex-col items-center">
+            <button onclick="window.loginGoogle()" class="w-full py-4 bg-white border border-slate-200 rounded-2xl flex items-center justify-center gap-3 shadow-sm hover:bg-slate-50 transition-all">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/action/google.svg" width="20">
+                <span class="font-bold text-slate-600">Google 快速登入</span>
+            </button>
+            <button onclick="window.loginGameCenter()" class="w-full py-4 bg-slate-900 text-white rounded-2xl flex items-center justify-center gap-3 shadow-sm hover:bg-black transition-all">
+                <span class="text-xl">🎮</span>
+                <span class="font-bold">Game Center</span>
+            </button>
+            
+            <div class="w-full flex flex-col items-center mt-4">
+                <button onclick="window.loginGuest()" class="w-full py-4 bg-blue-50 text-blue-500 font-black rounded-2xl hover:bg-blue-100 transition-all">
+                    訪客試玩模式
+                </button>
+                <p class="text-[10px] text-slate-400 mt-2 text-center">備註：訪客模式無法完整紀錄您的職涯進度</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. 沙龍大廳 -->
+    <div id="view-lobby" class="hidden flex flex-col items-center fade-in">
+        <div class="w-32 h-32 bg-white rounded-[3.5rem] flex items-center justify-center mb-10 shadow-2xl border-4 border-blue-50 rotate-3">
+            <span class="text-6xl">💎</span>
+        </div>
+        <h1 class="text-5xl font-black text-slate-800 tracking-tighter mb-1">瀅白之境</h1>
+        <p class="text-blue-400 font-black tracking-[0.5em] text-[10px] uppercase mb-12">Pure Skin Evolution</p>
+        
+        <div class="glass p-6 rounded-[2.5rem] mb-10 text-center min-w-[240px]">
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">當前服務顧問</p>
+            <p class="user-name font-black text-slate-700 text-xl italic">---</p>
+        </div>
+
+        <div class="flex flex-col gap-4 w-64">
+            <button onclick="window.startService()" class="w-full py-6 pure-btn text-2xl rounded-full shadow-2xl">
+                接待預約客
+            </button>
+            <button onclick="window.logout()" class="w-full py-3 text-slate-400 font-bold text-sm hover:text-red-400">
+                退出系統
+            </button>
+        </div>
+    </div>
+
+    <!-- 3. RPG 對話 -->
+    <div id="view-dialogue" class="hidden fixed inset-0 flex flex-col items-center justify-end p-10 bg-slate-900/5">
+        <div class="glass w-full max-w-2xl p-8 rounded-[3.5rem] shadow-2xl flex items-center gap-10 fade-in border-blue-100">
+            <div id="diag-avatar" class="text-8xl bg-white w-28 h-28 rounded-3xl flex items-center justify-center shadow-inner">👩</div>
+            <div class="flex-1">
+                <h4 id="diag-name" class="font-black text-blue-500 text-lg mb-1 italic tracking-widest">顧客</h4>
+                <p id="diag-text" class="text-slate-700 font-medium leading-relaxed text-xl min-h-[3.5em]">...</p>
+                <button onclick="window.nextDialogue()" class="mt-6 float-right px-10 py-3 bg-slate-900 text-white font-black rounded-2xl hover:bg-black transition-all">
+                    繼續 Next ❯
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. 部位選擇 -->
+    <div id="view-selection" class="hidden flex flex-col items-center w-full max-w-4xl px-4 fade-in">
+        <div class="glass p-12 rounded-[5rem] flex flex-col md:flex-row gap-16 items-center shadow-2xl">
+            <div class="w-64 h-[500px]">
+                <svg viewBox="0 0 200 500" class="w-full h-full drop-shadow-2xl">
+                    <circle cx="100" cy="50" r="38" class="hotspot" data-id="face" onclick="selectPart('face')" />
+                    <circle cx="60" cy="120" r="22" class="hotspot" data-id="underarm" onclick="selectPart('underarm')" />
+                    <circle cx="140" cy="120" r="22" class="hotspot" data-id="underarm" onclick="selectPart('underarm')" />
+                    <rect x="75" y="150" width="50" height="110" rx="20" class="hotspot" data-id="others" onclick="selectPart('others')" />
+                    <path d="M75 260 L125 260 L100 310 Z" class="hotspot" data-id="bikini" onclick="selectPart('bikini')" />
+                    <rect x="30" y="125" width="24" height="170" rx="12" class="hotspot" data-id="limbs" onclick="selectPart('limbs')" />
+                    <rect x="146" y="125" width="24" height="170" rx="12" class="hotspot" data-id="limbs" onclick="selectPart('limbs')" />
+                    <rect x="73" y="315" width="26" height="185" rx="13" class="hotspot" data-id="limbs" onclick="selectPart('limbs')" />
+                    <rect x="101" y="315" width="26" height="185" rx="13" class="hotspot" data-id="limbs" onclick="selectPart('limbs')" />
+                </svg>
+            </div>
+            <div class="w-full max-w-xs space-y-8 text-center md:text-left">
+                <h3 class="text-4xl font-black text-slate-800 tracking-tighter italic">定制療程</h3>
+                <div id="selection-detail"></div>
+                <div class="space-y-4 pt-6">
+                    <button onclick="confirmStart()" class="w-full py-6 pure-btn text-2xl rounded-[2.5rem] shadow-xl">開始專業療程</button>
+                    <button onclick="switchView('lobby')" class="w-full text-slate-400 font-bold text-sm tracking-widest uppercase">返回大廳</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. 遊戲畫布 -->
+    <div id="view-game" class="hidden flex flex-col items-center fade-in">
+        <div class="mb-8 w-80 text-center">
+            <div class="w-full h-4 bg-slate-100 rounded-full overflow-hidden shadow-inner border-4 border-white">
+                <div id="prog-bar" class="h-full pure-btn transition-all duration-300" style="width: 0%"></div>
+            </div>
+            <p class="text-[10px] font-black text-blue-400 mt-2 uppercase tracking-[0.3em]">Pure Laser Protocol Active</p>
+        </div>
+        <canvas id="game-canvas"></canvas>
+    </div>
+
+    <!-- 結算彈窗 -->
+    <div id="result-modal" class="hidden fixed inset-0 z-[200] items-center justify-center bg-blue-900/60 backdrop-blur-md px-4">
+        <div class="bg-white rounded-[5rem] p-16 text-center shadow-2xl max-sm w-full animate-in zoom-in">
+            <div class="text-8xl mb-8">🧊</div>
+            <h3 class="text-4xl font-black text-slate-800 mb-3 tracking-tighter">極致瀅白！</h3>
+            <p class="text-slate-400 font-bold mb-10 leading-relaxed">您的專業紀錄已同步至雲端美學中心</p>
+            <div class="bg-blue-50 p-6 rounded-[2.5rem] border border-blue-100 flex justify-between items-center mb-10 shadow-inner">
+                <span class="font-bold text-slate-500">結算瀅白金</span>
+                <span class="font-black text-blue-600 text-4xl tracking-tighter font-mono">💰 <span id="reward-val">0</span></span>
+            </div>
+            <button onclick="location.reload()" class="w-full py-6 pure-btn text-2xl rounded-3xl shadow-xl">接待下一位預約</button>
+        </div>
+    </div>
+
+</body>
+</html>
