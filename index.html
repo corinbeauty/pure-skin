@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>瀅白之境 Pure Skin V4.9 - 經營大師</title>
+    <title>瀅白之境 Pure Skin V5.4 - 美學教父之路</title>
     <!-- 引入系統資源 -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -21,23 +21,22 @@
                     },
                     fontFamily: { sans: ['Noto Sans TC', 'sans-serif'] },
                     animation: {
-                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'pulse-slow': 'pulse 3s infinite',
                         'float': 'float 3s ease-in-out infinite',
                         'slide-up': 'slideUp 0.5s ease-out forwards',
                         'fade-in': 'fadeIn 0.6s ease-out forwards',
-                        'bounce-subtle': 'bounceSubtle 2s infinite',
                     },
                     keyframes: {
                         slideUp: { '0%': { transform: 'translateY(20px)', opacity: '0' }, '100%': { transform: 'translateY(0)', opacity: '1' } },
                         fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
-                        bounceSubtle: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-5px)' } }
+                        float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-10px)' } }
                     }
                 }
             }
         }
     </script>
     <style>
-        /* 核心樣式 */
+        /* 核心美學設定 */
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: #f0f9ff; }
         ::-webkit-scrollbar-thumb { background: #bae6fd; border-radius: 10px; }
@@ -49,53 +48,82 @@
             box-shadow: 0 12px 45px -10px rgba(31, 38, 135, 0.08);
         }
         
-        .chart-container { position: relative; width: 100%; height: 240px; margin: 0 auto; }
+        .chart-container { position: relative; width: 100%; height: 220px; margin: 0 auto; }
 
-        /* NPC Elsa V4.9 */
-        .elsa-full { position: relative; width: 140px; height: 320px; transform: scale(0.85); margin-bottom: -40px; }
-        .elsa-hair-back { position: absolute; top: 10px; left: 10px; width: 120px; height: 220px; background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%); border-radius: 60px 60px 20px 20px; z-index: 1; }
-        .elsa-head { position: absolute; top: 15px; left: 35px; width: 70px; height: 85px; background: #ffe4e6; border-radius: 35px 35px 40px 40px; z-index: 10; }
-        .elsa-eyes::before, .elsa-eyes::after { content: ''; position: absolute; top: 42px; width: 10px; height: 12px; background: #0f172a; border-radius: 50%; z-index: 11; }
-        .elsa-eyes::before { left: 15px; } .elsa-eyes::after { right: 15px; }
-        .elsa-mouth { position: absolute; bottom: 15px; left: 28px; width: 14px; height: 5px; background: #e11d48; border-radius: 3px; z-index: 11; }
-        .elsa-body { position: absolute; top: 90px; left: 30px; width: 80px; height: 90px; background: #ffffff; border-radius: 20px; z-index: 5; border: 1px solid #cbd5e1; }
-        .elsa-skirt { position: absolute; top: 175px; left: 20px; width: 100px; height: 140px; background: linear-gradient(180deg, #0ea5e9 0%, #0c4a6e 100%); border-radius: 10px 10px 50px 50px; z-index: 4; }
+        /* --- 高精度 Elsa NPC 重繪 (根據原圖) --- */
+        .elsa-container { position: relative; width: 160px; height: 320px; transform: scale(0.9); }
+        /* 金髮包頭 */
+        .elsa-hair-main {
+            position: absolute; top: 5px; left: 20px; width: 120px; height: 140px;
+            background: linear-gradient(135deg, #e7c39a 0%, #c19b6e 100%);
+            border-radius: 60px 60px 30px 30px; z-index: 1;
+        }
+        .elsa-head {
+            position: absolute; top: 15px; left: 35px; width: 90px; height: 105px;
+            background: #ffe4e6; border-radius: 45px 45px 50px 50px; z-index: 10;
+        }
+        /* 眼鏡 */
+        .elsa-glasses {
+            position: absolute; top: 45px; left: 5px; width: 80px; height: 35px; z-index: 15;
+            display: flex; gap: 4px;
+        }
+        .glass-frame { width: 35px; height: 35px; border: 3px solid #1e293b; border-radius: 50%; background: rgba(255,255,255,0.2); }
+        /* 五官細節 */
+        .elsa-eye-dot { position: absolute; top: 58px; width: 8px; height: 8px; background: #0f172a; border-radius: 50%; z-index: 16; }
+        .elsa-mouth { position: absolute; bottom: 15px; left: 35px; width: 20px; height: 6px; background: #fb7185; border-radius: 3px; z-index: 11; }
+        /* 白袍與聽診器 */
+        .elsa-labcoat {
+            position: absolute; top: 110px; left: 20px; width: 120px; height: 200px;
+            background: #ffffff; border-radius: 20px; z-index: 5; border: 1px solid #e2e8f0;
+        }
+        .elsa-stethoscope {
+            position: absolute; top: 115px; left: 30px; width: 100px; height: 80px;
+            border: 4px solid #3b82f6; border-top: none; border-radius: 0 0 50px 50px; z-index: 12; pointer-events: none;
+        }
 
         /* 教學氣泡 */
-        .tutor-bubble { position: absolute; z-index: 10000; transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: none; pointer-events: none; }
-        .bubble-content { background: white; border: 3px solid #bae6fd; border-radius: 2.5rem; padding: 1.8rem; width: 280px; pointer-events: auto; position: relative; }
-        .bubble-content::after { content: ''; position: absolute; width: 24px; height: 24px; background: white; border-left: 3px solid #bae6fd; border-bottom: 3px solid #bae6fd; }
-        .bubble-top .bubble-content::after { bottom: -14px; left: 50%; transform: translateX(-50%) rotate(-45deg); }
-        .bubble-left .bubble-content::after { right: -14px; top: 50%; transform: translateY(-50%) rotate(-135deg); }
+        .tutor-bubble { position: absolute; z-index: 10000; transition: all 0.5s; display: none; pointer-events: none; }
+        .bubble-content { background: white; border: 3px solid #bae6fd; border-radius: 2rem; padding: 1.5rem; width: 260px; pointer-events: auto; position: relative; }
+        .bubble-content::after { content: ''; position: absolute; width: 20px; height: 20px; background: white; border-left: 3px solid #bae6fd; border-bottom: 3px solid #bae6fd; }
+        .bubble-top .bubble-content::after { bottom: -12px; left: 50%; transform: translateX(-50%) rotate(-45deg); }
 
-        #laser-cursor { position: fixed; width: 50px; height: 50px; border: 3px solid #0ea5e9; border-radius: 50%; transform: translate(-50%, -50%); pointer-events: none; z-index: 9999; display: none; box-shadow: 0 0 20px rgba(14, 165, 233, 0.6); background: rgba(14, 165, 233, 0.1); }
+        /* 時刻表 */
+        .calendar-table { width: 100%; border-collapse: separate; border-spacing: 4px; table-layout: fixed; }
+        .calendar-table th { padding: 8px; background: #f8fafc; border-radius: 8px; font-size: 0.6rem; color: #64748b; text-align: center; }
+        .calendar-cell { 
+            height: 65px; background: rgba(241, 245, 249, 0.5); border-radius: 12px;
+            transition: 0.3s; cursor: pointer; border: 1px solid transparent;
+        }
+        .calendar-cell.occupied-male { background: #eff6ff; border-color: #3b82f6; }
+        .calendar-cell.occupied-female { background: #fff1f2; border-color: #f43f5e; }
+        .calendar-cell.empty { border: 1px dashed #e2e8f0; }
 
-        /* 預約時刻表樣式 */
-        .timetable-row { border-bottom: 1px solid rgba(186, 230, 253, 0.3); padding: 16px 0; transition: 0.3s; }
-        .timetable-row:last-child { border-bottom: none; }
-        .timetable-row:hover { background: rgba(240, 249, 255, 0.5); }
-        .status-pill { padding: 4px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 900; }
-        .status-empty { background: #f1f5f9; color: #94a3b8; }
-        .status-pending { background: #fef3c7; color: #d97706; }
-        .status-accepted { background: #dcfce7; color: #16a34a; }
-        .status-overdue { background: #fee2e2; color: #dc2626; }
+        #laser-cursor { position: fixed; width: 40px; height: 40px; border: 3px solid #0ea5e9; border-radius: 50%; transform: translate(-50%, -50%); pointer-events: none; z-index: 9999; display: none; box-shadow: 0 0 15px rgba(14, 165, 233, 0.6); }
     </style>
 </head>
 <body class="bg-pure-50 text-slate-700 min-h-screen font-sans selection:bg-pure-200 overflow-x-hidden">
 
     <div id="laser-cursor"></div>
 
-    <!-- 教學氣泡 -->
+    <!-- 導師 Elsa 教學氣泡 (V5.4 重繪版) -->
     <div id="tutor-anchor" class="tutor-bubble bubble-top">
         <div class="flex flex-col items-center gap-2">
-            <div class="elsa-full animate-bounce-subtle">
-                <div class="elsa-hair-back"></div>
-                <div class="elsa-head"><div class="elsa-eyes"></div><div class="elsa-mouth"></div></div>
-                <div class="elsa-body"></div><div class="elsa-skirt"></div>
+            <div class="elsa-container animate-float">
+                <div class="elsa-hair-main"></div>
+                <div class="elsa-head">
+                    <div class="elsa-glasses">
+                        <div class="glass-frame"></div><div class="glass-frame"></div>
+                    </div>
+                    <div class="elsa-eye-dot" style="left:18px;"></div>
+                    <div class="elsa-eye-dot" style="right:18px;"></div>
+                    <div class="elsa-mouth"></div>
+                </div>
+                <div class="elsa-labcoat"></div>
+                <div class="elsa-stethoscope"></div>
             </div>
             <div class="bubble-content shadow-2xl">
                 <p id="tutor-text" class="text-slate-700 font-black leading-relaxed text-sm"></p>
-                <button onclick="app.tutorial.next()" class="mt-4 w-full py-3 bg-pure-600 text-white rounded-2xl text-xs font-black shadow-lg hover:bg-pure-700 transition-all">繼續 ❯</button>
+                <button onclick="app.tutorial.next()" class="mt-4 w-full py-2 bg-pure-600 text-white rounded-xl text-xs font-black hover:scale-105 transition-all">繼續 ❯</button>
             </div>
         </div>
     </div>
@@ -106,10 +134,15 @@
         <span id="toast-text" class="font-black text-slate-700 text-sm"></span>
     </div>
 
-    <!-- 遊戲時間時鐘 -->
-    <div class="fixed top-6 right-6 z-[150] glass-panel px-6 py-3 rounded-full flex items-center gap-3 shadow-lg border-pure-200 animate-fade-in">
-        <i class="fa-solid fa-clock text-pure-500"></i>
-        <span id="game-clock" class="font-black text-slate-800 text-xl font-mono italic">10:00 AM</span>
+    <!-- 精簡時鐘 -->
+    <div class="fixed bottom-6 left-6 z-[150] glass-panel px-4 py-2 rounded-2xl flex items-center gap-4 shadow-xl border-pure-100 animate-fade-in pointer-events-none">
+        <div class="flex flex-col items-start leading-none">
+            <span id="game-date" class="font-black text-slate-400 text-[9px] uppercase tracking-tighter mb-0.5">DAY 1</span>
+            <div class="flex items-center gap-2">
+                <i class="fa-solid fa-clock text-pure-500 text-xs"></i>
+                <span id="game-clock" class="font-black text-slate-800 text-lg font-mono italic">10:00 AM</span>
+            </div>
+        </div>
     </div>
 
     <main id="app-root" class="w-full min-h-screen flex flex-col items-center justify-center relative overflow-hidden">
@@ -124,77 +157,68 @@
         <section id="view-loading" class="flex flex-col items-center gap-6 text-center transition-all duration-500">
             <div class="w-20 h-20 border-4 border-pure-100 border-t-pure-500 rounded-full animate-spin"></div>
             <h1 class="text-4xl font-black tracking-tighter text-slate-800 italic">瀅白之境</h1>
-            <p id="loading-status" class="text-xs font-bold text-pure-500 tracking-[0.6em] animate-pulse uppercase">驗證身份中...</p>
+            <p id="loading-status" class="text-xs font-bold text-pure-500 tracking-[0.6em] animate-pulse uppercase">驗證數據同步中...</p>
         </section>
 
         <!-- 1. 認證視圖 -->
         <section id="view-login" class="hidden w-full max-w-md px-6 animate-float">
             <div class="glass-panel p-10 rounded-[3.5rem] text-center shadow-2xl">
-                <div class="w-24 h-24 bg-pure-50 rounded-3xl mx-auto flex items-center justify-center mb-8 text-4xl text-pure-600 shadow-inner">
-                    <i class="fa-solid fa-crown"></i>
-                </div>
-                <h2 class="text-4xl font-black mb-2 text-slate-800 tracking-tight">美學教父之路</h2>
+                <div class="w-24 h-24 bg-pure-50 rounded-3xl mx-auto flex items-center justify-center mb-8 text-4xl text-pure-600 shadow-inner"><i class="fa-solid fa-crown"></i></div>
+                <h2 class="text-4xl font-black mb-2 text-slate-800 tracking-tight italic">美學教父之路</h2>
                 <p class="text-slate-400 text-[10px] font-bold tracking-[0.3em] uppercase mb-10">Career Identity Hub</p>
                 <div class="space-y-4">
-                    <button onclick="app.auth.loginGoogle()" class="w-full py-5 bg-white border border-slate-200 rounded-2xl font-black text-slate-600 shadow-sm hover:bg-pure-50 transition-all flex items-center justify-center gap-4">
+                    <button onclick="app.auth.loginGoogle()" class="w-full py-5 bg-white border border-slate-200 rounded-2xl font-black text-slate-600 shadow-sm hover:bg-pure-50 flex items-center justify-center gap-4">
                         <i class="fa-brands fa-google text-lg text-pure-600"></i> Google 快速認證
                     </button>
-                    <button onclick="app.auth.loginGameCenter()" class="w-full py-5 bg-slate-900 text-white rounded-2xl font-black shadow-xl hover:bg-black transition-transform flex items-center justify-center gap-4">
+                    <button onclick="app.auth.loginGameCenter()" class="w-full py-5 bg-slate-900 text-white rounded-2xl font-black shadow-xl hover:bg-black flex items-center justify-center gap-4">
                         <i class="fa-brands fa-apple text-xl"></i> Game Center 登入
                     </button>
                 </div>
             </div>
         </section>
 
-        <!-- 1.2 名稱輸入視圖 (新玩家) -->
+        <!-- 1.2 命名視圖 -->
         <section id="view-naming" class="hidden w-full max-w-md px-6">
-            <div class="glass-panel p-10 rounded-[3.5rem] text-center shadow-2xl">
-                <h2 class="text-3xl font-black text-slate-800 mb-6 italic underline decoration-pure-300">建立美學名片</h2>
-                <p class="text-slate-400 text-sm mb-8 font-bold">請輸入您在美學界的專業名稱：</p>
-                <input id="input-player-name" type="text" maxlength="8" placeholder="例如：美學達人" class="w-full p-5 rounded-2xl bg-pure-50 border-2 border-pure-100 focus:border-pure-500 outline-none text-center font-black text-xl mb-8">
-                <button onclick="app.auth.submitName()" class="w-full py-5 bg-pure-600 text-white font-black rounded-2xl shadow-xl hover:scale-105 transition-all">確認身份 ❯</button>
+            <div class="glass-panel p-12 rounded-[3.5rem] text-center shadow-2xl animate-slide-up">
+                <h2 class="text-3xl font-black text-slate-800 mb-10 italic tracking-tighter">請設定遊戲中名稱</h2>
+                <input id="input-player-name" type="text" maxlength="8" class="w-full p-6 rounded-3xl bg-pure-50 border-4 border-pure-100 focus:border-pure-400 outline-none text-center font-black text-2xl mb-12 shadow-inner">
+                <button onclick="app.auth.confirmName()" class="w-full py-5 bg-pure-600 text-white font-black rounded-2xl shadow-xl hover:scale-105 transition-all text-xl">確認 ❯</button>
             </div>
         </section>
 
-        <!-- 1.5 歡迎視圖 -->
-        <section id="view-welcome" class="hidden w-full max-w-2xl px-6 text-center">
-            <div class="glass-panel p-12 rounded-[4rem] shadow-2xl border-white border-4 animate-fade-in">
-                <div class="text-8xl mb-8 animate-float">🧊</div>
-                <h2 class="text-5xl font-black text-slate-800 mb-6 italic tracking-tighter">歡迎開啟教父之路</h2>
-                <p class="text-slate-500 font-bold leading-relaxed text-lg mb-10">準備好管理您的美學排程與時刻表了嗎？</p>
-                <button onclick="app.tutorial.start()" class="px-16 py-5 bg-gradient-to-r from-pure-600 to-blue-700 text-white font-black text-xl rounded-2xl shadow-xl shadow-pure-200 hover:scale-105 transition-all">開始導引 ❯</button>
+        <!-- 1.3 命名確認 -->
+        <div id="modal-name-confirm" class="hidden fixed inset-0 z-[12000] bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-6">
+            <div class="glass-panel max-w-sm w-full p-8 rounded-[3rem] text-center shadow-2xl animate-slide-up">
+                <h3 class="text-xl font-black text-slate-800 mb-4 italic">最終確認</h3>
+                <p class="text-slate-500 mb-8 font-bold text-sm">您確定要以『<span id="display-confirm-name" class="text-pure-600"></span>』之名展開職涯嗎？</p>
+                <div class="flex gap-4">
+                    <button onclick="document.getElementById('modal-name-confirm').classList.add('hidden')" class="flex-1 py-4 bg-slate-100 text-slate-400 font-black rounded-2xl">修改</button>
+                    <button onclick="app.auth.submitName()" class="flex-1 py-4 bg-pure-600 text-white font-black rounded-2xl shadow-lg">確認 ❯</button>
+                </div>
             </div>
-        </section>
+        </div>
 
         <!-- 2. 大廳 (Dashboard) -->
         <section id="view-lobby" class="hidden w-full max-w-6xl flex flex-col gap-8 px-6">
             <header id="frame-profile" class="flex flex-col md:flex-row justify-between items-center glass-panel p-8 rounded-[3rem] gap-6 animate-slide-up">
                 <div class="flex items-center gap-8">
-                    <div class="w-16 h-16 bg-gradient-to-tr from-pure-500 to-cyan-400 rounded-2xl flex items-center justify-center text-white shadow-xl">
-                        <i class="fa-solid fa-user-doctor text-2xl"></i>
-                    </div>
+                    <div class="w-16 h-16 bg-gradient-to-tr from-pure-500 to-cyan-400 rounded-2xl flex items-center justify-center text-white shadow-xl"><i class="fa-solid fa-id-badge text-2xl"></i></div>
                     <div>
                         <h3 class="text-3xl font-black text-slate-800 italic" id="user-display-name">顧問</h3>
                         <p class="text-xs font-bold text-pure-500 uppercase tracking-[0.2em]" id="user-title">-</p>
                     </div>
                 </div>
                 <div class="flex gap-12 items-center border-l border-slate-100 pl-12">
-                    <div class="text-center">
-                        <p class="text-[10px] text-slate-400 font-black uppercase mb-1 tracking-widest">資產</p>
-                        <p class="text-4xl font-black text-slate-800 font-mono italic">💰 <span id="lobby-gold">0</span></p>
-                    </div>
-                    <div class="text-center">
-                        <p class="text-[10px] text-slate-400 font-black uppercase mb-1 tracking-widest">Lv</p>
-                        <p class="text-4xl font-black text-pure-600 font-mono italic" id="lobby-level">1</p>
-                    </div>
+                    <div class="text-center"><p class="text-[10px] text-slate-400 font-black uppercase mb-1">資產</p><p class="text-4xl font-black text-slate-800 font-mono italic">💰 <span id="lobby-gold">0</span></p></div>
+                    <div class="text-center"><p class="text-[10px] text-slate-400 font-black uppercase mb-1">Lv</p><p class="text-4xl font-black text-pure-600 font-mono italic" id="lobby-level">1</p></div>
                 </div>
             </header>
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 w-full animate-slide-up">
-                <div id="frame-chart" class="lg:col-span-2 glass-panel p-10 rounded-[3.5rem] flex flex-col gap-8">
+                <div id="frame-chart" class="lg:col-span-2 glass-panel p-10 rounded-[3.5rem] flex flex-col gap-8 shadow-inner">
                     <div class="flex justify-between items-center">
                         <h4 class="text-2xl font-black text-slate-800 tracking-tighter italic"><i class="fa-solid fa-chart-line mr-4 text-pure-500"></i>美學經營數據分析</h4>
-                        <span class="text-[10px] bg-green-100 text-green-600 px-4 py-1 rounded-full font-black uppercase">Live</span>
+                        <button onclick="app.router.go('reports')" class="px-6 py-2 bg-pure-100 text-pure-600 rounded-full font-black text-[10px] uppercase hover:bg-pure-200 transition-all shadow-sm">查看完整報表</button>
                     </div>
                     <div class="chart-container"><canvas id="revenueChart"></canvas></div>
                 </div>
@@ -203,12 +227,11 @@
                     <button id="frame-appt" onclick="app.router.go('appointments')" class="group relative flex-1 bg-gradient-to-br from-pure-600 to-blue-800 text-white p-10 rounded-[3.5rem] shadow-2xl hover:scale-[1.02] transition-all text-left overflow-hidden">
                         <div class="absolute right-[-30px] bottom-[-30px] text-[12rem] text-white opacity-10 group-hover:scale-110 transition-transform"><i class="fa-solid fa-calendar-days"></i></div>
                         <h2 class="text-4xl font-black italic mb-4">預約時刻表</h2>
-                        <p class="text-sm font-medium opacity-80 leading-relaxed italic">管理 10:00 - 21:00 的專業時段。</p>
+                        <p class="text-sm font-medium opacity-80 leading-relaxed italic">管理時段排班與市場行銷。</p>
                     </button>
-                    
                     <div class="glass-panel p-8 rounded-[3rem] flex flex-col gap-4">
-                        <button onclick="app.audio.toggle()" class="flex items-center justify-between w-full p-4 rounded-2xl bg-pure-50 hover:bg-pure-100 transition-colors">
-                            <span class="font-bold text-slate-600"><i id="lobby-music-icon" class="fa-solid fa-volume-xmark mr-3"></i>音樂</span>
+                        <button onclick="app.audio.toggle()" class="flex items-center justify-between w-full p-4 rounded-2xl bg-pure-50 hover:bg-pure-100 transition-colors border border-pure-100/50">
+                            <span class="font-bold text-slate-600"><i id="lobby-music-icon" class="fa-solid fa-volume-xmark mr-3"></i>音樂氛圍</span>
                             <span id="lobby-music-text" class="text-[10px] font-black text-pure-400">OFF</span>
                         </button>
                         <button onclick="app.auth.logout()" class="flex items-center gap-3 text-slate-400 font-bold hover:text-red-500 transition-colors px-4 py-1 text-sm italic">
@@ -219,145 +242,199 @@
             </div>
         </section>
 
-        <!-- 3. 預約時刻表 (Table Mode 10:00-21:00) -->
-        <section id="view-appointments" class="hidden w-full max-w-4xl flex flex-col h-[85vh] animate-slide-up px-4">
-            <div class="glass-panel p-8 rounded-t-[4rem] flex justify-between items-center z-10 border-b-0 shadow-none">
-                <div>
-                    <h2 class="text-4xl font-black text-slate-800 italic tracking-tighter">專業排程時刻表</h2>
-                    <p class="text-xs text-pure-400 font-bold mt-1 uppercase italic">Daily Aesthetic Timeline</p>
-                </div>
+        <!-- 3. 預約時刻表 (週視圖) -->
+        <section id="view-appointments" class="hidden w-full max-w-6xl flex flex-col h-[85vh] animate-slide-up px-4">
+            <div class="glass-panel p-10 rounded-t-[4rem] flex justify-between items-center z-10 border-b-0 shadow-none">
+                <div><h2 class="text-4xl font-black text-slate-800 italic tracking-tighter font-mono">RESERVATIONS</h2><p class="text-xs text-pure-400 font-bold mt-1 uppercase italic tracking-widest">7-Day Dynamic Matrix</p></div>
                 <button onclick="app.router.go('lobby')" class="w-14 h-14 rounded-2xl bg-pure-50 flex items-center justify-center text-pure-600 hover:bg-pure-100 shadow-inner transition-all"><i class="fa-solid fa-home text-xl"></i></button>
             </div>
-            <div class="glass-panel p-8 rounded-b-[4rem] flex-1 overflow-y-auto custom-scrollbar shadow-2xl" id="timetable-container">
-                <!-- Timetable rows generated by JS -->
+            <div class="glass-panel p-6 rounded-b-[4rem] flex-1 overflow-auto custom-scrollbar shadow-2xl" id="calendar-container"></div>
+        </section>
+
+        <!-- 4. 經營報表中心 -->
+        <section id="view-reports" class="hidden w-full max-w-5xl flex flex-col h-[85vh] animate-slide-up px-4">
+            <div class="glass-panel p-10 rounded-t-[4rem] flex justify-between items-center border-b-0">
+                <div><h2 class="text-4xl font-black text-slate-800 italic tracking-tighter">美學財報分析</h2><p class="text-xs text-pure-400 font-bold mt-1 uppercase italic">Financial Insight Center</p></div>
+                <button onclick="app.router.go('lobby')" class="w-14 h-14 rounded-2xl bg-pure-50 flex items-center justify-center shadow-inner transition-all hover:bg-pure-100"><i class="fa-solid fa-arrow-left text-xl text-pure-600"></i></button>
+            </div>
+            <div class="glass-panel p-10 rounded-b-[4rem] flex-1 overflow-y-auto space-y-8 shadow-2xl custom-scrollbar">
+                <div class="flex items-center gap-6 p-6 bg-pure-50 rounded-3xl border border-pure-100 shadow-inner">
+                    <div class="flex flex-col"><span class="text-[10px] font-black text-slate-400 uppercase mb-1">Select History Date</span><input type="date" id="report-date-picker" onchange="app.reports.lookup()" class="bg-white border-2 border-pure-100 p-3 rounded-xl font-bold outline-none focus:border-pure-400"></div>
+                    <div class="h-10 w-px bg-slate-200"></div>
+                    <div class="flex-1 grid grid-cols-2 gap-8">
+                        <div><p class="text-[10px] font-black text-slate-400 uppercase">當日收入 (Selected)</p><p class="text-3xl font-black text-pure-600 font-mono italic">💰 <span id="report-income">0</span></p></div>
+                        <div><p class="text-[10px] font-black text-slate-400 uppercase">當日來客 (Guests)</p><p class="text-3xl font-black text-slate-600 font-mono italic">👤 <span id="report-guests">0</span></p></div>
+                    </div>
+                </div>
+                <div class="p-8 border-2 border-pure-50 rounded-[3rem] bg-white/50">
+                    <h5 class="text-lg font-black text-slate-700 mb-6 italic underline decoration-pure-200">當月份每日收入趨勢分析</h5>
+                    <div class="chart-container"><canvas id="monthlyChart"></canvas></div>
+                </div>
             </div>
         </section>
 
-        <!-- 行銷方式選擇 (Modal) -->
-        <div id="modal-marketing" class="hidden fixed inset-0 z-[11000] bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-6">
-            <div class="glass-panel max-w-xl w-full p-10 rounded-[4rem] shadow-2xl">
-                <div class="flex justify-between items-center mb-8">
-                    <h3 class="text-2xl font-black text-slate-800 italic">市場開發投放</h3>
-                    <button onclick="document.getElementById('modal-marketing').classList.add('hidden')" class="text-slate-400 p-2 hover:text-red-500"><i class="fa-solid fa-times"></i></button>
+        <!-- 5. 結束營業結算 Modal -->
+        <div id="modal-closing" class="hidden fixed inset-0 z-[15000] bg-slate-950/80 backdrop-blur-xl flex items-center justify-center p-6">
+            <div class="glass-panel max-w-md w-full p-12 rounded-[4rem] text-center shadow-2xl animate-slide-up border-white border-4 relative overflow-hidden">
+                <div class="absolute -top-10 -right-10 w-32 h-32 bg-blue-50 rounded-full opacity-30"></div>
+                <div class="text-7xl mb-8">🌙</div>
+                <h2 class="text-4xl font-black text-slate-800 mb-2 italic">營業結束</h2>
+                <p class="text-slate-400 font-bold mb-10 text-sm tracking-widest" id="closing-day-label">Day 1 經營結算報告</p>
+                <div class="grid grid-cols-2 gap-4 mb-10">
+                    <div class="bg-pure-50 p-6 rounded-3xl shadow-inner border border-pure-100">
+                        <span class="text-[9px] font-black text-slate-400 uppercase block mb-1">今日總收入</span>
+                        <span class="text-2xl font-black text-pure-600 font-mono italic">💰 <span id="closing-income">0</span></span>
+                    </div>
+                    <div class="bg-pure-50 p-6 rounded-3xl shadow-inner border border-pure-100">
+                        <span class="text-[9px] font-black text-slate-400 uppercase block mb-1">服務貴賓數</span>
+                        <span class="text-2xl font-black text-pure-600 font-mono italic">👤 <span id="closing-guests">0</span></span>
+                    </div>
                 </div>
+                <button onclick="app.timer.startNextDay()" class="w-full py-5 bg-gradient-to-r from-pure-600 to-blue-700 text-white font-black text-xl rounded-2xl shadow-xl hover:scale-105 active:scale-95 transition-all italic">開始次日經營 ❯</button>
+            </div>
+        </div>
+
+        <!-- 行銷投放與遊戲 Canvas 維持 V5.3 架構 -->
+        <div id="modal-marketing" class="hidden fixed inset-0 z-[11000] bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-6">
+            <div class="glass-panel max-w-xl w-full p-10 rounded-[4rem] shadow-2xl animate-slide-up">
+                <div class="flex justify-between items-center mb-8"><h3 class="text-2xl font-black text-slate-800 italic">市場開發投放</h3><button onclick="document.getElementById('modal-marketing').classList.add('hidden')" class="text-slate-400 p-2 hover:text-red-500"><i class="fa-solid fa-times"></i></button></div>
                 <div class="grid grid-cols-2 gap-4" id="marketing-list"></div>
             </div>
         </div>
 
-        <!-- RPG 諮詢視圖 -->
         <section id="view-dialogue" class="hidden w-full max-w-2xl px-6">
-            <div class="glass-panel p-12 rounded-[5rem] text-center relative overflow-hidden shadow-2xl border-white border-4">
-                <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-pink-300 to-pure-400"></div>
+            <div class="glass-panel p-12 rounded-[5rem] text-center relative overflow-hidden shadow-2xl border-white border-4 animate-slide-up">
                 <div id="customer-avatar-box" class="mb-10 animate-float"></div>
-                <div class="bg-blue-50/50 p-8 rounded-[3rem] border border-pure-100 mb-8 text-left shadow-inner">
-                    <h3 class="font-black text-pure-600 text-xl mb-3" id="diag-name">貴賓諮詢</h3>
-                    <p id="diag-text" class="text-slate-700 font-bold leading-relaxed text-2xl italic min-h-[4em]">...</p>
-                </div>
+                <div class="bg-blue-50/50 p-8 rounded-[3rem] border border-pure-100 mb-8 text-left shadow-inner"><h3 class="font-black text-pure-600 text-xl mb-3 italic" id="diag-name">預約貴賓</h3><p id="diag-text" class="text-slate-700 font-bold leading-relaxed text-2xl italic min-h-[4em]">...</p></div>
                 <div id="diag-options" class="flex flex-col gap-4"></div>
             </div>
         </section>
 
-        <!-- 雷射互動 -->
         <section id="view-game" class="hidden w-full max-w-md flex flex-col items-center gap-10">
             <div class="w-full glass-panel p-6 rounded-full flex items-center gap-8 shadow-2xl border-white border-[6px]">
-                <div class="flex-1 bg-slate-100 h-6 rounded-full overflow-hidden relative shadow-inner">
-                    <div id="prog-bar" class="h-full bg-gradient-to-r from-pure-400 to-cyan-500 w-0 transition-all duration-300 shadow-[0_0_20px_#0ea5e9]"></div>
-                </div>
+                <div class="flex-1 bg-slate-100 h-6 rounded-full overflow-hidden relative shadow-inner"><div id="prog-bar" class="h-full bg-gradient-to-r from-pure-400 to-cyan-500 w-0 transition-all duration-300"></div></div>
                 <span id="prog-text" class="text-sm font-black text-pure-700 font-mono italic">0.0%</span>
             </div>
-            <div class="relative rounded-[5.5rem] overflow-hidden shadow-2xl border-[16px] border-white ring-2 ring-blue-50/50">
-                <canvas id="game-canvas" class="bg-pure-50 cursor-none touch-none"></canvas>
-            </div>
+            <div class="relative rounded-[5.5rem] overflow-hidden shadow-2xl border-[16px] border-white ring-2 ring-blue-50/50"><canvas id="game-canvas" class="bg-pure-50 cursor-none touch-none"></canvas></div>
             <p class="text-pure-500 text-xs font-bold mt-3 animate-pulse italic">操作雷射探頭抹除所有毛髮</p>
         </section>
 
-        <!-- 結算視圖 -->
         <div id="modal-result" class="hidden fixed inset-0 z-[100] bg-slate-900/70 backdrop-blur-3xl flex items-center justify-center p-6">
             <div class="glass-panel p-16 rounded-[6rem] text-center max-md w-full border-white border-[8px] shadow-2xl animate-fade-in relative overflow-hidden">
-                <div class="w-28 h-28 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-10 text-6xl text-green-500 shadow-inner animate-pulse"><i class="fa-solid fa-award"></i></div>
+                <div class="w-28 h-28 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-10 text-6xl text-green-500 shadow-inner"><i class="fa-solid fa-award"></i></div>
                 <h2 class="text-5xl font-black text-slate-800 mb-4 tracking-tighter italic underline decoration-pure-100">療程圓滿！</h2>
-                <div class="bg-pure-50 p-8 rounded-[3.5rem] border border-pure-100 mb-12 shadow-inner">
-                    <p class="text-6xl font-black text-pure-600 font-mono italic tracking-tighter">+💰 <span id="reward-val">0</span></p>
-                </div>
-                <button onclick="window.location.reload()" class="w-full py-7 bg-gradient-to-r from-pure-600 to-blue-700 text-white font-black text-2xl rounded-3xl shadow-2xl hover:scale-105 active:scale-95 transition-all">返回時刻表</button>
+                <div class="bg-pure-50 p-8 rounded-[3.5rem] border border-pure-100 mb-12 shadow-inner"><p class="text-6xl font-black text-pure-600 font-mono italic tracking-tighter">+💰 <span id="reward-val">0</span></p></div>
+                <button onclick="window.location.reload()" class="w-full py-7 bg-gradient-to-r from-pure-600 to-blue-700 text-white font-black text-2xl rounded-3xl shadow-2xl hover:scale-105 active:scale-95 transition-all italic">返回時刻表</button>
             </div>
         </div>
 
     </main>
 
+    <!-- 系統核心模組腳本 -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithPopup, GoogleAuthProvider, OAuthProvider, signInWithCustomToken, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged, signOut, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // --- 核心配置 ---
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { apiKey: "AIzaSyCIKSbaZ5R6RTSRcH_-YYfqz_OnQQFr1gc", authDomain: "pure-skin-8640d.firebaseapp.com", projectId: "pure-skin-8640d", storageBucket: "pure-skin-8640d.firebasestorage.app", messagingSenderId: "890613609117", appId: "1:890613609117:web:ed044e453e6cc789b01a74", measurementId: "G-27E3XSTTBH" };
-        const globalAppId = 'pure-skin-studio-master';
+        // --- Firebase 環境 ---
+        const firebaseConfig = JSON.parse(__firebase_config);
+        const globalAppId = typeof __app_id !== 'undefined' ? __app_id : 'pure-skin-studio-master';
         const fbApp = initializeApp(firebaseConfig);
         const auth = getAuth(fbApp);
         const db = getFirestore(fbApp);
 
-        // --- 名單與常量 ---
+        // --- 常量池 ---
         const CAREERS = ["瀅白實習生", "初級技師", "資深除毛師", "首席技術官", "醫美顧問", "雷射物理專家", "皮膚臨床醫生", "抗老研究員", "生物纖維專家", "醫學美容院長", "婚禮造型師", "時尚雜誌顧問", "好萊塢特效護理", "明星御用大師", "人體美學家", "沙龍店長", "品牌經理", "連鎖店創始人", "美容集團 CEO", "全球美學教父"];
-        const SURNAMES = ["陳", "李", "王", "張", "劉", "黃", "林", "趙", "吳", "徐", "孫", "胡", "朱", "高", "馬"];
-        const NAMES = ["小明", "美玲", "子豪", "雅雯", "承翰", "雨柔", "俊廷", "詩婷", "威廉", "凱瑟琳", "柏宇", "欣儀", "建宏", "嘉欣", "宗佑"];
-        const TW_NAMES = Array.from({length: 300}, () => SURNAMES[Math.floor(Math.random()*SURNAMES.length)] + NAMES[Math.floor(Math.random()*NAMES.length)]);
-        
-        const MARKETING_METHODS = [
-            { name: "社群限動推播", cost: 300, power: 0.15 },
-            { name: "區域簡訊廣告", cost: 200, power: 0.1 },
-            { name: "商圈定點派報", cost: 150, power: 0.08 },
-            { name: "美妝網紅開箱", cost: 1200, power: 0.4 },
-            { name: "捷運燈箱廣告", cost: 2000, power: 0.6 },
-            { name: "時尚雜誌專訪", cost: 3500, power: 0.8 },
-            { name: "電視螢幕投放", cost: 5000, power: 0.95 },
-            { name: "會員裂變獎勵", cost: 500, power: 0.25 }
-        ];
-
-        const BODY_PARTS = {
-            face: { name: '臉部', cost: 100 }, underarm: { name: '腋下', cost: 150 }, bikini: { name: 'VIO私密', cost: 480 }, limbs: { name: '四肢', cost: 220 }, back: { name: '背部', cost: 320 }
-        };
+        const MARKETING_METHODS = [ { name: "社群推播", cost: 300, power: 0.15 }, { name: "簡訊廣告", cost: 200, power: 0.1 }, { name: "商圈派報", cost: 150, power: 0.08 }, { name: "網紅開箱", cost: 1200, power: 0.4 }, { name: "捷運燈箱", cost: 2000, power: 0.6 }, { name: "雜誌專訪", cost: 3500, power: 0.8 }, { name: "電視廣告", cost: 6000, power: 1.2 }, { name: "會員裂變", cost: 500, power: 0.25 } ];
+        const BODY_PARTS = { face: '臉部', underarm: '腋下', bikini: 'VIO私密', limbs: '四肢', back: '背部' };
+        const FEEDBACKS = Array.from({length: 80}, (_, i) => `好評度 #${i+1}：專業且絲滑。`);
 
         const App = {
             state: {
-                user: null, data: { gold: 3000, level: 1, history: [], isNewPlayer: true, appointments: {}, playerName: "", gameHour: 10, gameMinute: 0, marketingStrength: 0 },
+                user: null, data: { gold: 3000, level: 1, exp: 0, history: [], dailyLog: {}, isNewPlayer: true, appointments: {}, playerName: "", gameHour: 10, gameMinute: 0, gameDay: 1, marketingStrength: 0 },
                 view: 'loading', session: null, isAuthResolved: false, tutorialStep: 0, audio: { el: null, muted: true }
             },
 
-            // --- 時間系統 ---
+            // --- 報表模組 ---
+            reports: {
+                lookup: () => {
+                    const date = document.getElementById('report-date-picker').value;
+                    const log = App.state.data.dailyLog?.[date] || { income: 0, guests: 0 };
+                    document.getElementById('report-income').innerText = log.income.toLocaleString();
+                    document.getElementById('report-guests').innerText = log.guests;
+                },
+                renderMonthlyChart: () => {
+                    const ctx = document.getElementById('monthlyChart').getContext('2d');
+                    const logs = App.state.data.dailyLog || {};
+                    const sortedDates = Object.keys(logs).sort().slice(-15);
+                    const incomeData = sortedDates.map(d => logs[d].income);
+                    if (window.monthlyChartInstance) window.monthlyChartInstance.destroy();
+                    window.monthlyChartInstance = new Chart(ctx, { type: 'bar', data: { labels: sortedDates.map(d => d.slice(5)), datasets: [{ label: '每日營收', data: incomeData, backgroundColor: '#38bdf8', borderRadius: 10 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { display: false } }, x: { grid: { display: false } } } } });
+                }
+            },
+
+            // --- 時間流轉引擎 V5.2 最佳化 ---
             timer: {
-                start: () => {
-                    setInterval(() => {
-                        if (App.state.view === 'lobby' || App.state.view === 'appointments') {
-                            App.timer.tick();
-                        }
-                    }, 5000); // 每5秒更新一次 (快速模擬)
+                lastTick: performance.now(),
+                start: () => requestAnimationFrame(App.timer.loop),
+                loop: (now) => {
+                    const elapsed = now - App.timer.lastTick;
+                    if (elapsed > 1000) { App.timer.lastTick = now; App.timer.tick(); }
+                    requestAnimationFrame(App.timer.loop);
                 },
                 tick: async () => {
-                    App.state.data.gameMinute += 15;
-                    if (App.state.data.gameMinute >= 60) {
-                        App.state.data.gameMinute = 0;
-                        App.state.data.gameHour++;
-                        if (App.state.data.gameHour > 21) App.state.data.gameHour = 10; // 循環營業
+                    let d = App.state.data;
+                    const isVisible = !document.hidden;
+                    const gameSecondsToAdd = isVisible ? 6 : (5 * 60) / 3600;
+                    d.gameMinute += gameSecondsToAdd / 60;
+                    if (d.gameMinute >= 60) {
+                        d.gameMinute = 0; d.gameHour++;
+                        if (d.gameHour >= 21) { App.timer.performDailySettlement(); return; }
                     }
                     App.ui.updateClock();
-                    App.timer.processMarketing();
-                    App.ui.renderTimetable();
+                    App.timer.processMarketing(isVisible);
+                    if (App.state.view === 'appointments') App.ui.renderTimetable();
                 },
-                processMarketing: async () => {
-                    if (App.state.data.marketingStrength > 0 && Math.random() < (0.1 + App.state.data.marketingStrength)) {
-                        const slots = [10, 12, 14, 16, 18, 20];
-                        const freeSlots = slots.filter(s => !App.state.data.appointments[s]);
-                        if (freeSlots.length > 0) {
-                            const target = freeSlots[Math.floor(Math.random()*freeSlots.length)];
-                            App.state.data.appointments[target] = {
-                                name: TW_NAMES[Math.floor(Math.random()*TW_NAMES.length)],
-                                part: Object.keys(BODY_PARTS)[Math.floor(Math.random()*5)],
-                                gender: Math.random() > 0.5 ? 'male' : 'female',
-                                status: 'pending' // 待接受
-                            };
-                            App.state.data.marketingStrength *= 0.8; // 力量隨時間衰減
-                            App.ui.notify("行銷生效！有新貴賓預約。");
+                performDailySettlement: async () => {
+                    const day = App.state.data.gameDay;
+                    const sid_prefix = `${day}-`;
+                    let dailyIncome = 0; let dailyGuests = 0;
+                    Object.keys(App.state.data.appointments).forEach(sid => {
+                        if (sid.startsWith(sid_prefix)) {
+                            const appt = App.state.data.appointments[sid];
+                            if (appt.status === 'finished') { dailyIncome += 800; dailyGuests++; }
+                        }
+                    });
+                    const dateStr = new Date().toISOString().split('T')[0]; 
+                    App.state.data.dailyLog[dateStr] = { income: dailyIncome, guests: dailyGuests };
+                    document.getElementById('closing-day-label').innerText = `Day ${day} 經營結算報告`;
+                    document.getElementById('closing-income').innerText = dailyIncome;
+                    document.getElementById('closing-guests').innerText = dailyGuests;
+                    document.getElementById('modal-closing').classList.remove('hidden');
+                    await App.data.save();
+                },
+                startNextDay: async () => {
+                    App.state.data.gameHour = 10; App.state.data.gameMinute = 0; App.state.data.gameDay++;
+                    document.getElementById('modal-closing').classList.add('hidden');
+                    await App.data.save(); App.router.go('lobby');
+                },
+                processMarketing: async (isVisible) => {
+                    let d = App.state.data;
+                    if (d.marketingStrength > 0 && Math.random() < (isVisible ? 0.05 : 0.001)) {
+                        const slotDays = [0, 1, 2, 3, 4, 5, 6]; const slotHours = [10, 12, 14, 16, 18, 20];
+                        let candidates = [];
+                        slotDays.forEach(dayOffset => {
+                            const day = d.gameDay + dayOffset;
+                            slotHours.forEach(hour => {
+                                const sid = `${day}-${hour}`;
+                                if (!d.appointments[sid] && (day > d.gameDay || hour > d.gameHour)) candidates.push(sid);
+                            });
+                        });
+                        if (candidates.length > 0) {
+                            const sid = candidates[Math.floor(Math.random()*candidates.length)];
+                            d.appointments[sid] = { name: TW_NAMES[Math.floor(Math.random()*300)], part: 'bikini', gender: Math.random() > 0.5 ? 'male' : 'female', status: 'pending' };
+                            d.marketingStrength *= 0.9;
+                            App.ui.notify("行銷引流成功，新貴賓預約。");
                             await App.data.save();
                         }
                     }
@@ -366,13 +443,13 @@
 
             auth: {
                 init: async () => {
+                    const watchdog = setTimeout(() => { if (!App.state.isAuthResolved && App.state.view === 'loading') App.router.go('login'); }, 6000);
                     onAuthStateChanged(auth, async (user) => {
-                        App.state.isAuthResolved = true;
+                        App.state.isAuthResolved = true; clearTimeout(watchdog);
                         if (user && !user.isAnonymous) {
-                            App.state.user = user;
-                            await App.data.sync(); 
+                            App.state.user = user; await App.data.sync(); 
                             if (!App.state.data.playerName) App.router.go('naming');
-                            else if (App.state.data.isNewPlayer) App.router.go('welcome');
+                            else if (App.state.data.isNewPlayer && !localStorage.getItem(`tut_done_${user.uid}`)) App.router.go('welcome');
                             else App.router.go('lobby');
                             App.timer.start();
                         } else {
@@ -381,138 +458,90 @@
                         }
                     });
                 },
-                loginGoogle: () => signInWithPopup(auth, new GoogleAuthProvider()),
-                submitName: async () => {
-                    const name = document.getElementById('input-player-name').value.trim();
-                    if (!name) return App.ui.notify("請輸入名稱", true);
-                    App.state.data.playerName = name;
-                    await App.data.save();
-                    App.router.go('welcome');
-                },
+                loginGoogle: () => signInWithPopup(auth, new GoogleAuthProvider()).catch(e => App.ui.notify("此網域尚未授權登入功能。", true)),
+                confirmName: () => { const name = document.getElementById('input-player-name').value.trim(); if (!name) return; document.getElementById('display-confirm-name').innerText = name; document.getElementById('modal-name-confirm').classList.remove('hidden'); },
+                submitName: async () => { const name = document.getElementById('input-player-name').value.trim(); App.state.data.playerName = name; document.getElementById('modal-name-confirm').classList.add('hidden'); await App.data.save(); App.router.go('welcome'); },
                 logout: async () => { localStorage.clear(); await signOut(auth); window.location.reload(); }
             },
 
             tutorial: {
                 steps: [
-                    { text: "導師 Elsa 報到！右上角是目前的營業時間，請注意經營效率。", target: "game-clock", pos: "bubble-top" },
-                    { text: "預約時刻表是您的戰略核心，點擊空位即可投放行銷廣告。", target: "frame-appt", pos: "bubble-left" },
-                    { text: "若是預約貴賓待確認，請儘速確認，否則逾時會造成資產損失喔！", target: "timetable-container", pos: "bubble-top" }
+                    { text: "我是導師 Elsa。左下角面板記錄營運時空，若跳離遊戲時間會大幅減速保障預約安全。", target: "game-clock", pos: "bubble-top" },
+                    { text: "預約時刻表是您的戰略核心。點擊空位進行投放，未來 7 天將陸續出現預約。", target: "frame-appt", pos: "bubble-left" },
+                    { text: "每天 21:00 會結束營業並結算，請點擊『經營報表』分析長期獲利趨勢。", target: "frame-chart", pos: "bubble-top" }
                 ],
                 start: () => { App.router.go('lobby'); App.state.tutorialStep = 0; document.getElementById('tutor-anchor').style.display = 'flex'; App.tutorial.render(); },
                 render: () => {
                     const step = App.tutorial.steps[App.state.tutorialStep];
-                    const anchor = document.getElementById('tutor-anchor');
                     document.getElementById('tutor-text').innerText = step.text;
-                    anchor.className = `tutor-bubble ${step.pos}`;
+                    const anchor = document.getElementById('tutor-anchor');
                     const targetEl = document.getElementById(step.target);
                     if (targetEl) {
                         const rect = targetEl.getBoundingClientRect();
-                        anchor.style.top = (rect.top - 420) + 'px'; anchor.style.left = (rect.left + rect.width/2 - 140) + 'px';
+                        anchor.style.top = (rect.top - 380) + 'px'; anchor.style.left = (rect.left + rect.width/2 - 130) + 'px';
+                        targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     }
                 },
-                next: async () => {
-                    App.state.tutorialStep++;
-                    if (App.state.tutorialStep < App.tutorial.steps.length) App.tutorial.render();
-                    else {
-                        document.getElementById('tutor-anchor').style.display = 'none';
-                        App.state.data.isNewPlayer = false;
-                        await App.data.save();
-                        App.ui.notify("美學之路正式啟動！");
-                    }
-                }
+                next: async () => { App.state.tutorialStep++; if (App.state.tutorialStep < App.tutorial.steps.length) App.tutorial.render(); else { document.getElementById('tutor-anchor').style.display = 'none'; App.state.data.isNewPlayer = false; if (App.state.user) localStorage.setItem(`tut_done_${App.state.user.uid}`, 'true'); await App.data.save(); } }
             },
 
             data: {
                 sync: async () => {
+                    if (!App.state.user) return;
                     const userRef = doc(db, 'artifacts', globalAppId, 'users', App.state.user.uid, 'saveData', 'profile');
                     const snap = await getDoc(userRef);
                     if (snap.exists()) App.state.data = { ...App.state.data, ...snap.data() };
                     else await setDoc(userRef, App.state.data);
                     onSnapshot(userRef, (s) => { if(s.exists()) { App.state.data = { ...App.state.data, ...s.data() }; App.ui.updateLobby(); } });
                 },
-                save: async () => {
-                    const userRef = doc(db, 'artifacts', globalAppId, 'users', App.state.user.uid, 'saveData', 'profile');
-                    await setDoc(userRef, App.state.data, { merge: true });
-                }
+                save: async () => { if (App.state.user) { const userRef = doc(db, 'artifacts', globalAppId, 'users', App.state.user.uid, 'saveData', 'profile'); await setDoc(userRef, App.state.data, { merge: true }); } }
             },
 
             ui: {
-                notify: (msg, isErr) => {
-                    const el = document.getElementById('toast');
-                    document.getElementById('toast-text').innerText = msg;
-                    document.getElementById('toast-icon').className = isErr ? "fa-solid fa-circle-exclamation text-red-500" : "fa-solid fa-circle-check text-green-500";
-                    el.classList.remove('-translate-y-24', 'opacity-0');
-                    setTimeout(() => el.classList.add('-translate-y-24', 'opacity-0'), 3000);
-                },
-                updateClock: () => {
-                    const h = App.state.data.gameHour; const m = App.state.data.gameMinute;
-                    document.getElementById('game-clock').innerText = `${h}:${m === 0 ? '00' : m} ${h >= 12 ? 'PM' : 'AM'}`;
-                },
+                notify: (msg, isErr) => { const el = document.getElementById('toast'); document.getElementById('toast-text').innerText = msg; document.getElementById('toast-icon').className = isErr ? "fa-solid fa-triangle-exclamation text-red-500" : "fa-solid fa-circle-check text-green-500"; el.classList.remove('-translate-y-24', 'opacity-0'); setTimeout(() => el.classList.add('-translate-y-24', 'opacity-0'), 3000); },
+                updateClock: () => { const d = App.state.data; const h = Math.floor(d.gameHour); const m = Math.floor(d.gameMinute); document.getElementById('game-clock').innerText = `${h}:${m < 10 ? '0'+m : m} ${h >= 12 ? 'PM' : 'AM'}`; document.getElementById('game-date').innerText = `DAY ${d.gameDay}`; },
                 updateLobby: () => {
                     document.getElementById('lobby-gold').innerText = App.state.data.gold.toLocaleString();
                     document.getElementById('lobby-level').innerText = App.state.data.level;
-                    document.getElementById('user-display-name').innerText = App.state.data.playerName;
-                    document.getElementById('user-title').innerText = CAREERS[Math.min(Math.floor(App.state.data.level / 2), CAREERS.length-1)];
+                    document.getElementById('user-display-name').innerText = App.state.data.playerName || "教父專家";
+                    document.getElementById('user-title').innerText = CAREERS[Math.min(Math.floor(App.state.data.level / 2), 19)];
                     if (window.revenueChartInstance) App.ui.renderChart();
                 },
                 renderChart: () => {
                     const ctx = document.getElementById('revenueChart').getContext('2d');
-                    const history = App.state.data.history.length > 0 ? App.state.data.history : [{a: 0, d:'系統載入'}];
+                    const history = App.state.data.history.length > 0 ? App.state.data.history : [{a: 0, d:'數據校準中'}];
                     if (window.revenueChartInstance) window.revenueChartInstance.destroy();
-                    window.revenueChartInstance = new Chart(ctx, {
-                        type: 'line',
-                        data: { labels: history.map(h => h.d), datasets: [{ data: history.map(h => h.a), borderColor: '#0ea5e9', backgroundColor: 'rgba(14, 165, 233, 0.05)', borderWidth: 5, tension: 0.4, fill: true }] },
-                        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false } } } }
-                    });
+                    window.revenueChartInstance = new Chart(ctx, { type: 'line', data: { labels: history.map(h => h.d), datasets: [{ data: history.map(h => h.a), borderColor: '#0ea5e9', backgroundColor: 'rgba(14, 165, 233, 0.05)', borderWidth: 5, tension: 0.4, fill: true }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false } } } } });
                 },
                 renderTimetable: () => {
-                    const container = document.getElementById('timetable-container');
+                    const container = document.getElementById('calendar-container');
                     if (!container) return;
-                    const slots = [10, 12, 14, 16, 18, 20];
-                    let html = `<div class="space-y-2">`;
-                    slots.forEach(hour => {
-                        const appt = App.state.data.appointments[hour];
-                        const isPast = hour < App.state.data.gameHour;
-                        let statusHtml = `<span class="status-pill status-empty">可排程空位</span>`;
-                        let actionBtn = `<button onclick="window.openMarketing(${hour})" class="px-4 py-2 bg-blue-50 text-blue-600 rounded-xl text-xs font-black">行銷投放</button>`;
-                        
-                        if (appt) {
-                            const isOverdue = isPast && appt.status !== 'finished';
-                            const genderIcon = appt.gender === 'male' ? '<i class="fa-solid fa-mars text-blue-500 mr-2"></i>' : '<i class="fa-solid fa-venus text-red-500 mr-2"></i>';
-                            
-                            if (appt.status === 'pending') {
-                                statusHtml = `<span class="status-pill status-pending">待確認預約</span>`;
-                                actionBtn = `<div class="flex gap-2"><button onclick="window.confirmAppt(${hour}, true)" class="px-4 py-2 bg-green-500 text-white rounded-xl text-xs font-black">接受</button><button onclick="window.confirmAppt(${hour}, false)" class="px-4 py-2 bg-slate-200 text-slate-500 rounded-xl text-xs font-black">婉拒</button></div>`;
-                            } else if (appt.status === 'accepted') {
-                                statusHtml = `<span class="status-pill status-accepted">已確認預約</span>`;
-                                actionBtn = isOverdue ? `<button onclick="window.rescheduleDialogue(${hour})" class="px-4 py-2 bg-red-500 text-white rounded-xl text-xs font-black">逾時協商</button>` : `<button onclick="window.startAesthetic(${hour})" class="px-4 py-2 bg-pure-600 text-white rounded-xl text-xs font-black">開始療程</button>`;
-                            } else if (appt.status === 'finished') {
-                                statusHtml = `<span class="status-pill status-empty opacity-50">療程已完成</span>`;
-                                actionBtn = `<span class="text-[10px] text-slate-300 italic font-bold">評價：好評</span>`;
-                            }
-
-                            html += `<div class="timetable-row flex items-center justify-between">
-                                <div class="flex items-center gap-6">
-                                    <span class="w-16 font-mono font-black text-slate-400 text-lg">${hour}:00</span>
-                                    <div>
-                                        <p class="font-black text-slate-700">${genderIcon}${appt.name}</p>
-                                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">${BODY_PARTS[appt.part]?.name || '全身'}療程</p>
-                                    </div>
-                                </div>
-                                <div class="flex items-center gap-4">${statusHtml} ${actionBtn}</div>
-                            </div>`;
-                        } else {
-                            html += `<div class="timetable-row flex items-center justify-between opacity-60">
-                                <div class="flex items-center gap-6">
-                                    <span class="w-16 font-mono font-black text-slate-300 text-lg">${hour}:00</span>
-                                    <span class="text-slate-300 italic text-sm">此時段尚無貴賓預約</span>
-                                </div>
-                                ${actionBtn}
-                            </div>`;
+                    const hours = [10, 12, 14, 16, 18, 20]; const curDay = App.state.data.gameDay;
+                    let html = `<table class="calendar-table"><thead><tr><th class="w-16">時段</th>`;
+                    for(let i=0; i<7; i++) html += `<th>D+${i}<br>${curDay+i}日</th>`;
+                    html += `</tr></thead><tbody>`;
+                    hours.forEach(h => {
+                        html += `<tr><td class="text-center font-mono font-black text-slate-400 text-[10px]">${h}:00</td>`;
+                        for(let i=0; i<7; i++) {
+                            const sid = `${curDay+i}-${h}`; const appt = App.state.data.appointments[sid];
+                            const isPast = (curDay+i < curDay) || (curDay+i === curDay && h < App.state.data.gameHour);
+                            if (appt) {
+                                const isFin = appt.status === 'finished'; const color = appt.gender === 'male' ? 'occupied-male' : 'occupied-female';
+                                const overdue = isPast && !isFin ? 'overdue' : ''; const icon = appt.gender === 'male' ? '<i class="fa-solid fa-mars"></i>' : '<i class="fa-solid fa-venus"></i>';
+                                html += `<td class="calendar-cell ${color} ${overdue}" onclick="window.apptAction('${sid}')"><div class="flex flex-col items-center justify-center h-full text-[9px] font-black"><span class="truncate w-full text-center px-1">${icon} ${appt.name}</span><span class="text-[7px] opacity-70 italic">${isFin ? '完成' : (overdue ? '逾時' : '預約')}</span></div></td>`;
+                            } else { html += `<td class="calendar-cell empty flex items-center justify-center" onclick="window.openMarketing('${sid}')"><span class="text-[8px] text-slate-300 font-black"><i class="fa-solid fa-bullhorn opacity-30"></i></span></td>`; }
                         }
+                        html += `</tr>`;
                     });
-                    html += `</div>`;
-                    container.innerHTML = html;
+                    html += `</tbody></table>`; container.innerHTML = html;
+                }
+            },
+
+            audio: {
+                toggle: () => {
+                    if(!App.state.audio.el) { App.state.audio.el = new Audio("https://assets.mixkit.co/music/preview/kit-serene-view-443.mp3"); App.state.audio.el.loop = true; }
+                    if(App.state.audio.muted) { App.state.audio.el.play().then(() => { App.state.audio.muted = false; document.getElementById('lobby-music-icon').className = "fa-solid fa-volume-high text-pure-500"; }); }
+                    else { App.state.audio.el.pause(); App.state.audio.muted = true; document.getElementById('lobby-music-icon').className = "fa-solid fa-volume-xmark"; }
                 }
             },
 
@@ -523,13 +552,25 @@
                     App.state.view = viewId;
                     if (viewId === 'appointments') App.ui.renderTimetable();
                     if (viewId === 'lobby') App.ui.updateLobby();
+                    if (viewId === 'reports') { App.reports.renderMonthlyChart(); document.getElementById('report-date-picker').valueAsDate = new Date(); App.reports.lookup(); }
+                    if (viewId === 'game') window.initCanvas();
                 }
             }
         };
 
-        // --- 全域橋接與行銷系統 ---
-        window.openMarketing = (hour) => {
-            App.state.targetSlot = hour;
+        window.app = { tutorial: App.tutorial, auth: App.auth, router: App.router, audio: { toggle: () => App.audio.toggle() }, reports: App.reports, timer: { startNextDay: App.timer.startNextDay } };
+
+        window.apptAction = (sid) => {
+            const appt = App.state.data.appointments[sid];
+            const [day, hour] = sid.split('-').map(Number);
+            const isPast = (day < App.state.data.gameDay) || (day === App.state.data.gameDay && hour < App.state.data.gameHour);
+            App.state.session = { ...appt, sid };
+            if (isPast && appt.status !== 'finished') window.rescheduleDialogue(sid);
+            else { App.router.go('dialogue'); window.renderDialogue(); }
+        };
+
+        window.openMarketing = (sid) => {
+            App.state.targetSlot = sid;
             const modal = document.getElementById('modal-marketing');
             document.getElementById('marketing-list').innerHTML = MARKETING_METHODS.map((m, i) => `
                 <button onclick="window.doMarketing(${i})" class="p-4 bg-white border-2 border-pure-100 rounded-2xl text-left hover:border-pure-500 transition-all shadow-sm group">
@@ -546,50 +587,64 @@
             App.state.data.gold -= m.cost;
             App.state.data.marketingStrength += m.power;
             document.getElementById('modal-marketing').classList.add('hidden');
-            App.ui.notify("廣告投放中，請隨時留意時刻表。");
             await App.data.save();
+            App.ui.notify("行銷投放成功。未來數日將有預約。");
         };
 
-        window.confirmAppt = async (hour, isAccept) => {
-            if (isAccept) App.state.data.appointments[hour].status = 'accepted';
-            else {
-                delete App.state.data.appointments[hour];
-                App.state.data.gold -= 100; // 拒絕預約損失客群
-                App.ui.notify("婉拒預約已扣除資產 100", true);
+        window.renderDialogue = () => {
+            const box = document.getElementById('customer-avatar-box');
+            const appt = App.state.session;
+            box.innerHTML = `<div class="css-avatar" style="border-color:${appt.gender==='male'?'#3b82f6':'#f43f5e'}"><div class="css-head"></div><div class="css-body"></div><div class="${appt.gender==='male'?'css-hair-male':'css-hair-female'}"></div></div>`;
+            document.getElementById('diag-name').innerText = appt.name;
+            if (appt.status === 'pending') {
+                document.getElementById('diag-text').innerText = `你好，我是預約的貴賓。預約部位是『${BODY_PARTS[appt.part] || '全身'}』，請問您能接受預約嗎？`;
+                document.getElementById('diag-options').innerHTML = `<div class="flex gap-4"><button onclick="window.confirmAppt(true)" class="flex-1 p-5 bg-green-500 text-white rounded-3xl font-black">接受預約</button><button onclick="window.confirmAppt(false)" class="flex-1 p-5 bg-slate-100 text-slate-400 rounded-3xl font-black">婉拒</button></div>`;
+            } else if (appt.status === 'accepted') {
+                document.getElementById('diag-text').innerText = "我已經準備好進行療程了。";
+                document.getElementById('diag-options').innerHTML = `<button onclick="app.router.go('game')" class="w-full p-6 bg-pure-600 text-white rounded-3xl font-black italic shadow-xl">啟動專業雷射儀 ❯</button>`;
+            } else if (appt.status === 'finished') {
+                document.getElementById('diag-text').innerText = `顧客評價：${appt.feedback || '專業且絲滑。'}`;
+                document.getElementById('diag-options').innerHTML = `<button onclick="app.router.go('appointments')" class="w-full p-6 bg-slate-100 text-slate-400 rounded-3xl font-black">服務已結案</button>`;
             }
-            await App.data.save();
-            App.ui.renderTimetable();
         };
 
-        window.rescheduleDialogue = (hour) => {
-            const appt = App.state.data.appointments[hour];
-            App.state.session = { ...appt, hour };
+        window.confirmAppt = async (isAccept) => {
+            const sid = App.state.session.sid;
+            if (isAccept) App.state.data.appointments[sid].status = 'accepted';
+            else { delete App.state.data.appointments[sid]; App.state.data.gold -= 200; App.ui.notify("拒絕預約造成資產損失 -200", true); }
+            await App.data.save(); App.router.go('appointments');
+        };
+
+        window.rescheduleDialogue = (sid) => {
+            const appt = App.state.data.appointments[sid];
             App.router.go('dialogue');
             document.getElementById('customer-avatar-box').innerHTML = `<div class="css-avatar"><div class="css-head"></div><div class="css-body"></div></div>`;
             document.getElementById('diag-name').innerText = appt.name;
-            document.getElementById('diag-text').innerText = "不好意思，因為您逾時未開展療程，是否能幫我重新排程到下一個空檔？";
-            document.getElementById('diag-options').innerHTML = `<button onclick="window.processReschedule(${hour})" class="w-full p-5 bg-pure-600 text-white rounded-3xl font-black">同意改期 ❯</button>`;
+            document.getElementById('diag-text').innerText = "因為您逾時了。是否能幫我重新排程到最近的空位？";
+            document.getElementById('diag-options').innerHTML = `<button onclick="window.processReschedule('${sid}')" class="w-full p-5 bg-pure-600 text-white rounded-3xl font-black shadow-xl">進行排程協商 ❯</button>`;
         };
 
-        window.processReschedule = async (oldHour) => {
-            const appt = App.state.data.appointments[oldHour];
-            const freeSlots = [10, 12, 14, 16, 18, 20].filter(s => !App.state.data.appointments[s] && s > App.state.data.gameHour);
-            if (freeSlots.length === 0) return App.ui.notify("今日已無空檔，請直接退費", true);
-            const nextSlot = freeSlots[0];
-            App.state.data.appointments[nextSlot] = { ...appt, status: 'accepted' };
-            delete App.state.data.appointments[oldHour];
-            await App.data.save();
-            App.router.go('appointments');
-            App.ui.notify("已成功改期至 " + nextSlot + ":00");
+        window.processReschedule = async (oldSid) => {
+            const appt = App.state.data.appointments[oldSid];
+            const hours = [10, 12, 14, 16, 18, 20];
+            const curDay = App.state.data.gameDay;
+            let found = false;
+            for(let i=0; i<7; i++) {
+                for(let h of hours) {
+                    const tsid = `${curDay+i}-${h}`;
+                    const isFut = (curDay+i > curDay) || (curDay+i === curDay && h > App.state.data.gameHour);
+                    if (isFut && !App.state.data.appointments[tsid]) {
+                        App.state.data.appointments[tsid] = { ...appt, status: 'accepted' };
+                        delete App.state.data.appointments[oldSid];
+                        found = true; break;
+                    }
+                }
+                if (found) break;
+            }
+            if (!found) return App.ui.notify("未來一週已滿", true);
+            await App.data.save(); App.router.go('appointments'); App.ui.notify("重新排程完成。");
         };
 
-        window.startAesthetic = (hour) => {
-            App.state.session = { ...App.state.data.appointments[hour], hour };
-            App.router.go('game');
-            window.initCanvas();
-        };
-
-        // --- Canvas 邏輯 ---
         let canvas, ctx;
         window.initCanvas = () => {
             canvas = document.getElementById('game-canvas'); ctx = canvas.getContext('2d');
@@ -597,61 +652,32 @@
             const total = canvas.width * canvas.height; const laser = document.getElementById('laser-cursor');
             ctx.fillStyle = App.state.session.gender === 'male' ? '#f4d1c1' : '#fff0f0';
             ctx.fillRect(0, 0, canvas.width, canvas.height); ctx.strokeStyle = '#4a3528'; ctx.lineWidth = 1;
-            for (let i = 0; i < 3000; i++) {
-                const x = Math.random() * canvas.width; const y = Math.random() * canvas.height;
-                ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + (Math.random()-0.5)*4, y + 8); ctx.stroke();
-            }
-            let isDragging = false;
-            canvas.onmousedown = () => isDragging = true;
-            window.onmouseup = () => isDragging = false;
+            for (let i = 0; i < 3000; i++) { const x = Math.random() * canvas.width; const y = Math.random() * canvas.height; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + (Math.random()-0.5)*4, y + 8); ctx.stroke(); }
+            let isD = false; canvas.onmousedown = () => isD = true; window.onmouseup = () => isD = false;
             window.onmousemove = (e) => {
                 const rect = canvas.getBoundingClientRect(); const cx = e.clientX; const cy = e.clientY;
                 laser.style.left = cx + 'px'; laser.style.top = cy + 'px'; laser.style.display = 'block';
-                if (isDragging) {
-                    ctx.globalCompositeOperation = 'destination-out'; ctx.beginPath();
-                    ctx.arc(cx - rect.left, cy - rect.top, 30, 0, Math.PI*2); ctx.fill();
+                if (isD) {
+                    ctx.globalCompositeOperation = 'destination-out'; ctx.beginPath(); ctx.arc(cx - rect.left, cy - rect.top, 30, 0, Math.PI*2); ctx.fill();
                     const data = ctx.getImageData(0,0, canvas.width, canvas.height).data;
-                    let empty = 0; for(let i=3; i<data.length; i+=4) if(data[i]===0) empty++;
-                    const prog = (empty/total); 
-                    document.getElementById('prog-bar').style.width = `${prog*100}%`;
-                    document.getElementById('prog-text').innerText = `${(prog*100).toFixed(1)}%`;
+                    let em = 0; for(let i=3; i<data.length; i+=4) if(data[i]===0) em++;
+                    const prog = (em/total); document.getElementById('prog-bar').style.width = `${prog*100}%`; document.getElementById('prog-text').innerText = `${(prog*100).toFixed(1)}%`;
                     if (prog > 0.985) window.finishAesthetic();
                 }
             };
         };
 
         window.finishAesthetic = async () => {
-            document.getElementById('laser-cursor').style.display = 'none';
-            const reward = BODY_PARTS[App.state.session.part]?.cost || 100;
-            App.state.data.gold += reward; App.state.data.level++;
-            App.state.data.history.push({ d: App.state.data.gameHour+":00", a: reward });
-            App.state.data.appointments[App.state.session.hour].status = 'finished';
+            const reward = 800; App.state.data.gold += reward; App.state.data.level++;
+            App.state.data.history.push({ d: App.state.data.gameDay+"日"+App.state.data.gameHour+"時", a: reward });
+            const sid = App.state.session.sid;
+            App.state.data.appointments[sid].status = 'finished';
+            App.state.data.appointments[sid].feedback = FEEDBACKS[Math.floor(Math.random()*80)];
             await App.data.save();
-            document.getElementById('reward-val').innerText = reward;
-            document.getElementById('modal-result').classList.remove('hidden');
-        };
-
-        App.audio = {
-            toggle: () => {
-                if(!App.state.audio.el) {
-                    App.state.audio.el = new Audio("https://assets.mixkit.co/music/preview/kit-serene-view-443.mp3");
-                    App.state.audio.el.loop = true;
-                }
-                if(App.state.audio.muted) {
-                    App.state.audio.el.play().then(() => {
-                        App.state.audio.muted = false;
-                        document.getElementById('lobby-music-icon').className = "fa-solid fa-volume-high text-pure-500";
-                    });
-                } else {
-                    App.state.audio.el.pause();
-                    App.state.audio.muted = true;
-                    document.getElementById('lobby-music-icon').className = "fa-solid fa-volume-xmark";
-                }
-            }
+            document.getElementById('reward-val').innerText = reward; document.getElementById('modal-result').classList.remove('hidden'); document.getElementById('laser-probe').style.display = 'none';
         };
 
         App.auth.init();
-        window.app = App;
     </script>
 </body>
 </html>
