@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>瀅白之境 Pure Skin - V3.0</title>
+    <title>瀅白之境 Pure Skin - V3.1</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
@@ -13,50 +13,57 @@
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // --- Firebase 配置 ---
+        // --- Firebase 環境變數讀取 ---
         const firebaseConfig = JSON.parse(__firebase_config);
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'pure-skin-studio-master';
 
-        // --- 預設劇情與預約名單生成 ---
+        // --- 備援配置與故事庫 ---
+        const FALLBACK_DATA = {
+            bodyParts: {
+                face: { name: '臉部療程', icon: '👤', cost: 100, desc: '上唇、下巴精細護理。' },
+                underarm: { name: '腋下護理', icon: '✨', cost: 150, desc: '掃除黑頭沉積。' },
+                bikini: { name: 'VIO 私密', icon: '👙', cost: 480, desc: '極致親膚溫柔呵護。' },
+                limbs: { name: '四肢除毛', icon: '🦵', cost: 220, desc: '打造大面積絲滑肌。' }
+            },
+            careerTitles: ["瀅白實習生", "初級技師", "資深除毛師", "首席技術官", "醫美顧問", "雷射物理專家", "皮膚臨床醫生", "抗老研究員", "生物纖維專家", "醫學美容院長", "婚禮造型師", "時尚雜誌顧問", "好萊塢特效護理", "明星御用大師", "人體美學家", "沙龍店長", "品牌經理", "連鎖店創始人", "美容集團 CEO", "全球美學教父"],
+            stories: Array.from({length: 20}, (_, i) => ({
+                id: i,
+                title: `案例 #${i + 1}`,
+                text: [
+                    `你好！我是第 ${i+1} 號預約者。我的皮膚比較敏感，不知道雷射會不會痛？`,
+                    `其實我下週有個重要的品牌活動，想讓肌膚看起來更淨白。`,
+                    `這是我第一次嘗試全身除毛，瀅白之境的評價真的很高。`,
+                    `教父你好，我想處理腋下的部分，夏天快到了，希望能徹底清潔。`,
+                    `最近覺得毛髮長得有點快，想嘗試看看專業的雷射技術。`
+                ][i % 5],
+                options: [
+                    { text: "我們會使用最溫和的冷感脈衝技術，請放心。", response: "太棒了！那我就放心交給你了。" },
+                    { text: "追求極致瀅白是需要一點勇氣的，我會儘快完成。", response: "很有道理，專業人士果然就是不一樣。" }
+                ]
+            }))
+        };
+
         const CUSTOMER_NAMES = ["艾米莉", "傑克", "露西", "索菲亞", "馬克斯", "奧莉薇亞", "湯姆", "凱特", "丹尼爾", "克洛伊"];
-        
-        const DEFAULT_STORIES = Array.from({length: 20}, (_, i) => ({
-            id: i,
-            title: `案例 #${i + 1}`,
-            text: [
-                `你好！我是第 ${i+1} 號預約者。我的皮膚比較敏感，不知道這裡的雷射會不會痛？`,
-                `其實我下週有個重要的約會，所以才決定來這裡改善膚況。`,
-                `這是我第一次嘗試全身除毛，聽說瀅白之境的技術是業界最強的。`,
-                `醫生你好，我最近覺得毛髮生長太快了，希望能徹底解決。`,
-                `我想要處理腋下的部分，因為夏天快到了，想穿無袖背心。`
-            ][i % 5],
-            options: [
-                { text: "我們會使用最溫和的脈衝技術，請放心。", response: "聽你這麼說我就安心多了！請開始吧。" },
-                { text: "追求瀅白是有代價的，但我會儘量快速精準。", response: "喔...好吧，我相信專業的判斷。" }
-            ]
-        }));
 
         // --- 狀態管理 ---
         let state = {
             user: null, totalGold: 0, level: 1, exp: 0, careerIndex: 0,
             view: 'loading',
-            bodyParts: {}, careerTitles: [], stories: DEFAULT_STORIES,
-            appointments: [],
-            currentCustomer: null,
-            dialogueStep: 0,
-            isCleaning: false, isMuted: true,
-            isDefinitionsLoaded: false
+            bodyParts: FALLBACK_DATA.bodyParts, careerTitles: FALLBACK_DATA.careerTitles, stories: FALLBACK_DATA.stories,
+            appointments: [], currentCustomer: null, currentStory: null,
+            isCleaning: false, isMuted: true, isDefinitionsLoaded: false
         };
 
+        // --- 音頻中心 ---
         const bgm = new Audio("https://assets.mixkit.co/music/preview/mixkit-serene-view-443.mp3");
         bgm.loop = true;
 
         window.toggleMusic = () => {
             state.isMuted = !state.isMuted;
-            if (!state.isMuted) bgm.play().catch(e => console.log("等待互動後播放"));
+            if (!state.isMuted) bgm.play().catch(e => console.log("等待交互"));
             else bgm.pause();
             document.getElementById('music-icon').innerText = state.isMuted ? "🔇" : "🔊";
         };
@@ -64,17 +71,15 @@
         // --- UI 工具 ---
         function showMessage(text, isError = false) {
             const box = document.getElementById('message-box');
-            if (!box) return;
             document.getElementById('message-content').innerText = text;
-            box.classList.remove('hidden');
-            box.classList.add('flex');
+            box.classList.remove('hidden'); box.classList.add('flex');
             box.className = isError 
                 ? "fixed top-10 left-1/2 -translate-x-1/2 z-[20000] px-8 py-4 rounded-3xl text-white font-bold shadow-2xl bg-red-500/90" 
                 : "fixed top-10 left-1/2 -translate-x-1/2 z-[20000] px-8 py-4 rounded-3xl text-white font-bold shadow-2xl bg-blue-600/90";
             setTimeout(() => { box.classList.add('hidden'); box.classList.remove('flex'); }, 5000);
         }
 
-        // --- 視覺引擎：可愛角色 SVG 生成 ---
+        // --- 視覺引擎：SVG 人物生成 ---
         function renderAvatar(gender, targetId) {
             const color = gender === 'male' ? '#bae6fd' : '#fecdd3';
             const hair = gender === 'male' 
@@ -95,100 +100,63 @@
             if (container) container.innerHTML = svg;
         }
 
-        // --- 初始化入口 ---
+        // --- 初始化與連線修復邏輯 ---
         async function init() {
-            try { 
-                await setPersistence(auth, browserLocalPersistence); 
-            } catch(e){ console.warn("持久化不可用"); }
-
-            // RULE 3: Auth Before Queries - 先執行登入
-            const initAuth = async () => {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else if (!auth.currentUser) {
-                    await signInAnonymously(auth);
+            // 超時出口：8秒內沒連上強制開啟
+            const safetyTimeout = setTimeout(() => {
+                if (state.view === 'loading') {
+                    console.warn("連線超時，啟動本地備援模式");
+                    state.isDefinitionsLoaded = true;
+                    switchView('login');
                 }
-            };
-            
-            await initAuth().catch(err => console.error("驗證失敗", err));
+            }, 8000);
+
+            try { await setPersistence(auth, browserLocalPersistence); } catch(e){}
 
             onAuthStateChanged(auth, async (currUser) => {
+                clearTimeout(safetyTimeout);
                 if (currUser) {
                     state.user = currUser;
                     await syncDefinitions();
                     await syncUserData();
                     generateAppointments();
-                    if (state.view === 'loading' || state.view === 'login') {
-                        switchView('lobby');
-                    }
+                    if (state.view === 'loading' || state.view === 'login') switchView('lobby');
                 } else {
                     state.user = null;
+                    await syncDefinitions();
                     switchView('login');
                 }
             });
 
+            if (!auth.currentUser) {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    signInAnonymously(auth).catch(e => console.warn("匿名連線異常"));
+                }
+            }
+
             const probe = document.getElementById('laser-probe');
             window.addEventListener('mousemove', (e) => { 
-                if (probe) {
-                    probe.style.left = `${e.clientX}px`; 
-                    probe.style.top = `${e.clientY}px`; 
-                }
+                if (probe) { probe.style.left = `${e.clientX}px`; probe.style.top = `${e.clientY}px`; }
             });
         }
 
-        function generateAppointments() {
-            const partsKeys = Object.keys(state.bodyParts).length > 0 ? Object.keys(state.bodyParts) : ['face', 'underarm', 'bikini', 'limbs'];
-            state.appointments = Array.from({length: 8}, (_, i) => ({
-                id: i,
-                name: CUSTOMER_NAMES[Math.floor(Math.random() * CUSTOMER_NAMES.length)],
-                time: `${10 + i}:30`,
-                gender: Math.random() > 0.5 ? 'female' : 'male',
-                part: partsKeys[Math.floor(Math.random() * partsKeys.length)],
-                status: i < 2 ? 'READY' : 'WAITING'
-            }));
-            if (state.view === 'appointments') renderAppointmentList();
-        }
-
         async function syncDefinitions() {
-            if (!auth.currentUser) return; // 沒登入不執行，防止 Permission Denied
-
             try {
-                // 確保路徑有偶數個段落 (6 segments)
+                // 修正路徑段落：/definitions/config (6段)
                 const defRef = doc(db, 'artifacts', appId, 'public', 'data', 'definitions', 'config');
                 const snap = await getDoc(defRef);
-                
                 if (snap.exists()) {
-                    const data = snap.data();
-                    state.bodyParts = data.bodyParts || {};
-                    state.careerTitles = data.careerTitles || [];
-                    state.stories = data.stories || DEFAULT_STORIES;
+                    const d = snap.data();
+                    state.bodyParts = d.bodyParts || FALLBACK_DATA.bodyParts;
+                    state.careerTitles = d.careerTitles || FALLBACK_DATA.careerTitles;
+                    state.stories = d.stories || FALLBACK_DATA.stories;
                 } else {
-                    const defaults = {
-                        bodyParts: {
-                            face: { name: '臉部', icon: '👤', cost: 100, desc: '上唇、下巴精細護理。' },
-                            underarm: { name: '腋下', icon: '✨', cost: 150, desc: '掃除黑頭沉積。' },
-                            bikini: { name: 'VIO', icon: '👙', cost: 480, desc: '極致親膚溫柔呵護。' },
-                            limbs: { name: '四肢', icon: '🦵', cost: 220, desc: '打造大面積絲滑肌。' }
-                        },
-                        careerTitles: ["瀅白實習生", "初級技師", "資深除毛師", "首席技術官", "醫美顧問", "雷射物理專家", "皮膚臨床醫生", "抗老研究員", "生物纖維專家", "醫學美容院長", "婚禮造型師", "時尚雜誌顧問", "好萊塢特效護理", "明星御用大師", "人體美學家", "沙龍店長", "品牌經理", "連鎖店創始人", "美容集團 CEO", "全球美學教父"],
-                        stories: DEFAULT_STORIES
-                    };
-                    // 嘗試寫入初始配置 (如果權限允許)
-                    await setDoc(defRef, defaults).catch(e => console.warn("無法寫入雲端配置，改用本地備援。"));
-                    state.bodyParts = defaults.bodyParts;
-                    state.careerTitles = defaults.careerTitles;
-                    state.stories = defaults.stories;
+                    await setDoc(defRef, FALLBACK_DATA).catch(()=>null);
                 }
             } catch (err) {
-                console.error("Sync Definitions Error:", err);
-                // 發生權限錯誤時使用本地預設值，防止遊戲崩潰
-                state.bodyParts = {
-                    face: { name: '臉部', icon: '👤', cost: 100, desc: '上唇、下巴精細護理。' },
-                    underarm: { name: '腋下', icon: '✨', cost: 150, desc: '掃除黑頭沉積。' },
-                    bikini: { name: 'VIO', icon: '👙', cost: 480, desc: '極致親膚溫柔呵護。' },
-                    limbs: { name: '四肢', icon: '🦵', cost: 220, desc: '打造大面積絲滑肌。' }
-                };
-                state.careerTitles = ["瀅白實習生", "初級技師", "資深除毛師"];
+                console.error("雲端同步失敗，已載入預設本地數據");
             } finally {
                 state.isDefinitionsLoaded = true;
                 updateUI();
@@ -197,41 +165,30 @@
 
         async function syncUserData() {
             if (!state.user) return;
-            const profileRef = doc(db, 'artifacts', appId, 'users', state.user.uid, 'saveData', 'profile');
-            onSnapshot(profileRef, (snap) => {
-                if (snap.exists()) { 
-                    const d = snap.data();
-                    state.totalGold = d.totalGold || 0;
-                    state.level = d.level || 1;
-                    state.careerIndex = d.careerIndex || 0;
-                    updateUI(); 
-                }
-            }, (err) => {
-                console.warn("存檔監聽異常:", err);
-            });
+            onSnapshot(doc(db, 'artifacts', appId, 'users', state.user.uid, 'saveData', 'profile'), (snap) => {
+                if (snap.exists()) { Object.assign(state, snap.data()); updateUI(); }
+            }, () => null);
         }
 
-        window.loginGoogle = () => signInWithPopup(auth, new GoogleAuthProvider()).catch(e => showMessage("驗證失敗："+e.message, true));
-        window.loginGuest = () => signInAnonymously(auth);
-        window.logout = () => signOut(auth).then(() => window.location.reload());
-
-        function switchView(v) {
-            state.view = v;
-            ['loading', 'login', 'lobby', 'appointments', 'dialogue', 'selection', 'game'].forEach(id => {
-                const el = document.getElementById(`view-${id}`);
-                if (el) el.classList.toggle('hidden', state.view !== id);
-                if (el) el.classList.toggle('flex', state.view === id);
-            });
-            if (v === 'game') setTimeout(initCanvas, 100);
-            if (v === 'appointments') renderAppointmentList();
-            updateUI();
+        // --- 業務邏輯 ---
+        function generateAppointments() {
+            const keys = Object.keys(state.bodyParts);
+            state.appointments = Array.from({length: 8}, (_, i) => ({
+                id: i,
+                name: CUSTOMER_NAMES[Math.floor(Math.random() * CUSTOMER_NAMES.length)],
+                time: `${10 + i}:30`,
+                gender: Math.random() > 0.5 ? 'female' : 'male',
+                part: keys[Math.floor(Math.random() * keys.length)],
+                status: i < 2 ? 'READY' : 'WAITING'
+            }));
+            if (state.view === 'appointments') renderAppointmentList();
         }
 
         function renderAppointmentList() {
             const list = document.getElementById('appointment-list');
             if (!list) return;
             list.innerHTML = state.appointments.map(app => `
-                <div class="flex items-center justify-between p-5 bg-white/60 rounded-[2.5rem] border border-blue-50 hover:bg-blue-100 hover:scale-[1.02] transition-all cursor-pointer shadow-sm" onclick="window.pickCustomer(${app.id})">
+                <div class="flex items-center justify-between p-5 bg-white/70 rounded-[2.5rem] border border-blue-50 hover:bg-blue-100 hover:scale-[1.02] transition-all cursor-pointer shadow-sm mb-4" onclick="window.pickCustomer(${app.id})">
                     <div class="flex items-center gap-4">
                         <div class="w-14 h-14 bg-white rounded-3xl flex items-center justify-center text-2xl shadow-inner border border-blue-50">${app.gender === 'male' ? '👦' : '👧'}</div>
                         <div>
@@ -248,7 +205,6 @@
             state.currentCustomer = state.appointments[id];
             state.selectedGender = state.currentCustomer.gender;
             state.selectedPartId = state.currentCustomer.part;
-            state.dialogueStep = 0;
             switchView('dialogue');
             startDialogue();
         };
@@ -256,39 +212,48 @@
         function startDialogue() {
             const story = state.stories[Math.floor(Math.random() * state.stories.length)];
             state.currentStory = story;
-            const nameEl = document.getElementById('diag-name');
-            const textEl = document.getElementById('diag-text');
-            if (nameEl) nameEl.innerText = state.currentCustomer.name;
-            if (textEl) textEl.innerText = story.text;
+            document.getElementById('diag-name').innerText = state.currentCustomer.name;
+            document.getElementById('diag-text').innerText = story.text;
             renderAvatar(state.currentCustomer.gender, 'diag-avatar-box');
-            
-            const optionsBox = document.getElementById('diag-options');
-            if (optionsBox) {
-                optionsBox.innerHTML = story.options.map((opt, i) => `
-                    <button onclick="window.chooseOption(${i})" class="w-full p-4 bg-white/90 rounded-3xl border border-blue-50 font-bold text-blue-600 hover:bg-blue-600 hover:text-white transition-all text-sm mb-3 shadow-sm text-left px-6">
-                        <span class="mr-2 text-blue-300">●</span> ${opt.text}
-                    </button>
-                `).join('');
-            }
+            document.getElementById('diag-options').innerHTML = story.options.map((opt, i) => `
+                <button onclick="window.chooseOption(${i})" class="w-full p-4 bg-white/90 rounded-3xl border border-blue-50 font-bold text-blue-600 hover:bg-blue-600 hover:text-white transition-all text-sm mb-3 shadow-sm text-left px-6">
+                    ● ${opt.text}
+                </button>
+            `).join('');
         }
 
         window.chooseOption = (idx) => {
             const opt = state.currentStory.options[idx];
             document.getElementById('diag-text').innerText = opt.response;
             document.getElementById('diag-options').innerHTML = `
-                <button onclick="switchView('selection')" class="w-full p-5 bg-gradient-to-r from-blue-600 to-blue-500 text-white rounded-3xl font-black shadow-xl hover:scale-[1.05] transition-transform">
-                    確定，進入專業評估流程
+                <button onclick="switchView('selection')" class="w-full p-5 bg-blue-600 text-white rounded-3xl font-black shadow-xl hover:scale-[1.05] transition-transform">
+                    確定，進入定制評估
                 </button>
             `;
         };
 
+        window.loginGoogle = () => signInWithPopup(auth, new GoogleAuthProvider()).catch(e => showMessage("驗證異常", true));
+        window.loginGuest = () => switchView('lobby');
+        window.logout = () => signOut(auth).then(() => window.location.reload());
+
+        function switchView(v) {
+            state.view = v;
+            ['loading', 'login', 'lobby', 'appointments', 'dialogue', 'selection', 'game'].forEach(id => {
+                const el = document.getElementById(`view-${id}`);
+                if (el) el.classList.toggle('hidden', state.view !== id);
+                if (el) el.classList.toggle('flex', state.view === id);
+            });
+            if (v === 'game') setTimeout(initCanvas, 100);
+            if (v === 'appointments') renderAppointmentList();
+            updateUI();
+        }
+
         function updateUI() {
-            if (!state.isDefinitionsLoaded) return;
             document.querySelectorAll('.gold-val').forEach(el => el.innerText = state.totalGold);
             document.querySelectorAll('.level-val').forEach(el => el.innerText = `Lv.${state.level}`);
-            const careerName = state.careerTitles[state.careerIndex] || "瀅白新人";
+            const careerName = state.careerTitles[state.careerIndex] || "瀅白學員";
             document.querySelectorAll('.career-val').forEach(el => el.innerText = careerName);
-            document.querySelectorAll('.user-name').forEach(el => el.innerText = state.user?.displayName || "專家顧問");
+            document.querySelectorAll('.user-name').forEach(el => el.innerText = state.user?.displayName || "美學顧問");
             if (state.view === 'selection') renderSelectionUI();
         }
 
@@ -298,17 +263,9 @@
             if (!canvas) return;
             ctx = canvas.getContext('2d');
             canvas.width = 340; canvas.height = 440;
-            canvas.onmousedown = (e) => { 
-                state.isCleaning = true; 
-                document.getElementById('laser-probe').classList.add('active'); 
-                clean(e); 
-            };
+            canvas.onmousedown = (e) => { state.isCleaning = true; document.getElementById('laser-probe').classList.add('active'); clean(e); };
             canvas.onmousemove = (e) => { if (state.isCleaning) clean(e); };
-            window.onmouseup = () => { 
-                state.isCleaning = false; 
-                document.getElementById('laser-probe').classList.remove('active'); 
-                checkProgress(); 
-            };
+            window.onmouseup = () => { state.isCleaning = false; document.getElementById('laser-probe').classList.remove('active'); checkProgress(); };
             drawSkin();
         }
 
@@ -339,47 +296,28 @@
         }
 
         async function finishSession() {
-            const part = state.bodyParts[state.selectedPartId] || { cost: 50 };
-            let reward = part.cost;
+            let reward = state.bodyParts[state.selectedPartId]?.cost || 50;
             if (state.selectedGender === 'male') reward *= 1.2;
             state.totalGold += Math.floor(reward);
             state.exp += 50;
-            if (state.exp >= 100) { 
-                state.level++; 
-                state.exp = 0; 
-                state.careerIndex = Math.min(Math.floor(state.level / 2), 19); 
-            }
-            if (state.user) {
-                const profileRef = doc(db, 'artifacts', appId, 'users', state.user.uid, 'saveData', 'profile');
-                await setDoc(profileRef, { 
-                    totalGold: state.totalGold, 
-                    level: state.level, 
-                    careerIndex: state.careerIndex,
-                    exp: state.exp
-                }, { merge: true });
-            }
+            if (state.exp >= 100) { state.level++; state.exp = 0; state.careerIndex = Math.min(Math.floor(state.level / 2), 19); }
+            if (state.user) await setDoc(doc(db, 'artifacts', appId, 'users', state.user.uid, 'saveData', 'profile'), { totalGold: state.totalGold, level: state.level, careerIndex: state.careerIndex }, { merge: true });
             document.getElementById('reward-val').innerText = Math.floor(reward);
             document.getElementById('result-modal').style.display = 'flex';
         }
 
         function renderSelectionUI() {
-            const p = state.bodyParts[state.selectedPartId] || { name: '未知部位', icon: '❓', desc: '目前正在載入數據...', cost: 0 };
-            const detail = document.getElementById('selection-detail');
-            if (detail) {
-                detail.innerHTML = `
-                    <div class="p-8 bg-blue-50/70 rounded-[3rem] border border-blue-100 shadow-inner">
-                        <div class="flex items-center gap-4 mb-3">
-                            <span class="text-4xl">${p.icon}</span>
-                            <h3 class="text-2xl font-black text-blue-600">${p.name}</h3>
-                        </div>
-                        <p class="text-sm text-slate-500 font-medium leading-relaxed mb-6">${p.desc}</p>
-                        <div class="mt-4 flex justify-between items-center border-t border-blue-100 pt-5">
-                            <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Session Reward</span>
-                            <span class="text-2xl font-black text-blue-800 font-mono">💰 ${p.cost}</span>
-                        </div>
+            const p = state.bodyParts[state.selectedPartId] || { name: '定制療程', icon: '❓', desc: '正在評估載入中...', cost: 0 };
+            document.getElementById('selection-detail').innerHTML = `
+                <div class="p-8 bg-blue-50/70 rounded-[3rem] border border-blue-100 shadow-inner">
+                    <div class="flex items-center gap-4 mb-3"><span class="text-4xl">${p.icon}</span><h3 class="text-2xl font-black text-blue-600">${p.name}</h3></div>
+                    <p class="text-sm text-slate-500 font-medium leading-relaxed mb-6">${p.desc}</p>
+                    <div class="mt-4 flex justify-between items-center border-t border-blue-100 pt-5">
+                        <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Reward</span>
+                        <span class="text-2xl font-black text-blue-800 font-mono">💰 ${p.cost}</span>
                     </div>
-                `;
-            }
+                </div>
+            `;
             document.querySelectorAll('.hotspot').forEach(el => el.classList.toggle('active', el.dataset.id === state.selectedPartId));
         }
 
@@ -392,32 +330,14 @@
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap');
         body { font-family: 'Noto Sans TC', sans-serif; background: #fdfdfe; cursor: none; overflow: hidden; margin: 0; user-select: none; }
         .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(25px); border: 1px solid rgba(255, 255, 255, 0.6); }
-        
-        #laser-probe { 
-            position: fixed; width: 54px; height: 54px; border: 3px solid #3b82f6; border-radius: 50%; 
-            pointer-events: none; z-index: 10000; transform: translate(-50%, -50%); 
-            background: rgba(59, 130, 246, 0.1); box-shadow: 0 0 20px rgba(59, 130, 246, 0.3); 
-            transition: transform 0.1s ease-out; 
-        }
-        #laser-probe.active { 
-            transform: translate(-50%, -50%) scale(0.8); 
-            background: rgba(59, 130, 246, 0.6); 
-            box-shadow: 0 0 40px #3b82f6; 
-        }
+        #laser-probe { position: fixed; width: 54px; height: 54px; border: 3px solid #3b82f6; border-radius: 50%; pointer-events: none; z-index: 10000; transform: translate(-50%, -50%); background: rgba(59, 130, 246, 0.1); box-shadow: 0 0 20px rgba(59, 130, 246, 0.3); transition: transform 0.1s ease-out; }
+        #laser-probe.active { transform: translate(-50%, -50%) scale(0.8); background: rgba(59, 130, 246, 0.6); box-shadow: 0 0 40px #3b82f6; }
         #laser-probe::after { content: ''; position: absolute; top: 50%; left: 50%; width: 4px; height: 4px; background: white; border-radius: 50%; transform: translate(-50%, -50%); }
-        
         .brand-btn { background: linear-gradient(135deg, #a5f3fc 0%, #e0f2fe 100%); color: #0369a1; font-weight: 900; cursor: pointer; transition: 0.3s; }
         .brand-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(186, 230, 253, 0.5); }
-        
         .hotspot { fill: #f8fafc; stroke: #e2e8f0; cursor: pointer; transition: 0.3s; }
-        .hotspot:hover { fill: #dcfce7; }
         .hotspot.active { fill: #3b82f6; stroke: #1d4ed8; stroke-width: 2.5; filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.5)); }
-        
         canvas { border-radius: 4.5rem; border: 12px solid white; box-shadow: 0 30px 70px rgba(186, 230, 253, 0.2); background: white; }
-        
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center">
@@ -434,36 +354,35 @@
 
     <div class="fixed top-6 w-full max-w-md px-6 flex justify-between items-center z-[100]">
         <div class="glass px-6 py-3 rounded-full flex items-center gap-3 shadow-lg border-blue-50">
-            <span class="text-2xl">💰</span>
-            <span class="gold-val font-black text-slate-700 text-lg">0</span>
+            <span class="text-2xl">💰</span><span class="gold-val font-black text-slate-700 text-lg">0</span>
         </div>
         <div class="glass px-7 py-3 rounded-full flex flex-col items-center shadow-lg border-blue-50">
-            <span class="career-val text-[11px] font-black text-blue-600 uppercase tracking-tighter text-center">正在認證...</span>
+            <span class="career-val text-[11px] font-black text-blue-600 uppercase tracking-tighter text-center">Loading...</span>
             <span class="level-val text-[10px] font-bold text-slate-400">Loading</span>
         </div>
     </div>
 
-    <!-- 0. Loading View -->
+    <!-- 0. Loading -->
     <div id="view-loading" class="flex flex-col items-center">
         <div class="w-16 h-16 border-4 border-blue-100 border-t-blue-500 rounded-full animate-spin mb-8"></div>
-        <p class="text-slate-400 font-black text-sm tracking-[0.4em] uppercase text-center leading-relaxed">Pure Skin Evolution<br><span class="text-blue-300 mt-2 block text-xs">正在建立雲端安全連線</span></p>
+        <p class="text-slate-400 font-black text-sm tracking-[0.4em] uppercase text-center leading-relaxed">Pure Skin Evolution<br><span class="text-blue-300 mt-2 block text-xs tracking-widest">建立雲端安全連線</span></p>
     </div>
 
-    <!-- 1. Login View -->
+    <!-- 1. Login -->
     <div id="view-login" class="hidden flex flex-col items-center">
-        <div class="w-28 h-28 bg-white rounded-[3rem] flex items-center justify-center mb-12 shadow-xl border border-blue-50"><span class="text-7xl text-blue-300">🧊</span></div>
+        <div class="w-28 h-28 bg-white rounded-[3rem] flex items-center justify-center mb-12 shadow-xl border border-blue-50"><span class="text-7xl">🧊</span></div>
         <h1 class="text-5xl font-black text-slate-800 mb-2 tracking-tighter">瀅白之境</h1>
         <p class="text-slate-400 text-xs mb-12 font-black tracking-[0.3em] uppercase">Identity Center</p>
         <div class="space-y-4 w-72 flex flex-col items-center">
-            <button onclick="window.loginGoogle()" class="w-full py-5 bg-white border border-slate-100 rounded-3xl flex items-center justify-center gap-4 shadow-sm hover:bg-blue-50 hover:scale-[1.03] transition-all"><img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/action/google.svg" width="22"><span class="font-black text-slate-600">Google 快速登入</span></button>
+            <button onclick="window.loginGoogle()" class="w-full py-5 bg-white border border-slate-100 rounded-3xl flex items-center justify-center gap-4 shadow-sm hover:bg-blue-50 transition-all"><img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/action/google.svg" width="22"><span class="font-black text-slate-600">Google 快速登入</span></button>
             <button onclick="window.loginGuest()" class="w-full py-5 bg-blue-50 text-blue-600 font-black rounded-3xl hover:bg-blue-100 transition-all">訪客試玩模式</button>
-            <p class="text-[10px] text-slate-400 mt-4 text-center px-4 leading-relaxed">※ 訪客模式僅供單次體驗，無法跨裝置同步您的美學進度</p>
+            <p class="text-[10px] text-slate-400 mt-4 text-center px-4 leading-relaxed">※ 訪客模式僅供單次體驗，進度無法跨裝置同步</p>
         </div>
     </div>
 
-    <!-- 2. Lobby View -->
+    <!-- 2. Lobby -->
     <div id="view-lobby" class="hidden flex flex-col items-center">
-        <div class="w-36 h-36 bg-white rounded-[4rem] flex items-center justify-center mb-12 shadow-2xl border-4 border-blue-50 rotate-3 transition-transform hover:rotate-0 duration-500"><span class="text-7xl">💎</span></div>
+        <div class="w-36 h-36 bg-white rounded-[4rem] flex items-center justify-center mb-12 shadow-2xl border-4 border-blue-50 rotate-3 transition-transform hover:rotate-0"><span class="text-7xl">💎</span></div>
         <h1 class="text-6xl font-black text-slate-800 tracking-tighter mb-1">瀅白之境</h1>
         <p class="text-blue-400 font-black tracking-[0.5em] text-xs uppercase mb-12 italic">Pure Skin Evolution</p>
         <div class="glass p-8 rounded-[3rem] mb-12 text-center min-w-[280px] border-blue-100/50 shadow-inner">
@@ -471,39 +390,31 @@
             <p class="user-name font-black text-slate-700 text-2xl italic truncate max-w-[220px]">---</p>
         </div>
         <button onclick="switchView('appointments')" class="w-80 py-7 brand-btn text-3xl rounded-[2.5rem] shadow-2xl hover:scale-105 active:scale-95">開啟預約管理</button>
-        <button onclick="window.logout()" class="mt-8 text-slate-300 font-bold text-sm hover:text-red-400 transition-colors uppercase tracking-widest">Logout System</button>
+        <button onclick="window.logout()" class="mt-8 text-slate-300 font-bold text-sm tracking-widest">Logout System</button>
     </div>
 
-    <!-- 2.5 Appointments List View -->
+    <!-- 2.5 Appointments List -->
     <div id="view-appointments" class="hidden flex-col items-center w-full max-w-lg p-6">
         <div class="glass w-full p-10 rounded-[4.5rem] shadow-2xl border border-blue-50">
-            <div class="flex items-end justify-between mb-8">
-                <h2 class="text-3xl font-black text-slate-800 tracking-tighter underline decoration-blue-200 decoration-4">今日預約表</h2>
-                <span class="text-[10px] font-black text-blue-300 uppercase tracking-[0.2em] mb-1">Today's Schedule</span>
-            </div>
-            <div id="appointment-list" class="space-y-4 max-h-[450px] overflow-y-auto pr-4 custom-scrollbar">
-                <!-- 由 JS 生成列表 -->
-            </div>
-            <button onclick="switchView('lobby')" class="w-full mt-10 py-5 text-slate-400 font-black text-sm uppercase tracking-widest border-t border-blue-50 pt-8 hover:text-blue-400 transition-colors">返回沙龍大廳</button>
+            <div class="flex items-end justify-between mb-8"><h2 class="text-3xl font-black text-slate-800 tracking-tighter underline decoration-blue-200">今日預約表</h2><span class="text-[10px] font-black text-blue-300 uppercase mb-1">Schedule</span></div>
+            <div id="appointment-list" class="space-y-4 max-h-[450px] overflow-y-auto pr-4"></div>
+            <button onclick="switchView('lobby')" class="w-full mt-10 py-5 text-slate-400 font-black text-sm tracking-widest border-t border-blue-50 pt-8">返回大廳</button>
         </div>
     </div>
 
-    <!-- 3. Dialogue View -->
+    <!-- 3. Dialogue -->
     <div id="view-dialogue" class="hidden fixed inset-0 flex flex-col items-center justify-end p-10 bg-slate-900/10 backdrop-blur-sm">
-        <div class="glass w-full max-w-2xl p-12 rounded-[5rem] shadow-2xl flex items-start gap-12 border-blue-50 relative overflow-hidden">
-            <div class="absolute top-0 right-0 p-8 opacity-5 text-8xl pointer-events-none">"</div>
+        <div class="glass w-full max-w-2xl p-12 rounded-[5rem] shadow-2xl flex items-start gap-12 border-blue-50">
             <div id="diag-avatar-box" class="w-36 h-36 bg-gradient-to-br from-white to-blue-50 rounded-[3rem] flex-shrink-0 border border-blue-50 p-3 shadow-inner"></div>
             <div class="flex-1">
-                <h4 id="diag-name" class="font-black text-blue-500 text-xl mb-2 italic tracking-[0.2em] underline decoration-blue-100 decoration-4">顧客</h4>
+                <h4 id="diag-name" class="font-black text-blue-500 text-xl mb-2 italic underline decoration-blue-100">顧客</h4>
                 <p id="diag-text" class="text-slate-700 font-bold leading-relaxed text-2xl min-h-[4em] mb-10">...</p>
-                <div id="diag-options" class="flex flex-col">
-                    <!-- 由 JS 生成選項 -->
-                </div>
+                <div id="diag-options" class="flex flex-col"></div>
             </div>
         </div>
     </div>
 
-    <!-- 4. Selection View -->
+    <!-- 4. Selection -->
     <div id="view-selection" class="hidden flex-col items-center w-full max-w-5xl px-4">
         <div class="glass p-16 rounded-[6rem] flex flex-col md:flex-row gap-20 items-center shadow-2xl border-blue-50">
             <div class="w-72 h-[550px]">
@@ -519,40 +430,37 @@
                     <rect x="102" y="345" width="28" height="200" rx="14" class="hotspot" data-id="limbs" onclick="selectPart('limbs')" />
                 </svg>
             </div>
-            <div class="w-full max-w-md space-y-10">
-                <h3 class="text-5xl font-black text-slate-800 tracking-tighter italic">定制療程評估</h3>
+            <div class="w-full max-w-md space-y-10 text-center md:text-left">
+                <h3 class="text-5xl font-black text-slate-800 tracking-tighter italic">定制評估</h3>
                 <div id="selection-detail"></div>
                 <div class="space-y-4">
-                    <button onclick="confirmStart()" class="w-full py-7 brand-btn text-3xl rounded-[3rem] shadow-xl hover:scale-105">啟動雷射儀器</button>
-                    <button onclick="switchView('appointments')" class="w-full text-slate-400 font-black text-sm tracking-[0.3em] uppercase hover:text-blue-400 transition-colors">重新檢視預約表</button>
+                    <button onclick="confirmStart()" class="w-full py-7 brand-btn text-3xl rounded-[3rem] shadow-xl">啟動雷射儀器</button>
+                    <button onclick="switchView('appointments')" class="w-full text-slate-400 font-black text-sm uppercase">重新檢視預約表</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- 5. Game View -->
+    <!-- 5. Game -->
     <div id="view-game" class="hidden flex flex-col items-center">
         <div class="mb-12 w-96 text-center">
-            <div class="w-full h-5 bg-white rounded-full overflow-hidden shadow-inner border-4 border-blue-50">
-                <div id="prog-bar" class="h-full bg-gradient-to-r from-blue-400 to-blue-600 transition-all duration-300" style="width: 0%"></div>
-            </div>
-            <p class="text-[11px] font-black text-blue-500 mt-4 uppercase tracking-[0.5em] animate-pulse">Laser Protocol: Cleaning In Progress</p>
+            <div class="w-full h-5 bg-white rounded-full overflow-hidden shadow-inner border-4 border-blue-50"><div id="prog-bar" class="h-full bg-gradient-to-r from-blue-400 to-blue-600 transition-all duration-300" style="width: 0%"></div></div>
+            <p class="text-[11px] font-black text-blue-500 mt-4 uppercase tracking-[0.5em] animate-pulse">Laser Protocol Active</p>
         </div>
         <canvas id="game-canvas" class="cursor-none"></canvas>
     </div>
 
-    <!-- Result Modal -->
+    <!-- Result -->
     <div id="result-modal" class="hidden fixed inset-0 z-[200] items-center justify-center bg-blue-900/60 backdrop-blur-xl px-4">
         <div class="bg-white rounded-[6rem] p-20 text-center shadow-2xl max-w-md w-full border-4 border-blue-50 relative overflow-hidden">
-            <div class="absolute -top-10 -left-10 w-40 h-40 bg-blue-50 rounded-full opacity-50 blur-3xl"></div>
             <div class="text-9xl mb-12">🧊</div>
             <h3 class="text-5xl font-black text-slate-800 mb-4 tracking-tighter">極致瀅白！</h3>
-            <p class="text-slate-400 font-bold mb-12 leading-relaxed text-lg px-6">本次療程圓滿完成，您的專業數據已同步至雲端美學中心。</p>
+            <p class="text-slate-400 font-bold mb-12 leading-relaxed">專業數據已同步至雲端美學中心。</p>
             <div class="bg-blue-50 p-8 rounded-[3.5rem] border border-blue-100 flex justify-between items-center mb-14 shadow-inner">
                 <span class="font-black text-slate-500 uppercase tracking-widest text-xs">Settled Bonus</span>
                 <span class="font-black text-blue-600 text-5xl tracking-tighter font-mono">💰 <span id="reward-val">0</span></span>
             </div>
-            <button onclick="location.reload()" class="w-full py-7 brand-btn text-2xl rounded-[3rem] shadow-xl hover:scale-105 transition-transform font-black">接待下一位預約</button>
+            <button onclick="location.reload()" class="w-full py-7 brand-btn text-2xl rounded-[3rem] shadow-xl font-black">接待下一位預約</button>
         </div>
     </div>
 
