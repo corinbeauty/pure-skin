@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>瀅白之境 Pure Skin V5.10 - 經營大師</title>
+    <title>瀅白之境 Pure Skin V5.11 - 經營大師</title>
     <!-- 引入系統資源 -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -31,14 +31,14 @@
                         slideUp: { '0%': { transform: 'translateY(20px)', opacity: '0' }, '100%': { transform: 'translateY(0)', opacity: '1' } },
                         fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
                         float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-10px)' } },
-                        marketingRadar: { '0%': { transform: 'scale(1)', opacity: '0.8' }, '100%': { transform: 'scale(2)', opacity: '0' } }
+                        marketingRadar: { '0%': { transform: 'scale(1)', opacity: '0.8' }, '100%': { transform: 'scale(2.5)', opacity: '0' } }
                     }
                 }
             }
         }
     </script>
     <style>
-        /* 核心美學與行銷動畫設定 */
+        /* 核心樣式設定 */
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: #f0f9ff; }
         ::-webkit-scrollbar-thumb { background: #bae6fd; border-radius: 10px; }
@@ -52,7 +52,7 @@
         
         .chart-container { position: relative; width: 100%; height: 240px; margin: 0 auto; }
 
-        /* NPC Elsa V5.10 精緻重繪 */
+        /* NPC Elsa V5.11 (精緻視覺重繪) */
         .elsa-container { position: relative; width: 140px; height: 300px; transform: scale(0.85); margin-bottom: -40px; }
         .elsa-hair {
             position: absolute; top: 5px; left: 15px; width: 110px; height: 130px;
@@ -79,7 +79,7 @@
             border: 3px solid #3b82f6; border-top: none; border-radius: 0 0 45px 45px; z-index: 12;
         }
 
-        /* 脈衝雷達動畫 - 用於行銷格子 */
+        /* 脈衝雷達動畫 - 行銷中 */
         .marketing-pulse-wrapper {
             position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;
         }
@@ -103,6 +103,8 @@
         #laser-cursor { position: fixed; width: 40px; height: 40px; border: 3px solid #0ea5e9; border-radius: 50%; transform: translate(-50%, -50%); pointer-events: none; z-index: 9999; display: none; box-shadow: 0 0 15px rgba(14, 165, 233, 0.6); }
 
         .modal-overlay { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(8px); }
+
+        .css-avatar { position: relative; width: 100px; height: 100px; border-radius: 50%; background: white; overflow: hidden; border: 3px solid #e0f2fe; }
     </style>
 </head>
 <body class="bg-pure-50 text-slate-700 min-h-screen font-sans selection:bg-pure-200 overflow-x-hidden">
@@ -161,10 +163,10 @@
 
         <!-- 1. 認證中心 -->
         <section id="view-login" class="hidden w-full max-w-md px-6 animate-float">
-            <div class="glass-panel p-10 rounded-[3.5rem] text-center shadow-2xl">
+            <div class="glass-panel p-10 rounded-[3.5rem] text-center shadow-2xl border-white border-2">
                 <div class="w-24 h-24 bg-pure-50 rounded-3xl mx-auto flex items-center justify-center mb-8 text-4xl text-pure-600 shadow-inner"><i class="fa-solid fa-crown"></i></div>
                 <h2 class="text-4xl font-black mb-2 text-slate-800 tracking-tight italic">美學教父之路</h2>
-                <p class="text-slate-400 text-[10px] font-bold tracking-[0.3em] uppercase mb-10">Real-Name Verification</p>
+                <p class="text-slate-400 text-[10px] font-bold tracking-[0.3em] uppercase mb-10">Real-Name Verification Required</p>
                 <div class="space-y-4">
                     <button onclick="app.auth.loginGoogle()" class="w-full py-5 bg-white border border-slate-100 rounded-3xl flex items-center justify-center gap-4 shadow-sm hover:bg-blue-50 transition-all font-black text-slate-600 text-lg">
                         <i class="fa-brands fa-google text-lg text-pure-600"></i> Google 快速認證
@@ -173,6 +175,7 @@
                         <i class="fa-brands fa-apple text-xl"></i> Game Center 登入
                     </button>
                 </div>
+                <p class="mt-8 text-[9px] text-slate-300 font-bold uppercase tracking-widest leading-relaxed">提示：匿名模式已關閉，請登入以同步雲端資產</p>
             </div>
         </section>
 
@@ -181,13 +184,25 @@
             <div class="glass-panel p-12 rounded-[3.5rem] text-center shadow-2xl animate-slide-up">
                 <h2 class="text-3xl font-black text-slate-800 mb-10 italic tracking-tighter">請設定遊戲中名稱</h2>
                 <input id="input-player-name" type="text" maxlength="8" class="w-full p-6 rounded-3xl bg-pure-50 border-4 border-pure-100 focus:border-pure-400 outline-none text-center font-black text-2xl mb-12 shadow-inner">
-                <button onclick="app.auth.confirmName()" class="w-full py-5 bg-pure-600 text-white font-black rounded-2xl shadow-xl hover:scale-105 transition-all text-xl italic">確認 ❯</button>
+                <button onclick="app.auth.confirmName()" class="w-full py-5 bg-pure-600 text-white font-black rounded-2xl shadow-xl hover:scale-105 transition-all text-xl italic">確認並開啟職涯 ❯</button>
             </div>
         </section>
 
+        <!-- 1.3 命名確認 -->
+        <div id="modal-name-confirm" class="hidden fixed inset-0 z-[12000] bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-6">
+            <div class="glass-panel max-w-sm w-full p-8 rounded-[3rem] text-center shadow-2xl animate-slide-up">
+                <h3 class="text-xl font-black text-slate-800 mb-4 italic">最終確認</h3>
+                <p class="text-slate-500 mb-8 font-bold text-sm">確定要以『<span id="display-confirm-name" class="text-pure-600"></span>』之名展開職涯嗎？</p>
+                <div class="flex gap-4">
+                    <button onclick="document.getElementById('modal-name-confirm').classList.add('hidden')" class="flex-1 py-4 bg-slate-100 text-slate-400 font-black rounded-2xl">修改</button>
+                    <button onclick="app.auth.submitName()" class="flex-1 py-4 bg-pure-600 text-white font-black rounded-2xl shadow-lg">這就是我 ❯</button>
+                </div>
+            </div>
+        </div>
+
         <!-- 2. 大廳 (Dashboard) -->
         <section id="view-lobby" class="hidden w-full max-w-6xl flex flex-col gap-8 px-6">
-            <header id="frame-profile" class="flex flex-col md:flex-row justify-between items-center glass-panel p-8 rounded-[3rem] gap-6 animate-slide-up">
+            <header id="frame-profile" class="flex flex-col md:flex-row justify-between items-center glass-panel p-8 rounded-[3rem] gap-6 animate-slide-up shadow-xl border-blue-50">
                 <div class="flex items-center gap-8">
                     <div class="w-16 h-16 bg-gradient-to-tr from-pure-500 to-cyan-400 rounded-2xl flex items-center justify-center text-white shadow-xl"><i class="fa-solid fa-gem text-2xl"></i></div>
                     <div>
@@ -214,22 +229,22 @@
                     <button id="frame-appt" onclick="app.router.go('appointments')" class="group relative flex-1 bg-gradient-to-br from-pure-600 to-blue-800 text-white p-10 rounded-[3.5rem] shadow-2xl hover:scale-[1.02] transition-all text-left overflow-hidden">
                         <div class="absolute right-[-30px] bottom-[-30px] text-[12rem] text-white opacity-10 group-hover:scale-110 transition-transform"><i class="fa-solid fa-calendar-days"></i></div>
                         <h2 class="text-4xl font-black italic mb-4">預約時刻表</h2>
-                        <p class="text-sm font-medium opacity-80 leading-relaxed italic">一週跨日排程矩陣與市場行銷。</p>
+                        <p class="text-sm font-medium opacity-80 leading-relaxed italic">一週跨日排程與市場引流投放。</p>
                     </button>
                     <div class="glass-panel p-8 rounded-[3rem] flex flex-col gap-4 shadow-sm border border-pure-50">
                         <button onclick="app.audio.toggle()" class="flex items-center justify-between w-full p-4 rounded-2xl bg-pure-50 hover:bg-pure-100 transition-colors">
-                            <span class="font-bold text-slate-600 italic">音樂氛圍感</span>
+                            <span class="font-bold text-slate-600 italic">環境氛圍感</span>
                             <span id="lobby-music-text" class="text-[10px] font-black text-pure-400 font-mono">OFF</span>
                         </button>
                         <button onclick="app.auth.logout()" class="flex items-center gap-3 text-slate-400 font-bold hover:text-red-500 transition-colors px-4 py-1 text-xs">
-                            <i class="fa-solid fa-power-off"></i> 系統登出
+                            <i class="fa-solid fa-power-off"></i> 安全登出系統
                         </button>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- 3. 預約時刻表 -->
+        <!-- 3. 預約時刻表 (含行銷動畫) -->
         <section id="view-appointments" class="hidden w-full max-w-6xl flex flex-col h-[85vh] animate-slide-up px-4">
             <div class="glass-panel p-10 rounded-t-[4rem] flex justify-between items-center z-10 border-b-0 shadow-none">
                 <div><h2 class="text-4xl font-black text-slate-800 italic tracking-tighter font-mono">RESERVATIONS</h2><p class="text-xs text-pure-400 font-bold mt-1 uppercase italic tracking-widest font-mono">7-Day Dynamic Matrix</p></div>
@@ -242,7 +257,7 @@
         <section id="view-reports" class="hidden w-full max-w-5xl flex flex-col h-[85vh] animate-slide-up px-4">
             <div class="glass-panel p-10 rounded-t-[4rem] flex justify-between items-center border-b-0">
                 <div><h2 class="text-4xl font-black text-slate-800 italic tracking-tighter font-mono">FINANCE CENTER</h2><p class="text-xs text-pure-400 font-bold mt-1 uppercase italic">Monthly Business Analysis</p></div>
-                <button onclick="app.router.go('lobby')" class="w-14 h-14 rounded-2xl bg-pure-50 flex items-center justify-center shadow-inner hover:bg-pure-100 transition-all"><i class="fa-solid fa-arrow-left text-xl text-pure-600"></i></button>
+                <button onclick="app.router.go('lobby')" class="w-14 h-14 rounded-2xl bg-pure-50 flex items-center justify-center shadow-inner hover:bg-pure-100 transition-all font-black"><i class="fa-solid fa-arrow-left text-xl text-pure-600"></i></button>
             </div>
             <div class="glass-panel p-10 rounded-b-[4rem] flex-1 overflow-y-auto space-y-8 shadow-2xl custom-scrollbar">
                 <div class="flex items-center gap-6 p-6 bg-pure-50 rounded-3xl border border-pure-100 shadow-inner">
@@ -277,7 +292,7 @@
                         <span class="text-2xl font-black text-pure-600 font-mono italic">👤 <span id="closing-guests">0</span></span>
                     </div>
                 </div>
-                <button onclick="app.timer.startNextDay()" class="w-full py-5 bg-gradient-to-r from-pure-600 to-blue-700 text-white font-black text-xl rounded-2xl shadow-xl hover:scale-105 active:scale-95 transition-all italic tracking-widest uppercase">Start Next Day ❯</button>
+                <button onclick="app.timer.startNextDay()" class="w-full py-5 bg-gradient-to-r from-pure-600 to-blue-700 text-white font-black text-xl rounded-2xl shadow-xl hover:scale-105 active:scale-95 transition-all italic tracking-widest uppercase shadow-blue-200">Start Next Day ❯</button>
             </div>
         </div>
 
@@ -286,20 +301,18 @@
             <div class="glass-panel max-w-xl w-full p-10 rounded-[4rem] shadow-2xl animate-slide-up border border-pure-100">
                 <div class="flex justify-between items-center mb-8">
                     <h3 class="text-2xl font-black text-slate-800 italic font-mono tracking-tighter">MARKET DEVELOPMENT</h3>
-                    <button onclick="document.getElementById('modal-marketing').classList.add('hidden')" class="text-slate-400 hover:text-red-500 transition-colors"><i class="fa-solid fa-times"></i></button>
+                    <button onclick="document.getElementById('modal-marketing').classList.add('hidden')" class="text-slate-400 hover:text-red-500 transition-colors p-2"><i class="fa-solid fa-times"></i></button>
                 </div>
                 <div class="grid grid-cols-2 gap-4" id="marketing-list"></div>
+                <p class="mt-8 text-[9px] text-slate-400 font-bold uppercase tracking-[0.3em] text-center">投放後格子將顯示行銷動畫，隨遊戲時間推移吸引預約客</p>
             </div>
         </div>
 
         <!-- RPG 諮詢視圖 -->
         <section id="view-dialogue" class="hidden w-full max-w-2xl px-6">
             <div class="glass-panel p-12 rounded-[5rem] text-center relative overflow-hidden shadow-2xl border-white border-4 animate-slide-up">
-                <div id="customer-avatar-box" class="mb-10 animate-float flex justify-center items-center"></div>
-                <div class="bg-blue-50/50 p-8 rounded-[3rem] border border-pure-100 mb-8 text-left shadow-inner">
-                    <h3 class="font-black text-pure-600 text-xl mb-3 italic tracking-widest" id="diag-name">貴賓諮詢</h3>
-                    <p id="diag-text" class="text-slate-700 font-bold leading-relaxed text-2xl italic min-h-[4em]">...</p>
-                </div>
+                <div id="customer-avatar-box" class="mb-10 animate-float flex justify-center items-center h-32"></div>
+                <div class="bg-blue-50/50 p-8 rounded-[3rem] border border-pure-100 mb-8 text-left shadow-inner"><h3 class="font-black text-pure-600 text-xl mb-3 italic tracking-widest" id="diag-name">貴賓諮詢</h3><p id="diag-text" class="text-slate-700 font-bold leading-relaxed text-2xl italic min-h-[4em]">...</p></div>
                 <div id="diag-options" class="flex flex-col gap-4"></div>
             </div>
         </section>
@@ -321,12 +334,23 @@
         import { getAuth, signInAnonymously, signInWithPopup, GoogleAuthProvider, OAuthProvider, signInWithCustomToken, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        const firebaseConfig = JSON.parse(__firebase_config);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'pure-skin-studio-master';
+        // --- Firebase 環境 ---
+        // V5.11 核心修正：SDK 配置硬核寫入，移除環境變數依賴
+        const firebaseConfig = {
+            apiKey: "AIzaSyCIKSbaZ5R6RTSRcH_-YYfqz_OnQQFr1gc",
+            authDomain: "pure-skin-8640d.firebaseapp.com",
+            projectId: "pure-skin-8640d",
+            storageBucket: "pure-skin-8640d.firebasestorage.app",
+            messagingSenderId: "890613609117",
+            appId: "1:890613609117:web:ed044e453e6cc789b01a74",
+            measurementId: "G-27E3XSTTBH"
+        };
+        const globalAppId = 'pure-skin-studio-master';
         const fbApp = initializeApp(firebaseConfig);
         const auth = getAuth(fbApp);
         const db = getFirestore(fbApp);
 
+        // --- 常量池 ---
         const CAREERS = ["瀅白實習生", "初級技師", "資深除毛師", "首席技術官", "醫美顧問", "雷射物理專家", "皮膚臨床醫生", "抗老研究員", "生物纖維專家", "醫學美容院長", "婚禮造型師", "時尚雜誌顧問", "好萊塢特效護理", "明星御用大師", "人體美學家", "沙龍店長", "品牌經理", "連鎖店創始人", "美容集團 CEO", "全球美學教父"];
         const TW_NAMES = Array.from({length: 300}, (_, i) => ["陳", "李", "王", "張", "劉", "黃", "林", "郭", "徐", "吳"][i % 10] + ["子豪", "雅雯", "美玲", "承翰", "雨柔", "欣儀", "建宏", "嘉欣", "宗佑", "志明", "春嬌", "凱特", "子軒", "佩珊", "宜庭"][Math.floor(Math.random()*15)]);
         const MARKETING_METHODS = [ { name: "社群推播", cost: 300, power: 0.15 }, { name: "區域簡訊", cost: 200, power: 0.1 }, { name: "網紅開箱", cost: 1200, power: 0.4 }, { name: "捷運燈箱", cost: 2000, power: 0.6 }, { name: "雜誌專訪", cost: 3500, power: 0.8 }, { name: "電視廣告", cost: 6000, power: 1.2 }, { name: "會員裂變", cost: 500, power: 0.25 }, { name: "商圈派報", cost: 150, power: 0.08 } ];
@@ -339,6 +363,7 @@
                 view: 'loading', session: null, isAuthResolved: false, tutorialStep: 0, audio: { el: null, muted: true }
             },
 
+            // --- 報表中心 ---
             reports: {
                 lookup: () => {
                     const date = document.getElementById('report-date-picker').value;
@@ -355,6 +380,7 @@
                 }
             },
 
+            // --- 時間流轉引擎 ---
             timer: {
                 lastTick: performance.now(),
                 start: () => requestAnimationFrame(App.timer.loop),
@@ -412,6 +438,7 @@
                 }
             },
 
+            // --- 認證核心 (V5.11 修復版) ---
             auth: {
                 init: async () => {
                     const watchdog = setTimeout(() => { if (!App.state.isAuthResolved && App.state.view === 'loading') App.router.go('login'); }, 3500);
@@ -433,13 +460,26 @@
                         }
                     });
                 },
-                loginGoogle: () => signInWithPopup(auth, new GoogleAuthProvider()).catch(e => App.ui.notify("登入超時，請檢查網域授權。", true)),
+                loginGoogle: () => signInWithPopup(auth, new GoogleAuthProvider()).catch(e => App.ui.notify("連線超時，請檢查網域授權。", true)),
                 loginGameCenter: () => {
                     const provider = new OAuthProvider('apple.com');
                     signInWithPopup(auth, provider).catch(e => App.ui.notify("此環境不支援 Game Center 登入。", true));
                 },
-                confirmName: () => { const n = document.getElementById('input-player-name').value.trim(); if(!n) return; document.getElementById('modal-name-confirm').classList.remove('hidden'); document.getElementById('display-confirm-name').innerText = n; },
-                submitName: async () => { const n = document.getElementById('input-player-name').value.trim(); App.state.data.playerName = n; document.getElementById('modal-name-confirm').classList.add('hidden'); await App.data.save(); App.router.go('lobby'); document.getElementById('tutor-anchor').style.display = 'flex'; App.tutorial.render(); },
+                confirmName: () => { 
+                    const n = document.getElementById('input-player-name').value.trim(); 
+                    if(!n) return App.ui.notify("請設定一個名稱", true);
+                    document.getElementById('modal-name-confirm').classList.remove('hidden'); 
+                    document.getElementById('display-confirm-name').innerText = n; 
+                },
+                submitName: async () => { 
+                    const n = document.getElementById('input-player-name').value.trim(); 
+                    App.state.data.playerName = n; 
+                    document.getElementById('modal-name-confirm').classList.add('hidden'); 
+                    await App.data.save(); 
+                    App.router.go('lobby');
+                    document.getElementById('tutor-anchor').style.display = 'flex';
+                    App.tutorial.render();
+                },
                 logout: async () => { localStorage.clear(); await signOut(auth); window.location.reload(); }
             },
 
@@ -475,7 +515,7 @@
                 updateLobby: () => {
                     document.getElementById('lobby-gold').innerText = App.state.data.gold.toLocaleString();
                     document.getElementById('lobby-level').innerText = App.state.data.level;
-                    document.getElementById('user-display-name').innerText = App.state.data.playerName || "認證教父";
+                    document.getElementById('user-display-name').innerText = App.state.data.playerName || "教父顧問";
                     document.getElementById('user-title').innerText = CAREERS[Math.min(Math.floor(App.state.data.level / 2), 19)];
                     if (window.revenueChartInstance) App.ui.renderChart();
                 },
@@ -502,7 +542,7 @@
                                 const overdue = isPast && !isFin ? 'overdue' : ''; const icon = appt.gender === 'male' ? '<i class="fa-solid fa-mars"></i>' : '<i class="fa-solid fa-venus"></i>';
                                 html += `<td class="calendar-cell ${color} ${overdue}" onclick="window.apptAction('${sid}')"><div class="flex flex-col items-center justify-center h-full text-[9px] font-black"><span class="truncate w-full text-center px-1">${icon} ${appt.name}</span><span class="text-[7px] opacity-70 italic font-mono uppercase">${isFin ? 'Done' : (overdue ? 'Lost' : 'Appt')}</span></div></td>`;
                             } else if (isMarketing) {
-                                html += `<td class="calendar-cell marketing-active" onclick="App.ui.notify('此時段正在廣告引流中...')"><div class="marketing-pulse-wrapper"><div class="radar-circle animate-marketing-radar"></div><div class="radar-circle animate-marketing-radar" style="animation-delay: 0.5s"></div><i class="fa-solid fa-tower-broadcast text-pure-500 text-xs relative z-10"></i></div></td>`;
+                                html += `<td class="calendar-cell marketing-active" onclick="App.ui.notify('廣告引流中，請留意預約客。')"><div class="marketing-pulse-wrapper"><div class="radar-circle animate-marketing-radar"></div><div class="radar-circle animate-marketing-radar" style="animation-delay: 0.5s"></div><i class="fa-solid fa-tower-broadcast text-pure-500 text-xs relative z-10"></i></div></td>`;
                             } else { 
                                 html += `<td class="calendar-cell empty flex items-center justify-center" onclick="window.openMarketing('${sid}')"><span class="text-[8px] text-slate-300 font-black hover:text-pure-500 transition-colors"><i class="fa-solid fa-bullhorn opacity-30"></i></span></td>`; 
                             }
@@ -584,7 +624,7 @@
                 document.getElementById('diag-options').innerHTML = `<div class="flex gap-4 w-full"><button onclick="window.confirmAppt(true)" class="flex-1 p-5 bg-green-500 text-white rounded-3xl font-black shadow-lg">接受預約</button><button onclick="window.confirmAppt(false)" class="flex-1 p-5 bg-slate-100 text-slate-400 rounded-3xl font-black">婉拒</button></div>`;
             } else if (appt.status === 'accepted') {
                 document.getElementById('diag-text').innerText = "我已經準備好進行療程了，麻煩教父啟動精密雷射。";
-                document.getElementById('diag-options').innerHTML = `<button onclick="app.router.go('game')" class="w-full p-6 bg-pure-600 text-white rounded-3xl font-black italic shadow-xl tracking-widest">啟動專業雷射儀 ❯</button>`;
+                document.getElementById('diag-options').innerHTML = `<button onclick="app.router.go('game')" class="w-full p-6 bg-pure-600 text-white rounded-3xl font-black italic shadow-xl tracking-widest uppercase">Start Treatment ❯</button>`;
             } else if (appt.status === 'finished') {
                 document.getElementById('diag-text').innerText = `顧客評價：${appt.feedback || '專業且絲滑。'}`;
                 document.getElementById('diag-options').innerHTML = `<button onclick="app.router.go('appointments')" class="w-full p-6 bg-slate-100 text-slate-400 rounded-3xl font-black">服務已結案</button>`;
