@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>瀅白之境 Pure Skin V4.3 - 專業管理系統</title>
+    <title>瀅白之境 Pure Skin V4.6 - 精緻管理系統</title>
     <!-- 引入系統資源 -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -24,44 +24,94 @@
                         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
                         'float': 'float 3s ease-in-out infinite',
                         'slide-up': 'slideUp 0.5s ease-out forwards',
+                        'fade-in': 'fadeIn 0.6s ease-out forwards',
+                        'bounce-subtle': 'bounceSubtle 2s infinite',
                     },
                     keyframes: {
-                        slideUp: { '0%': { transform: 'translateY(20px)', opacity: '0' }, '100%': { transform: 'translateY(0)', opacity: '1' } }
+                        slideUp: { '0%': { transform: 'translateY(20px)', opacity: '0' }, '100%': { transform: 'translateY(0)', opacity: '1' } },
+                        fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
+                        bounceSubtle: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-5px)' } }
                     }
                 }
             }
         }
     </script>
     <style>
-        /* 核心美學樣式 */
+        /* 核心樣式 */
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: #f0f9ff; }
         ::-webkit-scrollbar-thumb { background: #bae6fd; border-radius: 10px; }
 
         .glass-panel {
-            background: rgba(255, 255, 255, 0.92);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
+            background: rgba(255, 255, 255, 0.94);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
             border: 1px solid rgba(255, 255, 255, 0.7);
-            box-shadow: 0 10px 40px -10px rgba(31, 38, 135, 0.08);
+            box-shadow: 0 12px 45px -10px rgba(31, 38, 135, 0.08);
         }
         
-        .chart-container {
-            position: relative;
-            width: 100%; height: 280px;
-            max-width: 600px; margin: 0 auto;
+        .chart-container { position: relative; width: 100%; height: 260px; max-width: 600px; margin: 0 auto; }
+
+        /* --- 精緻化 Elsa NPC (Pure CSS) --- */
+        .elsa-full {
+            position: relative; width: 140px; height: 260px; transform: scale(0.9);
+        }
+        .elsa-hair-back {
+            position: absolute; top: 10px; left: 15px; width: 110px; height: 180px;
+            background: linear-gradient(180deg, #334155 0%, #1e293b 100%);
+            border-radius: 55px 55px 20px 20px; z-index: 1;
+        }
+        .elsa-head {
+            position: absolute; top: 15px; left: 35px; width: 70px; height: 85px;
+            background: #ffe4e6; border-radius: 35px 35px 40px 40px; z-index: 10;
+            box-shadow: inset 0 -5px 10px rgba(0,0,0,0.05);
+        }
+        /* 五官 */
+        .elsa-eyes::before, .elsa-eyes::after {
+            content: ''; position: absolute; top: 40px; width: 8px; height: 10px;
+            background: #1e293b; border-radius: 50%; z-index: 11;
+        }
+        .elsa-eyes::before { left: 15px; } .elsa-eyes::after { right: 15px; }
+        .elsa-mouth {
+            position: absolute; bottom: 15px; left: 25px; width: 20px; height: 6px;
+            background: #fb7185; border-radius: 3px 3px 10px 10px; z-index: 11;
+        }
+        .elsa-hair-front {
+            position: absolute; top: 5px; left: 30px; width: 80px; height: 40px;
+            background: #334155; border-radius: 40px 40px 0 0; z-index: 12;
+        }
+        .elsa-body {
+            position: absolute; top: 90px; left: 30px; width: 80px; height: 80px;
+            background: #f8fafc; border-radius: 20px 20px 5px 5px; z-index: 5;
+            border: 1px solid #e2e8f0;
+        }
+        .elsa-skirt {
+            position: absolute; top: 165px; left: 20px; width: 100px; height: 90px;
+            background: linear-gradient(135deg, #0369a1 0%, #0c4a6e 100%);
+            border-radius: 10px 10px 40px 40px; z-index: 4;
         }
 
-        /* 純 CSS 顧客畫像 (避免 SVG 失敗) */
-        .css-avatar {
-            position: relative; width: 130px; height: 130px;
-            background: #fff; border-radius: 50%; border: 5px solid #e0f2fe;
-            margin: 0 auto; overflow: hidden; box-shadow: 0 12px 25px rgba(14, 165, 233, 0.1);
+        /* --- 局部教學氣泡樣式 --- */
+        .tutor-bubble {
+            position: absolute; z-index: 10000;
+            filter: drop-shadow(0 10px 25px rgba(0,0,0,0.15));
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: none;
         }
-        .css-head { position: absolute; top: 25%; left: 25%; width: 50%; height: 50%; background: #ffe4e6; border-radius: 50%; z-index: 10; }
-        .css-body { position: absolute; bottom: -5%; left: 15%; width: 70%; height: 55%; background: #bae6fd; border-radius: 45% 45% 0 0; z-index: 5; }
-        .css-hair-male { position: absolute; top: 15%; left: 22%; width: 56%; height: 28%; background: #334155; border-radius: 50% 50% 0 0; z-index: 15; }
-        .css-hair-female { position: absolute; top: 15%; left: 15%; width: 70%; height: 78%; background: #fca5a5; border-radius: 50% 50% 40% 40%; z-index: 4; }
+        .bubble-content {
+            background: white; border: 2px solid #bae6fd;
+            border-radius: 2rem; padding: 1.5rem; max-width: 240px;
+            position: relative;
+        }
+        .bubble-content::after {
+            content: ''; position: absolute; width: 20px; height: 20px;
+            background: white; border-left: 2px solid #bae6fd; border-bottom: 2px solid #bae6fd;
+            transform: rotate(-45deg);
+        }
+        /* 氣泡指向位置 */
+        .bubble-top .bubble-content::after { bottom: -12px; left: 50%; transform: translateX(-50%) rotate(-45deg); }
+        .bubble-left .bubble-content::after { right: -12px; top: 50%; transform: translateY(-50%) rotate(-135deg); }
+        .bubble-right .bubble-content::after { left: -12px; top: 50%; transform: translateY(-50%) rotate(45deg); }
 
         #laser-cursor {
             position: fixed; width: 50px; height: 50px; border: 3px solid #0ea5e9; border-radius: 50%;
@@ -75,15 +125,39 @@
 
     <div id="laser-cursor"></div>
 
-    <!-- 全域通知 -->
-    <div id="toast" class="fixed top-6 left-1/2 -translate-x-1/2 z-[10000] transition-all duration-300 transform -translate-y-24 opacity-0 flex items-center gap-3 px-8 py-4 rounded-3xl shadow-2xl bg-white/95 backdrop-blur-md border border-pure-100">
+    <!-- 局部教學引導組件 (會動態移動) -->
+    <div id="tutor-anchor" class="tutor-bubble bubble-top">
+        <div class="flex flex-col items-center gap-4">
+            <!-- 精緻 Elsa NPC -->
+            <div class="elsa-full animate-bounce-subtle">
+                <div class="elsa-hair-back"></div>
+                <div class="elsa-head">
+                    <div class="elsa-eyes"></div>
+                    <div class="elsa-mouth"></div>
+                </div>
+                <div class="elsa-hair-front"></div>
+                <div class="elsa-body"></div>
+                <div class="elsa-skirt"></div>
+            </div>
+            <!-- 對話氣泡 -->
+            <div class="bubble-content">
+                <p id="tutor-text" class="text-slate-700 font-black leading-relaxed text-sm">歡迎來到瀅白之境！</p>
+                <button onclick="app.tutorial.next()" class="mt-4 w-full py-2 bg-pure-600 text-white rounded-xl text-xs font-bold shadow-lg shadow-pure-100 hover:bg-pure-700 transition-all">
+                    了解！Next ❯
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 通知元件 -->
+    <div id="toast" class="fixed top-6 left-1/2 -translate-x-1/2 z-[20000] transition-all duration-500 transform -translate-y-24 opacity-0 flex items-center gap-3 px-8 py-4 rounded-3xl shadow-2xl bg-white/95 backdrop-blur-md border border-pure-100">
         <i id="toast-icon" class="fa-solid fa-circle-check text-green-500"></i>
         <span id="toast-text" class="font-black text-slate-700 text-sm">系統已就緒</span>
     </div>
 
     <main id="app-root" class="w-full min-h-screen flex flex-col items-center justify-center relative overflow-hidden">
         
-        <!-- 動態背景 -->
+        <!-- 背景飾品 -->
         <div class="absolute top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
             <div class="absolute top-[-10%] left-[-15%] w-[60vw] h-[60vw] bg-pure-200/30 rounded-full filter blur-[120px] animate-pulse-slow"></div>
             <div class="absolute bottom-[-10%] right-[-10%] w-[55vw] h-[55vw] bg-pink-100/30 rounded-full filter blur-[120px] animate-pulse-slow"></div>
@@ -93,49 +167,56 @@
         <section id="view-loading" class="flex flex-col items-center gap-6 text-center transition-all duration-500">
             <div class="w-20 h-20 border-4 border-pure-100 border-t-pure-500 rounded-full animate-spin"></div>
             <div>
-                <h1 class="text-4xl font-black tracking-tighter text-slate-800 mb-2 italic tracking-widest">瀅白之境</h1>
-                <p id="loading-status" class="text-xs font-bold text-pure-500 tracking-[0.6em] animate-pulse uppercase">驗證登入中...</p>
+                <h1 class="text-4xl font-black tracking-tighter text-slate-800 mb-2 italic">瀅白之境</h1>
+                <p id="loading-status" class="text-xs font-bold text-pure-500 tracking-[0.6em] animate-pulse uppercase">安全權杖驗證中...</p>
             </div>
         </section>
 
         <!-- 1. 認證視圖 -->
-        <section id="view-login" class="hidden w-full max-w-md px-6 animate-float">
-            <div class="glass-panel p-10 rounded-[3.5rem] text-center shadow-2xl">
+        <section id="view-login" class="hidden w-full max-w-md px-6">
+            <div class="glass-panel p-10 rounded-[3.5rem] text-center shadow-2xl animate-slide-up">
                 <div class="w-24 h-24 bg-pure-50 rounded-3xl mx-auto flex items-center justify-center mb-8 text-4xl text-pure-600 shadow-inner">
                     <i class="fa-solid fa-user-lock"></i>
                 </div>
                 <h2 class="text-4xl font-black mb-2 text-slate-800 tracking-tight">身分驗證</h2>
                 <p class="text-slate-400 text-[10px] font-bold tracking-[0.3em] uppercase mb-10">Pure Identity center</p>
-                
                 <div class="space-y-4">
                     <button onclick="app.auth.loginGoogle()" class="w-full py-5 bg-white border border-slate-200 rounded-2xl font-black text-slate-600 shadow-sm hover:bg-pure-50 transition-all flex items-center justify-center gap-4">
-                        <i class="fa-brands fa-google text-lg"></i> Google 快速認證
+                        <i class="fa-brands fa-google text-lg text-pure-600"></i> Google 快速認證
                     </button>
                     <button onclick="app.auth.loginGameCenter()" class="w-full py-5 bg-slate-900 text-white rounded-2xl font-black shadow-xl hover:bg-black transition-transform flex items-center justify-center gap-4">
-                        <i class="fa-brands fa-apple text-xl"></i> Game Center
-                    </button>
-                    <div class="flex items-center gap-4 py-2">
-                        <div class="flex-1 border-t border-slate-100"></div>
-                        <span class="text-[10px] text-slate-300 font-black uppercase tracking-widest">或</span>
-                        <div class="flex-1 border-t border-slate-100"></div>
-                    </div>
-                    <button onclick="app.auth.loginGuest()" class="w-full py-4 text-pure-600 font-black text-sm hover:bg-pure-100 rounded-2xl transition-all border border-pure-100/50 italic tracking-widest">
-                        以訪客身份開啟沙龍
+                        <i class="fa-brands fa-apple text-xl"></i> Game Center 登入
                     </button>
                 </div>
             </div>
         </section>
 
-        <!-- 2. 大廳視圖 (Dashboard) -->
+        <!-- 1.5 品牌歡迎視圖 -->
+        <section id="view-welcome" class="hidden w-full max-w-2xl px-6 text-center">
+            <div class="glass-panel p-12 rounded-[4rem] shadow-2xl border-white border-4 animate-fade-in">
+                <div class="text-8xl mb-8 animate-float">🧊</div>
+                <h2 class="text-5xl font-black text-slate-800 mb-6 italic tracking-tighter">瀅白之境</h2>
+                <p class="text-slate-500 font-bold leading-relaxed text-lg mb-10 italic">
+                    Pure Aesthetics Evolution.<br>
+                    準備好迎接您的美學教父之路了嗎？
+                </p>
+                <button onclick="app.tutorial.start()" class="px-16 py-5 bg-gradient-to-r from-pure-600 to-blue-700 text-white font-black text-xl rounded-2xl shadow-xl shadow-pure-200 hover:scale-105 transition-all">
+                    開啟導引流程 ❯
+                </button>
+            </div>
+        </section>
+
+        <!-- 2. 管理大廳 (DASHBOARD) -->
         <section id="view-lobby" class="hidden w-full max-w-6xl flex-col gap-8 px-6">
-            <header class="flex flex-col md:flex-row justify-between items-center glass-panel p-8 rounded-[3rem] gap-6 animate-slide-up">
+            <!-- 框架：個人資訊 -->
+            <header id="frame-profile" class="flex flex-col md:flex-row justify-between items-center glass-panel p-8 rounded-[3rem] gap-6 animate-slide-up">
                 <div class="flex items-center gap-8">
                     <div class="w-16 h-16 bg-gradient-to-tr from-pure-500 to-cyan-400 rounded-2xl flex items-center justify-center text-white shadow-xl">
                         <i class="fa-solid fa-crown text-2xl"></i>
                     </div>
                     <div>
                         <h3 class="text-3xl font-black text-slate-800 italic" id="user-display-name">瀅白顧問</h3>
-                        <p class="text-xs font-bold text-pure-500 uppercase tracking-[0.2em]" id="user-title">正在同步職位...</p>
+                        <p class="text-xs font-bold text-pure-500 uppercase tracking-[0.2em]" id="user-title">同步中</p>
                     </div>
                 </div>
                 <div class="flex gap-12 items-center border-l border-slate-100 pl-12">
@@ -151,10 +232,11 @@
             </header>
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 w-full animate-slide-up" style="animation-delay: 0.1s">
-                <div class="lg:col-span-2 glass-panel p-10 rounded-[3.5rem] flex flex-col gap-8">
+                <!-- 框架：營收數據 -->
+                <div id="frame-chart" class="lg:col-span-2 glass-panel p-10 rounded-[3.5rem] flex flex-col gap-8">
                     <div class="flex justify-between items-center">
-                        <h4 class="text-2xl font-black text-slate-800 tracking-tighter italic"><i class="fa-solid fa-chart-area mr-4 text-pure-500"></i>營收分析儀表板</h4>
-                        <span class="text-[10px] bg-green-100 text-green-600 px-4 py-1 rounded-full font-black uppercase tracking-widest">Live Sync</span>
+                        <h4 class="text-2xl font-black text-slate-800 tracking-tighter italic font-mono"><i class="fa-solid fa-chart-area mr-4 text-pure-500"></i>Aesthetic Analytics</h4>
+                        <span class="text-[10px] bg-green-100 text-green-600 px-4 py-1 rounded-full font-black uppercase">Live</span>
                     </div>
                     <div class="chart-container">
                         <canvas id="revenueChart"></canvas>
@@ -162,97 +244,78 @@
                 </div>
 
                 <div class="flex flex-col gap-6">
-                    <button onclick="app.router.go('appointments')" class="group relative flex-1 bg-gradient-to-br from-pure-600 to-blue-800 text-white p-10 rounded-[3.5rem] shadow-2xl hover:scale-[1.02] transition-all text-left overflow-hidden">
+                    <!-- 框架：預約管理按鈕 -->
+                    <button id="frame-appt" onclick="app.router.go('appointments')" class="group relative flex-1 bg-gradient-to-br from-pure-600 to-blue-800 text-white p-10 rounded-[3.5rem] shadow-2xl hover:scale-[1.02] transition-all text-left overflow-hidden">
                         <div class="absolute right-[-30px] bottom-[-30px] text-[12rem] text-white opacity-10 group-hover:scale-110 transition-transform"><i class="fa-solid fa-calendar-check"></i></div>
                         <p class="text-pure-100 font-bold text-xs uppercase tracking-widest mb-2 italic">Operation</p>
                         <h2 class="text-4xl font-black italic mb-4">預約管理</h2>
-                        <p class="text-sm font-medium opacity-80 leading-relaxed">今日已有預約等待服務，請展開療程排程。</p>
+                        <p class="text-sm font-medium opacity-80 leading-relaxed italic">展開療程排程，開始服務今日預約貴賓。</p>
                     </button>
                     
-                    <div class="glass-panel p-8 rounded-[3rem] flex flex-col gap-5">
-                        <button onclick="app.audio.toggle()" class="flex items-center justify-between w-full p-4 rounded-2xl bg-pure-50 hover:bg-pure-100 transition-colors border border-pure-100/50">
-                            <span class="font-bold text-slate-600"><i id="lobby-music-icon" class="fa-solid fa-volume-xmark mr-3"></i>背景氛圍音</span>
-                            <span id="lobby-music-text" class="text-[10px] font-black text-pure-400 uppercase">OFF</span>
+                    <div id="frame-settings" class="glass-panel p-8 rounded-[3rem] flex flex-col gap-5">
+                        <button onclick="app.audio.toggle()" class="flex items-center justify-between w-full p-4 rounded-2xl bg-pure-50 hover:bg-pure-100 transition-colors">
+                            <span class="font-bold text-slate-600"><i id="lobby-music-icon" class="fa-solid fa-volume-xmark mr-3"></i>音樂氛圍</span>
+                            <span id="lobby-music-text" class="text-[10px] font-black text-pure-400">OFF</span>
                         </button>
                         <button onclick="app.auth.logout()" class="flex items-center gap-3 text-slate-400 font-bold hover:text-red-500 transition-colors px-4 py-2 text-sm italic">
-                            <i class="fa-solid fa-power-off"></i> 登出系統
+                            <i class="fa-solid fa-power-off"></i> 登出並清除存取
                         </button>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- 3. 預約名單視圖 -->
+        <!-- 3. 預約表視圖 -->
         <section id="view-appointments" class="hidden w-full max-w-3xl flex flex-col h-[85vh] animate-slide-up px-4">
-            <div class="glass-panel p-10 rounded-t-[4rem] flex justify-between items-center z-10 border-b-0 shadow-none">
-                <div>
-                    <h2 class="text-4xl font-black text-slate-800 italic tracking-tighter">今日預約表</h2>
-                    <p class="text-[10px] font-black text-pure-400 tracking-widest uppercase mt-1">Today's Aesthetic Schedule</p>
-                </div>
+            <div class="glass-panel p-10 rounded-t-[4rem] flex justify-between items-center z-10 border-b-0">
+                <h2 class="text-4xl font-black text-slate-800 italic tracking-tighter">今日預約表</h2>
                 <button onclick="app.router.go('lobby')" class="w-14 h-14 rounded-2xl bg-pure-50 flex items-center justify-center text-pure-600 hover:bg-pure-100 shadow-inner transition-all"><i class="fa-solid fa-arrow-left text-xl"></i></button>
             </div>
-            <div class="glass-panel p-8 rounded-b-[4rem] flex-1 overflow-y-auto space-y-4 custom-scrollbar shadow-2xl" id="appointment-list">
-                <!-- JS 動態生成 -->
-            </div>
+            <div class="glass-panel p-8 rounded-b-[4rem] flex-1 overflow-y-auto space-y-4 custom-scrollbar shadow-2xl" id="appointment-list"></div>
         </section>
 
-        <!-- 4. RPG 諮詢視圖 -->
+        <!-- 4. RPG 諮詢 -->
         <section id="view-dialogue" class="hidden w-full max-w-2xl px-6">
             <div class="glass-panel p-12 rounded-[5rem] text-center relative overflow-hidden shadow-2xl">
                 <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-pink-300 to-pure-400"></div>
                 <div id="customer-avatar-box" class="mb-12 animate-float"></div>
-                
                 <div class="bg-blue-50/50 p-10 rounded-[3rem] border border-pure-100 mb-10 shadow-inner text-left">
-                    <h3 class="font-black text-pure-600 text-xl mb-3" id="diag-name">貴賓諮詢</h3>
-                    <p class="text-slate-700 font-bold leading-relaxed text-2xl" id="diag-text">載入諮詢內容中...</p>
+                    <h3 class="font-black text-pure-600 text-xl mb-3 underline underline-offset-8 italic" id="diag-name">貴賓諮詢</h3>
+                    <p class="text-slate-700 font-bold leading-relaxed text-2xl" id="diag-text">...</p>
                 </div>
-
-                <div id="diag-options" class="flex flex-col gap-4">
-                    <!-- JS Generated -->
-                </div>
+                <div id="diag-options" class="flex flex-col gap-4"></div>
             </div>
         </section>
 
-        <!-- 5. 互動畫布視圖 -->
+        <!-- 5. 雷射互動 -->
         <section id="view-game" class="hidden w-full max-w-md flex flex-col items-center gap-10">
             <div class="w-full glass-panel p-6 rounded-full flex items-center gap-8 shadow-2xl border-white border-[6px]">
                 <div class="flex-1 bg-slate-100 h-6 rounded-full overflow-hidden relative">
                     <div id="prog-bar" class="h-full bg-gradient-to-r from-pure-400 to-cyan-500 w-0 transition-all duration-700 shadow-[0_0_20px_#0ea5e9]"></div>
                 </div>
-                <span class="text-sm font-black text-pure-700 italic">CLEANING</span>
+                <span class="text-sm font-black text-pure-700 font-mono italic">98% CLEAN</span>
             </div>
-            
-            <div class="relative rounded-[5.5rem] overflow-hidden shadow-2xl border-[16px] border-white ring-2 ring-slate-100">
+            <div class="relative rounded-[5.5rem] overflow-hidden shadow-2xl border-[16px] border-white">
                 <canvas id="game-canvas" class="bg-pure-50 cursor-none touch-none"></canvas>
             </div>
-            
-            <div class="text-center">
-                <p class="text-slate-400 text-[10px] font-black uppercase tracking-[0.8em] animate-pulse">Laser Protocol Active</p>
-                <p class="text-pure-500 text-xs font-bold mt-3 italic underline underline-offset-4 decoration-pure-200 decoration-2">操作雷射探頭抹除所有毛髮</p>
-            </div>
+            <p class="text-pure-500 text-xs font-bold mt-3 animate-pulse italic">操作雷射探頭抹除所有毛髮</p>
         </section>
 
-        <!-- 6. 結算彈窗 -->
+        <!-- 6. 結算畫面 -->
         <div id="modal-result" class="hidden fixed inset-0 z-[100] bg-slate-900/70 backdrop-blur-3xl flex items-center justify-center p-6">
             <div class="glass-panel p-16 rounded-[6rem] text-center max-md w-full border-white border-[8px] shadow-2xl relative">
-                <div class="w-28 h-28 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-10 text-6xl text-green-500 shadow-inner">
-                    <i class="fa-solid fa-sparkles"></i>
-                </div>
-                <h2 class="text-5xl font-black text-slate-800 mb-4 tracking-tighter italic underline decoration-pure-100 decoration-8 underline-offset-[-2px]">療程圓滿！</h2>
+                <div class="w-28 h-28 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-10 text-6xl text-green-500 shadow-inner"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                <h2 class="text-5xl font-black text-slate-800 mb-4 tracking-tighter italic">療程圓滿！</h2>
                 <div class="bg-pure-50 p-8 rounded-[3.5rem] border border-pure-100 mb-12 shadow-inner">
                     <span class="text-[10px] text-slate-400 font-black uppercase tracking-[0.3em] block mb-2 italic">Aesthetic Revenue</span>
                     <p class="text-6xl font-black text-pure-600 font-mono italic tracking-tighter">+💰 <span id="reward-val">0</span></p>
                 </div>
-
-                <button onclick="window.location.reload()" class="w-full py-7 bg-gradient-to-r from-pure-600 to-blue-700 text-white font-black text-2xl rounded-3xl shadow-2xl hover:scale-105 active:scale-95 transition-all shadow-pure-300 uppercase tracking-widest">
-                    返回儀表板
-                </button>
+                <button onclick="window.location.reload()" class="w-full py-7 bg-gradient-to-r from-pure-600 to-blue-700 text-white font-black text-2xl rounded-3xl shadow-2xl hover:scale-105 active:scale-95 transition-all">返回儀表板</button>
             </div>
         </div>
 
     </main>
 
-    <!-- 系統核心邏輯 -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { 
@@ -261,108 +324,108 @@
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // --- 核心修復：動態解析環境變數與 appId ---
-        const firebaseConfig = typeof __firebase_config !== 'undefined' 
-            ? JSON.parse(__firebase_config) 
-            : {
-                apiKey: "AIzaSyCIKSbaZ5R6RTSRcH_-YYfqz_OnQQFr1gc",
-                authDomain: "pure-skin-8640d.firebaseapp.com",
-                projectId: "pure-skin-8640d",
-                storageBucket: "pure-skin-8640d.firebasestorage.app",
-                messagingSenderId: "890613609117",
-                appId: "1:890613609117:web:ed044e453e6cc789b01a74",
-                measurementId: "G-27E3XSTTBH"
-            };
-            
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'pure-skin-studio-master'; 
-        
+        // --- Firebase 環境 ---
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { apiKey: "AIzaSyCIKSbaZ5R6RTSRcH_-YYfqz_OnQQFr1gc", authDomain: "pure-skin-8640d.firebaseapp.com", projectId: "pure-skin-8640d", storageBucket: "pure-skin-8640d.firebasestorage.app", messagingSenderId: "890613609117", appId: "1:890613609117:web:ed044e453e6cc789b01a74", measurementId: "G-27E3XSTTBH" };
+        const globalAppId = 'pure-skin-studio-master';
         const fbApp = initializeApp(firebaseConfig);
         const auth = getAuth(fbApp);
         const db = getFirestore(fbApp);
 
-        // --- 備援數據庫 ---
+        // --- 備援配置 ---
         const FALLBACK_DB = {
-            bodyParts: {
-                face: { name: '臉部精雕', cost: 150, desc: '掃除面部細微雜毛。' },
-                legs: { name: '絲滑美腿', cost: 380, desc: '大面積高效除毛。' },
-                underarm: { name: '腋下淨白', cost: 200, desc: '掃除黑頭沉積。' },
-                bikini: { name: 'VIO 專業', cost: 650, desc: '極致親膚技術。' }
-            },
+            bodyParts: { face: { name: '臉部精雕', cost: 150, desc: '掃除面部雜毛。' }, legs: { name: '絲滑美腿', cost: 380, desc: '大面積除毛。' }, underarm: { name: '腋下淨白', cost: 200, desc: '掃除沉積。' }, bikini: { name: 'VIO 專業', cost: 650, desc: '極致親膚。' } },
             titles: ["瀅白實習生", "初級技師", "資深除毛師", "首席技術官", "醫美顧問", "雷射物理學家", "美學導師", "教父級大師"],
-            stories: [
-                { text: "我擔心雷射會痛，能量可以稍微幫我調低嗎？", opts: [{t: "我們有專利冷卻技術，請放心。", r: "太棒了！"}, {t: "我會縮短單次操作時間。", r: "好吧。"}] },
-                { text: "下週有重要的海邊拍片，想把腋下處理乾淨。", opts: [{t: "沒問題，保證讓您完美出鏡。", r: "謝謝專家！"}, {t: "這個療程非常適合您此時的需求。", r: "專家說得對。"}] }
-            ]
+            stories: [ { text: "我擔心雷射會痛...", opts: [{t: "我們有冷卻技術。", r: "太棒了！"}, {t: "我會縮短時間。", r: "好吧。"}] }, { text: "下週要拍婚紗...", opts: [{t: "保證讓您完美。", r: "謝謝！"}, {t: "最適合您的療程。", r: "專家說得對。"}] } ]
         };
 
         const App = {
             state: {
-                user: null, data: { gold: 0, level: 1, exp: 0, history: [] },
-                config: FALLBACK_DB, view: 'loading',
-                session: { customer: null, part: null, gender: 'female' },
-                audio: { muted: true, el: null }, isAuthResolved: false
+                user: null, data: { gold: 0, level: 1, exp: 0, history: [], isNewPlayer: true },
+                config: FALLBACK_DB, view: 'loading', session: { customer: null, part: null, gender: 'female' },
+                audio: { muted: true, el: null }, isAuthResolved: false, tutorialStep: 0
             },
 
-            // --- 認證邏輯 (V4.1 原子化門控，修復 Token Mismatch) ---
+            // --- 認證邏輯 (V4.6) ---
             auth: {
                 init: async () => {
-                    const watchdog = setTimeout(() => {
-                        if (!App.state.isAuthResolved && App.state.view === 'loading') {
-                            console.warn("認證逾時，解鎖門戶");
-                            App.router.go('login');
-                        }
-                    }, 4000);
-
+                    const watchdog = setTimeout(() => { if (!App.state.isAuthResolved && App.state.view === 'loading') App.router.go('login'); }, 4000);
                     onAuthStateChanged(auth, async (user) => {
-                        App.state.isAuthResolved = true;
-                        clearTimeout(watchdog);
-                        if (user) {
+                        App.state.isAuthResolved = true; clearTimeout(watchdog);
+                        if (user && !user.isAnonymous) {
                             App.state.user = user;
                             document.getElementById('loading-status').innerText = "載入美學存檔中...";
                             await App.data.sync(); 
-                            App.router.go('lobby');
+                            if (App.state.data.isNewPlayer) App.router.go('welcome');
+                            else App.router.go('lobby');
                         } else {
+                            if(user && user.isAnonymous) await signOut(auth);
                             App.router.go('login');
                         }
                     });
-
-                    // 嘗試登入流程：優先使用環境提供的 Token
-                    try {
-                        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                            await signInWithCustomToken(auth, __initial_auth_token).catch(async (err) => {
-                                // 捕獲 mismatch 錯誤並嘗試匿名登入作為備援
-                                console.error("Custom Token Mismatch, falling back to anonymous", err);
-                                await signInAnonymously(auth);
-                            });
-                        } else if (!auth.currentUser) {
-                            await signInAnonymously(auth);
-                        }
-                    } catch (err) {
-                        console.error("Auth Init Sequence Failed:", err);
-                        // 最後的防線：直接顯示登入畫面
-                        App.state.isAuthResolved = true;
-                        App.router.go('login');
-                    }
+                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) signInWithCustomToken(auth, __initial_auth_token).catch(()=>null);
                 },
                 loginGoogle: () => signInWithPopup(auth, new GoogleAuthProvider()).catch(()=>null),
-                loginGuest: () => signInAnonymously(auth).catch(() => {
-                    App.state.user = { uid: 'guest_local_' + Date.now(), isAnonymous: true };
+                logout: async () => { localStorage.clear(); sessionStorage.clear(); await signOut(auth); window.location.reload(); }
+            },
+
+            // --- 教學系統 (V4.6 局部指向版) ---
+            tutorial: {
+                steps: [
+                    { text: "你好！我是 Elsa，將引導你成為美學大師。首先，這裡顯示你的專家職位與等級。", target: "frame-profile", pos: "bubble-top" },
+                    { text: "中間這塊儀表板會追蹤你最近 7 次療程的『瀅白金』收益趨勢。", target: "frame-chart", pos: "bubble-top" },
+                    { text: "核心經營功能就在這！點擊『預約管理』即可接待今日候診的貴賓。", target: "frame-appt", pos: "bubble-left" },
+                    { text: "準備好了嗎？完成第一場療程後，導引就會結束。開始你的美學之旅吧！", target: "app-root", pos: "bubble-top" }
+                ],
+                start: () => {
                     App.router.go('lobby');
-                }),
-                logout: () => signOut(auth).then(() => window.location.reload())
+                    App.state.tutorialStep = 0;
+                    document.getElementById('tutor-anchor').style.display = 'flex';
+                    App.tutorial.renderStep();
+                },
+                renderStep: () => {
+                    const step = App.tutorial.steps[App.state.tutorialStep];
+                    const anchor = document.getElementById('tutor-anchor');
+                    const text = document.getElementById('tutor-text');
+                    const targetEl = document.getElementById(step.target);
+                    
+                    text.innerText = step.text;
+                    anchor.className = `tutor-bubble ${step.pos}`;
+
+                    if (targetEl) {
+                        const rect = targetEl.getBoundingClientRect();
+                        // 簡單的定位邏輯
+                        if (step.pos === 'bubble-top') {
+                            anchor.style.top = (rect.top - 360) + 'px';
+                            anchor.style.left = (rect.left + rect.width/2 - 70) + 'px';
+                        } else if (step.pos === 'bubble-left') {
+                            anchor.style.top = (rect.top - 100) + 'px';
+                            anchor.style.left = (rect.left - 260) + 'px';
+                        }
+                        targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                },
+                next: async () => {
+                    App.state.tutorialStep++;
+                    if (App.state.tutorialStep < App.tutorial.steps.length) {
+                        App.tutorial.renderStep();
+                    } else {
+                        document.getElementById('tutor-anchor').style.display = 'none';
+                        App.state.data.isNewPlayer = false;
+                        await App.data.save();
+                        App.ui.notify("導覽完成，專家身份已解鎖！");
+                    }
+                }
             },
 
             data: {
                 sync: async () => {
                     if (!App.state.user) return;
                     try {
-                        // 1. 公共定義 (6段路徑: artifacts/appId/public/data/definitions/config)
-                        const cfgRef = doc(db, 'artifacts', appId, 'public', 'data', 'definitions', 'config');
+                        const cfgRef = doc(db, 'artifacts', globalAppId, 'public', 'data', 'definitions', 'config');
                         const cfgSnap = await getDoc(cfgRef);
                         if (cfgSnap.exists()) App.state.config = cfgSnap.data();
 
-                        // 2. 個人進度 (6段路徑)
-                        const userRef = doc(db, 'artifacts', appId, 'users', App.state.user.uid, 'saveData', 'profile');
+                        const userRef = doc(db, 'artifacts', globalAppId, 'users', App.state.user.uid, 'saveData', 'profile');
                         onSnapshot(userRef, (snap) => {
                             if (snap.exists()) {
                                 App.state.data = { ...App.state.data, ...snap.data() };
@@ -370,20 +433,17 @@
                             } else {
                                 setDoc(userRef, App.state.data, { merge: true });
                             }
-                        }, (err) => console.warn("Firestore Sync Error:", err));
-                    } catch (e) { console.warn("數據同步異常，使用本地備援模式"); }
+                        });
+                    } catch (e) { console.warn("Sync Error"); }
                 },
                 save: async () => {
                     const uid = App.state.user?.uid;
-                    if (uid && !uid.includes('guest_local')) {
-                        const userRef = doc(db, 'artifacts', appId, 'users', uid, 'saveData', 'profile');
+                    if (uid) {
+                        const userRef = doc(db, 'artifacts', globalAppId, 'users', uid, 'saveData', 'profile');
                         const newHistory = [...(App.state.data.history || [])];
-                        newHistory.push({ d: new Date().toLocaleTimeString('zh-TW', {hour:'2-digit', minute:'2-digit'}), a: App.state.data.lastReward });
+                        if (App.state.data.lastReward) newHistory.push({ d: new Date().toLocaleTimeString('zh-TW', {hour:'2-digit', minute:'2-digit'}), a: App.state.data.lastReward });
                         if (newHistory.length > 7) newHistory.shift();
-
-                        await setDoc(userRef, { 
-                            gold: App.state.data.gold, level: App.state.data.level, history: newHistory
-                        }, { merge: true });
+                        await setDoc(userRef, { gold: App.state.data.gold, level: App.state.data.level, isNewPlayer: App.state.data.isNewPlayer, history: newHistory }, { merge: true });
                     }
                 }
             },
@@ -399,7 +459,7 @@
                 updateLobby: () => {
                     document.getElementById('lobby-gold').innerText = App.state.data.gold.toLocaleString();
                     document.getElementById('lobby-level').innerText = `Lv.${App.state.data.level}`;
-                    document.getElementById('user-display-name').innerText = App.state.user?.displayName || (App.state.user?.isAnonymous ? '訪客顧問' : '美學專家');
+                    document.getElementById('user-display-name').innerText = App.state.user?.displayName || "認證專家";
                     const titles = App.state.config.titles;
                     const titleIdx = Math.min(Math.floor(App.state.data.level / 2), titles.length - 1);
                     document.getElementById('user-title').innerText = `${titles[titleIdx]} Evolution`;
@@ -407,26 +467,12 @@
                 },
                 renderChart: () => {
                     const ctx = document.getElementById('revenueChart').getContext('2d');
-                    const history = App.state.data.history && App.state.data.history.length > 0 
-                        ? App.state.data.history : [{a: 100, d:'系統載入中'}];
-                    
+                    const history = App.state.data.history && App.state.data.history.length > 0 ? App.state.data.history : [{a: 100, d:'系統載入中'}];
                     if (window.revenueChartInstance) window.revenueChartInstance.destroy();
                     window.revenueChartInstance = new Chart(ctx, {
                         type: 'line',
-                        data: {
-                            labels: history.map(h => h.d),
-                            datasets: [{
-                                data: history.map(h => h.a),
-                                borderColor: '#0ea5e9', backgroundColor: 'rgba(14, 165, 233, 0.05)',
-                                borderWidth: 5, tension: 0.5, fill: true, pointRadius: 6, pointBackgroundColor: '#fff',
-                                pointBorderColor: '#0284c7', pointBorderWidth: 3
-                            }]
-                        },
-                        options: {
-                            responsive: true, maintainAspectRatio: false,
-                            plugins: { legend: { display: false } },
-                            scales: { y: { display: false, beginAtZero: true }, x: { grid: { display: false }, ticks: { color: '#94a3b8', font: { weight: 'bold', size: 10 } } } }
-                        }
+                        data: { labels: history.map(h => h.d), datasets: [{ data: history.map(h => h.a), borderColor: '#0ea5e9', backgroundColor: 'rgba(14, 165, 233, 0.05)', borderWidth: 5, tension: 0.5, fill: true, pointRadius: 6, pointBackgroundColor: '#fff', pointBorderColor: '#0284c7', pointBorderWidth: 3 }] },
+                        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false, beginAtZero: true }, x: { grid: { display: false }, ticks: { color: '#94a3b8', font: { weight: 'bold', size: 10 } } } } }
                     });
                 },
                 renderAppointments: () => {
@@ -434,118 +480,54 @@
                     const parts = Object.keys(App.state.config.bodyParts);
                     const names = ["艾米莉", "蘇菲亞", "張先生", "李小姐", "凱特", "陳醫師", "王總裁", "新貴賓"];
                     list.innerHTML = Array.from({length: 8}).map((_, i) => {
-                        const name = names[i];
-                        const gender = i % 2 === 0 ? 'female' : 'male';
-                        const partKey = parts[i % parts.length];
-                        const part = App.state.config.bodyParts[partKey];
-                        return `
-                        <div onclick="window.startSession('${name}', '${gender}', '${partKey}')" class="group flex items-center justify-between p-8 bg-white/60 rounded-[3rem] border border-pure-100 hover:bg-white hover:shadow-2xl transition-all cursor-pointer">
-                            <div class="flex items-center gap-8">
-                                <div class="w-16 h-16 rounded-3xl bg-pure-100 flex items-center justify-center text-3xl text-pure-600 shadow-inner group-hover:rotate-6 transition-transform">
-                                    <i class="fa-solid fa-${gender === 'male' ? 'mars' : 'venus'}"></i>
-                                </div>
-                                <div>
-                                    <h4 class="text-xl font-black text-slate-800">${name}</h4>
-                                    <p class="text-xs font-black text-pure-400 uppercase tracking-widest mt-1 italic">${part.name}</p>
-                                </div>
-                            </div>
-                            <div class="text-right">
-                                <span class="px-6 py-3 bg-pure-100 text-pure-700 text-[10px] font-black rounded-2xl group-hover:bg-pure-600 group-hover:text-white transition-all uppercase">啟動諮詢</span>
-                            </div>
-                        </div>`;
+                        const name = names[i]; const gender = i % 2 === 0 ? 'female' : 'male'; const partKey = parts[i % parts.length]; const part = App.state.config.bodyParts[partKey];
+                        return `<div onclick="window.startSession('${name}', '${gender}', '${partKey}')" class="group flex items-center justify-between p-8 bg-white/60 rounded-[3rem] border border-pure-100 hover:bg-white hover:shadow-2xl transition-all cursor-pointer">
+                            <div class="flex items-center gap-8"><div class="w-16 h-16 rounded-3xl bg-pure-100 flex items-center justify-center text-3xl text-pure-600 shadow-inner group-hover:rotate-6 transition-transform"><i class="fa-solid fa-${gender === 'male' ? 'mars' : 'venus'}"></i></div><div><h4 class="text-xl font-black text-slate-800">${name}</h4><p class="text-xs font-black text-pure-400 uppercase tracking-widest mt-1 italic">${part.name}</p></div></div>
+                            <div class="text-right"><span class="px-6 py-3 bg-pure-100 text-pure-700 text-[10px] font-black rounded-2xl group-hover:bg-pure-600 group-hover:text-white transition-all uppercase italic">啟動諮詢</span></div></div>`;
                     }).join('');
                 }
             },
 
             router: {
                 go: (viewId) => {
-                    document.querySelectorAll('section').forEach(el => {
-                        el.classList.add('hidden');
-                        if (el.id === `view-${viewId}`) {
-                            el.classList.remove('hidden');
-                            if (viewId === 'lobby') App.ui.renderChart();
-                            if (viewId === 'game') App.game.init();
-                        }
-                    });
-                    App.state.view = viewId;
-                    if (viewId === 'appointments') App.ui.renderAppointments();
+                    document.querySelectorAll('section').forEach(el => { el.classList.add('hidden'); if (el.id === `view-${viewId}`) el.classList.remove('hidden'); });
+                    App.state.view = viewId; if (viewId === 'lobby') App.ui.renderChart(); if (viewId === 'game') App.game.init(); if (viewId === 'appointments') App.ui.renderAppointments();
                 }
             },
 
             game: {
                 init: () => {
-                    const canvas = document.getElementById('game-canvas');
-                    const ctx = canvas.getContext('2d');
-                    const container = canvas.parentElement;
-                    canvas.width = container.clientWidth;
-                    canvas.height = 450;
-                    const totalPixels = canvas.width * canvas.height;
-                    const laser = document.getElementById('laser-cursor');
-
-                    ctx.fillStyle = App.state.session.gender === 'male' ? '#f4d1c1' : '#fff0f0';
-                    ctx.fillRect(0, 0, canvas.width, canvas.height);
-                    ctx.strokeStyle = '#4a3528';
-                    ctx.lineWidth = 1.2;
-                    const density = App.state.session.part === 'bikini' ? 3800 : 2200;
-                    for (let i = 0; i < density; i++) {
-                        const x = Math.random() * canvas.width;
-                        const y = Math.random() * canvas.height;
-                        ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + (Math.random()-0.5)*4, y + 8); ctx.stroke();
+                    const canvas = document.getElementById('game-canvas'); const ctx = canvas.getContext('2d'); const container = canvas.parentElement;
+                    canvas.width = container.clientWidth; canvas.height = 450; const totalPixels = canvas.width * canvas.height; const laser = document.getElementById('laser-cursor');
+                    ctx.fillStyle = App.state.session.gender === 'male' ? '#f4d1c1' : '#fff0f0'; ctx.fillRect(0, 0, canvas.width, canvas.height); ctx.strokeStyle = '#4a3528'; ctx.lineWidth = 1.2;
+                    for (let i = 0; i < (App.state.session.part === 'bikini' ? 3800 : 2200); i++) {
+                        const x = Math.random() * canvas.width; const y = Math.random() * canvas.height; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + (Math.random()-0.5)*4, y + 8); ctx.stroke();
                     }
-
                     let isDragging = false;
                     const handleMove = (e) => {
-                        const rect = canvas.getBoundingClientRect();
-                        const cx = e.touches ? e.touches[0].clientX : e.clientX;
-                        const cy = e.touches ? e.touches[0].clientY : e.clientY;
+                        const rect = canvas.getBoundingClientRect(); const cx = e.touches ? e.touches[0].clientX : e.clientX; const cy = e.touches ? e.touches[0].clientY : e.clientY;
                         laser.style.left = cx + 'px'; laser.style.top = cy + 'px';
                         if (isDragging) {
-                            const x = cx - rect.left; const y = cy - rect.top;
-                            ctx.globalCompositeOperation = 'destination-out';
-                            ctx.beginPath(); ctx.arc(x, y, 32, 0, Math.PI * 2); ctx.fill();
-                            laser.classList.add('active');
-                            triggerLaserParticles(cx, cy);
+                            const x = cx - rect.left; const y = cy - rect.top; ctx.globalCompositeOperation = 'destination-out'; ctx.beginPath(); ctx.arc(x, y, 32, 0, Math.PI * 2); ctx.fill(); laser.classList.add('active'); triggerLaserFX(cx, cy);
                         } else { laser.classList.remove('active'); }
                     };
-
                     const checkEnd = () => {
-                        if (!isDragging) return;
-                        isDragging = false;
-                        laser.classList.remove('active');
-                        const data = ctx.getImageData(0,0, canvas.width, canvas.height).data;
-                        let empty = 0;
+                        if (!isDragging) return; isDragging = false; laser.classList.remove('active');
+                        const data = ctx.getImageData(0,0, canvas.width, canvas.height).data; let empty = 0;
                         for (let i = 3; i < data.length; i += 4) if (data[i] === 0) empty++;
-                        const progress = (empty / totalPixels);
-                        document.getElementById('prog-bar').style.width = `${progress * 100}%`;
+                        const progress = (empty / totalPixels); document.getElementById('prog-bar').style.width = `${progress * 100}%`;
                         if (progress > 0.97) finalizeGame();
                     };
-
-                    canvas.onmousedown = () => isDragging = true;
-                    canvas.ontouchstart = () => isDragging = true;
-                    window.onmouseup = checkEnd;
-                    window.ontouchend = checkEnd;
-                    window.onmousemove = handleMove;
-                    window.ontouchmove = handleMove;
-                    laser.style.display = 'block';
+                    canvas.onmousedown = () => isDragging = true; canvas.ontouchstart = () => isDragging = true;
+                    window.onmouseup = checkEnd; window.ontouchend = checkEnd; window.onmousemove = handleMove; window.ontouchmove = handleMove; laser.style.display = 'block';
                 }
             },
 
             audio: {
                 toggle: () => {
-                    if (!App.state.audio.el) {
-                        App.state.audio.el = new Audio("https://assets.mixkit.co/music/preview/kit-serene-view-443.mp3");
-                        App.state.audio.el.loop = true; App.state.audio.el.volume = 0.2;
-                    }
-                    if (App.state.audio.muted) {
-                        App.state.audio.el.play().catch(() => App.ui.notify("點擊頁面以啟用音訊體驗"));
-                        App.state.audio.muted = false;
-                        document.getElementById('lobby-music-icon').className = "fa-solid fa-volume-high text-pure-500";
-                        document.getElementById('lobby-music-text').innerText = "ON";
-                    } else {
-                        App.state.audio.el.pause(); App.state.audio.muted = true;
-                        document.getElementById('lobby-music-icon').className = "fa-solid fa-volume-xmark";
-                        document.getElementById('lobby-music-text').innerText = "OFF";
-                    }
+                    if (!App.state.audio.el) { App.state.audio.el = new Audio("https://assets.mixkit.co/music/preview/kit-serene-view-443.mp3"); App.state.audio.el.loop = true; App.state.audio.el.volume = 0.2; }
+                    if (App.state.audio.muted) { App.state.audio.el.play().catch(() => App.ui.notify("點擊頁面以啟用音訊")); App.state.audio.muted = false; document.getElementById('lobby-music-icon').className = "fa-solid fa-volume-high text-pure-500"; document.getElementById('lobby-music-text').innerText = "ON"; }
+                    else { App.state.audio.el.pause(); App.state.audio.muted = true; document.getElementById('lobby-music-icon').className = "fa-solid fa-volume-xmark"; document.getElementById('lobby-music-text').innerText = "OFF"; }
                 }
             }
         };
@@ -555,35 +537,24 @@
             const reward = App.state.config.bodyParts[App.state.session.part].cost;
             App.state.data.gold += reward; App.state.data.exp += 50;
             if (App.state.data.exp >= 100) { App.state.data.level++; App.state.data.exp = 0; }
-            App.state.data.lastReward = reward;
-            await App.data.save();
-            document.getElementById('reward-val').innerText = reward;
-            document.getElementById('modal-result').classList.remove('hidden');
+            App.state.data.lastReward = reward; await App.data.save();
+            document.getElementById('reward-val').innerText = reward; document.getElementById('modal-result').classList.remove('hidden');
         };
 
         window.app = App;
         window.startSession = (name, gender, partKey) => {
             App.state.session = { name, gender, part: partKey };
-            const box = document.getElementById('customer-avatar-box');
-            const hC = gender === 'male' ? 'css-hair-male' : 'css-hair-female';
+            const box = document.getElementById('customer-avatar-box'); const hC = gender === 'male' ? 'css-hair-male' : 'css-hair-female';
             box.innerHTML = `<div class="css-avatar"><div class="css-head"></div><div class="css-body"></div><div class="${hC}"></div></div>`;
-            document.getElementById('diag-name').innerText = name;
-            const story = App.state.config.stories[Math.floor(Math.random() * App.state.config.stories.length)];
-            document.getElementById('diag-text').innerText = story.text;
-            const optDiv = document.getElementById('diag-options');
-            optDiv.innerHTML = story.opts.map(opt => `
-                <button onclick="app.router.go('game')" class="w-full text-left p-8 bg-white rounded-[2.5rem] text-xl font-black text-slate-700 hover:bg-pure-600 hover:text-white transition-all shadow-sm border border-pure-100 flex justify-between items-center group">
-                    <span>${opt.t}</span> <i class="fa-solid fa-circle-chevron-right opacity-0 group-hover:opacity-100 transition-all transform group-hover:translate-x-2 text-pure-500"></i>
-                </button>
-            `).join('');
+            document.getElementById('diag-name').innerText = name; const story = App.state.config.stories[Math.floor(Math.random() * App.state.config.stories.length)];
+            document.getElementById('diag-text').innerText = story.text; const optDiv = document.getElementById('diag-options');
+            optDiv.innerHTML = story.opts.map(opt => `<button onclick="app.router.go('game')" class="w-full text-left p-8 bg-white rounded-[2.5rem] text-xl font-black text-slate-700 hover:bg-pure-600 hover:text-white transition-all shadow-sm border border-pure-100 flex justify-between items-center group"><span>${opt.t}</span><i class="fa-solid fa-circle-chevron-right opacity-0 group-hover:opacity-100 transition-all transform group-hover:translate-x-2 text-pure-500"></i></button>`).join('');
             App.router.go('dialogue');
         };
 
-        function triggerLaserParticles(x, y) {
-            const el = document.createElement('div');
-            el.style.cssText = `position:fixed; left:${x}px; top:${y}px; width:4px; height:4px; background:#fff; border-radius:50%; pointer-events:none; z-index:9998; box-shadow: 0 0 15px #0ea5e9;`;
-            document.body.appendChild(el);
-            el.animate([{opacity:1, transform:'scale(1)'}, {opacity:0, transform:'scale(5)'}], {duration:450, easing:'ease-out'}).onfinish = () => el.remove();
+        function triggerLaserFX(x, y) {
+            const el = document.createElement('div'); el.style.cssText = `position:fixed; left:${x}px; top:${y}px; width:4px; height:4px; background:#fff; border-radius:50%; pointer-events:none; z-index:9998; box-shadow: 0 0 15px #0ea5e9;`;
+            document.body.appendChild(el); el.animate([{opacity:1, transform:'scale(1)'}, {opacity:0, transform:'scale(5)'}], {duration:450, easing:'ease-out'}).onfinish = () => el.remove();
         }
 
         App.auth.init();
