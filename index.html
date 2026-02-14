@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>瀅白之境 Pure Skin V5.15 - 行動美學旗艦版</title>
+    <title>瀅白之境 Pure Skin V5.16 - 行動美學旗艦版</title>
     <!-- 引入外部資源 -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -26,11 +26,15 @@
                         'slide-up': 'slideUp 0.5s ease-out forwards',
                         'fade-in': 'fadeIn 0.6s ease-out forwards',
                         'marketing-radar': 'marketingRadar 2s infinite cubic-bezier(0, 0, 0.2, 1)',
+                        'breath-border': 'breathBorder 1.5s ease-in-out infinite',
                     },
                     keyframes: {
                         slideUp: { '0%': { transform: 'translateY(20px)', opacity: '0' }, '100%': { transform: 'translateY(0)', opacity: '1' } },
                         fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
-                        float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-10px)' } },
+                        breathBorder: {
+                            '0%, 100%': { borderColor: 'rgba(14, 165, 233, 0.2)', transform: 'scale(1)', boxShadow: '0 0 0px rgba(14, 165, 233, 0)' },
+                            '50%': { borderColor: 'rgba(14, 165, 233, 0.8)', transform: 'scale(1.02)', boxShadow: '0 0 15px rgba(14, 165, 233, 0.4)' }
+                        },
                         marketingRadar: { '0%': { transform: 'scale(1)', opacity: '0.8' }, '100%': { transform: 'scale(2.5)', opacity: '0' } }
                     }
                 }
@@ -38,7 +42,7 @@
         }
     </script>
     <style>
-        /* 核心手機適配與極致美化樣式 */
+        /* 手機適配與極致美化樣式 */
         * { -webkit-tap-highlight-color: transparent; outline: none; }
         ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
@@ -47,7 +51,7 @@
         body { overscroll-behavior: none; -webkit-user-select: none; user-select: none; }
 
         .glass-panel {
-            background: rgba(255, 255, 255, 0.82);
+            background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(24px);
             -webkit-backdrop-filter: blur(24px);
             border: 1px solid rgba(255, 255, 255, 0.6);
@@ -56,7 +60,7 @@
         
         .chart-container { position: relative; width: 100%; height: 200px; margin: 0 auto; }
 
-        /* --- NPC Elsa 視覺優化 --- */
+        /* NPC Elsa 視覺重繪 */
         .elsa-container { position: relative; width: 140px; height: 300px; transform: scale(0.85); margin-bottom: -40px; }
         .elsa-hair {
             position: absolute; top: 5px; left: 15px; width: 110px; height: 130px;
@@ -82,23 +86,22 @@
             border: 3px solid #3b82f6; border-top: none; border-radius: 0 0 45px 45px; z-index: 12;
         }
 
-        /* 預約時刻表：手機單頁最佳化佈局 */
-        .calendar-wrapper { overflow-x: auto; width: 100%; -webkit-overflow-scrolling: touch; }
-        .calendar-table { min-width: 580px; border-collapse: separate; border-spacing: 2px; table-layout: fixed; }
+        /* 預約時刻表：手機單頁橫滑佈局 */
+        .calendar-wrapper { overflow-x: auto; width: 100%; -webkit-overflow-scrolling: touch; padding-bottom: 10px; }
+        .calendar-table { min-width: 580px; border-collapse: separate; border-spacing: 4px; table-layout: fixed; }
         .calendar-table th { padding: 8px 4px; background: #f8fafc; border-radius: 10px; font-size: 0.55rem; font-weight: 900; color: #64748b; text-align: center; text-transform: uppercase; }
         .calendar-cell { 
-            height: 46px; background: rgba(241, 245, 249, 0.6); border-radius: 10px;
-            transition: 0.2s; cursor: pointer; border: 1px solid transparent; position: relative;
+            height: 48px; background: rgba(241, 245, 249, 0.6); border-radius: 12px;
+            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; border: 2px solid transparent; position: relative;
             display: flex; align-items: center; justify-content: center; text-align: center;
         }
         .calendar-cell.occupied-male { background: #eff6ff; border-color: #3b82f6; }
         .calendar-cell.occupied-female { background: #fff1f2; border-color: #f43f5e; }
-        .calendar-cell.empty { border: 1px dashed #e2e8f0; }
-        .calendar-cell.marketing-active { background: #f0f9ff; border: 1.5px solid #0ea5e9; }
-        .calendar-cell.overdue { background: #fef2f2; border-color: #ef4444; opacity: 0.8; }
+        .calendar-cell.empty { border: 1.5px dashed #e2e8f0; }
+        .calendar-cell.marketing-active { background: #f0f9ff; border: 2px solid #0ea5e9; }
+        .calendar-cell.overdue { background: #fee2e2; border-color: #ef4444; opacity: 0.9; }
 
-        .marketing-pulse-wrapper { position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
-        .radar-circle { position: absolute; width: 30px; height: 30px; background: rgba(14, 165, 233, 0.4); border-radius: 50%; pointer-events: none; }
+        .pending-breath { animation: breathBorder 2s ease-in-out infinite; z-index: 5; }
 
         .tutor-bubble { position: absolute; z-index: 10000; transition: all 0.5s; display: none; pointer-events: none; }
         .bubble-content { background: white; border: 3px solid #bae6fd; border-radius: 2.5rem; padding: 1.5rem; width: 270px; pointer-events: auto; position: relative; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15); }
@@ -139,7 +142,7 @@
         </div>
         <div class="bubble-content shadow-2xl glass-panel p-6 rounded-[3rem] border-pure-200">
             <p id="tutor-text" class="text-slate-700 font-black leading-relaxed text-sm"></p>
-            <button onclick="app.tutorial.next()" class="mt-4 w-full py-4 bg-pure-600 text-white rounded-[2rem] text-sm font-black shadow-lg active:scale-95 transition-transform">繼續下一步 ❯</button>
+            <button onclick="app.tutorial.next()" class="mt-4 w-full py-4 bg-pure-600 text-white rounded-[2rem] text-sm font-black shadow-lg active:scale-95 transition-transform">了解！下一步 ❯</button>
         </div>
     </div>
 
@@ -187,7 +190,7 @@
                 <h2 class="text-4xl font-black mb-2 text-slate-800 tracking-tight italic">美學教父之路</h2>
                 <p class="text-slate-400 text-xs font-bold tracking-[0.2em] uppercase mb-12">Pure Aesthetics Portal</p>
                 <div class="space-y-5">
-                    <button onclick="app.auth.loginGoogle()" class="w-full py-6 bg-white border border-slate-100 rounded-[2.5rem] flex items-center justify-center gap-4 shadow-sm hover:bg-pure-50 transition-all font-black text-slate-600 text-xl">
+                    <button onclick="app.auth.loginGoogle()" class="w-full py-6 bg-white border border-slate-100 rounded-[2.5rem] flex items-center justify-center gap-4 shadow-sm hover:bg-pure-50 transition-all font-black text-slate-600 text-lg">
                         <i class="fa-brands fa-google text-2xl text-pure-600"></i> Google 快速認證
                     </button>
                     <button onclick="app.auth.loginGameCenter()" class="w-full py-6 bg-slate-900 text-white rounded-[2.5rem] flex items-center justify-center gap-4 shadow-xl active:scale-95 transition-transform font-black text-lg">
@@ -212,8 +215,8 @@
             <div class="glass-panel p-12 rounded-[5rem] shadow-2xl border-white border-4 animate-fade-in relative overflow-hidden">
                 <div class="absolute -top-10 -left-10 w-40 h-40 bg-pure-50 rounded-full opacity-40"></div>
                 <div class="text-9xl mb-12 drop-shadow-2xl">🧊</div>
-                <h2 class="text-5xl font-black text-slate-800 mb-8 italic tracking-tighter">歡迎開啟教父之路</h2>
-                <p class="text-slate-500 font-bold leading-relaxed text-xl mb-14 italic px-4">
+                <h2 class="text-5xl font-black text-slate-800 mb-8 italic tracking-tighter text-center">歡迎開啟教父之路</h2>
+                <p class="text-slate-500 font-bold leading-relaxed text-xl mb-14 italic text-center px-4">
                     您的專業排程與智慧時刻表已同步。<br>準備好接受 Elsa 導師的引導了嗎？
                 </p>
                 <button onclick="app.tutorial.start()" class="px-16 py-8 bg-gradient-to-r from-pure-600 to-blue-700 text-white font-black text-2xl rounded-[3.5rem] shadow-2xl hover:scale-105 active:scale-95 transition-all uppercase tracking-widest mx-auto block">
@@ -237,7 +240,7 @@
                 </div>
                 <div class="flex gap-4 items-center pt-6 border-t border-slate-100">
                     <div class="flex-1 bg-pure-50/50 p-4 rounded-3xl text-center">
-                        <p class="text-[9px] text-slate-400 font-black uppercase mb-1 tracking-widest">瀅白資產</p>
+                        <p class="text-[9px] text-slate-400 font-black uppercase mb-1 tracking-widest">資產</p>
                         <p class="text-3xl font-black text-slate-800 font-mono italic">💰 <span id="lobby-gold">0</span></p>
                     </div>
                     <div class="flex-1 bg-pure-50/50 p-4 rounded-3xl text-center">
@@ -257,8 +260,8 @@
 
             <button id="frame-appt" onclick="app.router.go('appointments')" class="group relative bg-gradient-to-br from-pure-600 to-blue-800 text-white p-10 rounded-[4.5rem] shadow-2xl active:scale-95 transition-all text-left overflow-hidden h-44">
                 <div class="absolute right-[-10px] bottom-[-20px] text-[11rem] text-white opacity-10"><i class="fa-solid fa-calendar-check"></i></div>
-                <h2 class="text-4xl font-black italic mb-2 tracking-tighter uppercase">預約時刻表</h2>
-                <p class="text-sm font-medium opacity-85 leading-relaxed italic pr-12">一週跨日排程矩陣與引流投放開發。</p>
+                <h2 class="text-4xl font-black italic mb-2 tracking-tighter uppercase text-center">預約時刻表</h2>
+                <p class="text-sm font-medium opacity-85 leading-relaxed italic pr-12 text-center">一週跨日排程矩陣與引流投放開發。</p>
             </button>
 
             <div id="frame-settings" class="glass-panel p-6 rounded-[3rem] flex flex-col gap-5 shadow-sm border border-pure-50 mt-4">
@@ -300,7 +303,7 @@
                     </div>
                 </div>
                 <div class="p-8 border-2 border-pure-50 rounded-[4rem] bg-white/50 shadow-inner text-center">
-                    <h5 class="text-lg font-black text-slate-700 mb-8 italic underline decoration-pure-200">月度經營數據趨勢</h5>
+                    <h5 class="text-lg font-black text-slate-700 mb-8 italic underline decoration-pure-200 text-center">月度經營數據趨勢</h5>
                     <div class="chart-container"><canvas id="monthlyChart"></canvas></div>
                 </div>
             </div>
@@ -341,10 +344,10 @@
         <!-- 結算評價彈窗 -->
         <div id="modal-result" class="hidden fixed inset-0 z-[200] items-center justify-center bg-blue-900/80 backdrop-blur-3xl px-6 animate-slide-in">
             <div class="glass-panel p-16 rounded-[6rem] text-center max-md w-full border-white border-[10px] shadow-2xl relative overflow-hidden">
-                <div id="result-rank-icon" class="text-9xl mb-10 drop-shadow-2xl">🧊</div>
-                <h2 class="text-5xl font-black text-slate-800 mb-4 tracking-tighter italic" id="result-rank-title">極致瀅白！</h2>
+                <div id="result-rank-icon" class="text-9xl mb-10 drop-shadow-2xl text-center">🧊</div>
+                <h2 class="text-5xl font-black text-slate-800 mb-4 tracking-tighter italic text-center" id="result-rank-title">極致瀅白！</h2>
                 <div id="result-stars" class="flex justify-center gap-2 mb-10 text-yellow-400 text-3xl"></div>
-                <p id="result-feedback-text" class="text-slate-500 font-bold mb-14 leading-relaxed text-xl italic px-6"></p>
+                <p id="result-feedback-text" class="text-slate-500 font-bold mb-14 leading-relaxed text-xl italic px-6 text-center"></p>
                 
                 <div class="bg-blue-50 p-8 rounded-[4rem] border border-blue-100 flex justify-between items-center mb-14 shadow-inner">
                     <span class="font-black text-slate-500 uppercase tracking-widest text-sm italic">結算獎金 Reward</span>
@@ -357,9 +360,9 @@
         <!-- 結束營業結算 Modal -->
         <div id="modal-closing" class="hidden fixed inset-0 z-[15000] bg-slate-950/80 backdrop-blur-xl flex items-center justify-center p-6 text-center">
             <div class="glass-panel max-w-md w-full p-12 rounded-[4rem] shadow-2xl border-white border-4 animate-slide-up">
-                <div class="text-7xl mb-8">🌙</div>
-                <h2 class="text-4xl font-black text-slate-800 mb-2 italic">營業結束</h2>
-                <p class="text-slate-400 font-bold mb-10 text-sm tracking-widest uppercase italic" id="closing-day-label">Day 1 經營結算</p>
+                <div class="text-7xl mb-8 text-center">🌙</div>
+                <h2 class="text-4xl font-black text-slate-800 mb-2 italic tracking-tighter text-center">營業結束</h2>
+                <p class="text-slate-400 font-bold mb-10 text-sm tracking-widest uppercase italic text-center" id="closing-day-label">Day 1 經營結算</p>
                 <div class="grid grid-cols-2 gap-4 mb-10">
                     <div class="bg-pure-50 p-6 rounded-3xl shadow-inner border border-pure-100">
                         <span class="text-[9px] font-black text-slate-400 uppercase block mb-1">今日總收入</span>
@@ -370,15 +373,15 @@
                         <span class="text-2xl font-black text-pure-600 font-mono italic">👤 <span id="closing-guests">0</span></span>
                     </div>
                 </div>
-                <button onclick="app.timer.startNextDay()" class="w-full py-5 bg-gradient-to-r from-pure-600 to-blue-700 text-white font-black text-xl rounded-2xl shadow-xl active:scale-95 transition-all">開始次日經營 ❯</button>
+                <button onclick="app.timer.startNextDay()" class="w-full py-5 bg-gradient-to-r from-pure-600 to-blue-700 text-white font-black text-xl rounded-2xl shadow-xl active:scale-95 transition-all uppercase italic">開始次日經營 START ❯</button>
             </div>
         </div>
 
-        <!-- RPG 諮詢與行銷 Modal -->
+        <!-- 行銷投放 Modal -->
         <div id="modal-marketing" class="hidden fixed inset-0 z-[11000] bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-6">
             <div class="glass-panel max-w-xl w-full p-10 rounded-[4rem] shadow-2xl animate-slide-up">
-                <div class="flex justify-between items-center mb-8 uppercase font-black text-slate-800 italic">
-                    <h3>市場開發投放</h3>
+                <div class="flex justify-between items-center mb-8 uppercase font-black text-slate-800 italic text-center">
+                    <h3 class="text-center w-full">市場開發投放</h3>
                     <button onclick="document.getElementById('modal-marketing').classList.add('hidden')" class="text-slate-400 p-2"><i class="fa-solid fa-times"></i></button>
                 </div>
                 <div class="grid grid-cols-2 gap-4" id="marketing-list"></div>
@@ -390,10 +393,10 @@
     <!-- Firebase SDK 校準導入 (修正 GoogleAuthProvider 錯誤) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, OAuthProvider, signInWithCustomToken, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, signInWithPopup, GoogleAuthProvider, OAuthProvider, signInWithCustomToken, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // V5.15 旗艦版認證配置
+        // V5.16 配置
         const firebaseConfig = {
             apiKey: "AIzaSyCIKSbaZ5R6RTSRcH_-YYfqz_OnQQFr1gc", authDomain: "pure-skin-8640d.firebaseapp.com",
             projectId: "pure-skin-8640d", storageBucket: "pure-skin-8640d.firebasestorage.app",
@@ -411,7 +414,6 @@
         const BODY_PARTS = { face: '臉部精雕', underarm: '腋下淨白', bikini: 'VIO私密', limbs: '四肢絲滑', back: '背部美學' };
         const FEEDBACKS = Array.from({length: 80}, (_, i) => `專業評分 #${i+1}：這是目前見過最專業的瀅白技術，肌膚完全零瑕疵！`);
 
-        // 背景音樂實體
         const bgm = new Audio("https://assets.mixkit.co/music/preview/mixkit-serene-view-443.mp3");
         bgm.loop = true; bgm.volume = 0.3;
 
@@ -462,7 +464,7 @@
                 tick: async () => {
                     let d = App.state.data;
                     const isVisible = !document.hidden;
-                    // 時空感應：經營中 1:5, 背景 720:1
+                    // V5.16 時空流速：開啟 1:5, 背景 720:1
                     const gameSecondsToAdd = isVisible ? 5 : (5 * 60) / 3600;
                     d.gameMinute += gameSecondsToAdd / 60;
                     if (d.gameMinute >= 60) {
@@ -484,7 +486,7 @@
                     });
                     const dateStr = new Date().toISOString().split('T')[0]; 
                     App.state.data.dailyLog[dateStr] = { income: dailyIncome, guests: dailyGuests };
-                    document.getElementById('closing-day-label').innerText = `第 ${day} 天 經營報告`;
+                    document.getElementById('closing-day-label').innerText = `第 ${day} 天 經營結算報告`;
                     document.getElementById('closing-income').innerText = dailyIncome.toLocaleString();
                     document.getElementById('closing-guests').innerText = dailyGuests;
                     document.getElementById('modal-closing').classList.remove('hidden');
@@ -501,7 +503,7 @@
                         if (Math.random() < (isVisible ? 0.03 : 0.0005)) {
                             if (!d.appointments[sid]) {
                                 d.appointments[sid] = { name: TW_NAMES[Math.floor(Math.random()*300)], part: 'face', gender: Math.random() > 0.5 ? 'male' : 'female', status: 'pending' };
-                                delete d.marketingSlots[sid]; App.ui.notify("引流成功！有新貴賓預約。"); await App.data.save();
+                                delete d.marketingSlots[sid]; App.ui.notify("引流成功！有新貴賓預約時段。"); await App.data.save();
                             }
                         }
                     });
@@ -520,12 +522,13 @@
                             else App.router.go('lobby');
                             App.timer.start();
                         } else {
+                            if(user && user.isAnonymous) await signOut(auth);
                             App.router.go('login');
                         }
                     });
                 },
                 loginGoogle: () => signInWithPopup(auth, new GoogleAuthProvider()).catch(e => App.ui.notify("認證超時，請檢查網域授權。", true)),
-                loginGameCenter: () => App.ui.notify("環境不支援 Game Center。", true),
+                loginGameCenter: () => App.ui.notify("此環境不支援 Game Center。", true),
                 confirmName: () => { 
                     const n = document.getElementById('input-player-name').value.trim(); 
                     if(!n) return App.ui.notify("請設定專家名稱", true);
@@ -543,9 +546,9 @@
 
             tutorial: {
                 steps: [
-                    { text: "您好，美學教父！我是 Elsa。左下角是營運時頻感應器，會依據活躍度自動調節流速。", target: "fixed-clock" },
-                    { text: "時刻表已優化為行動版，左右滑動可管理未來 7 天排程。空位可點擊投放行銷。", target: "frame-appt" },
-                    { text: "教學完成！初始資產 3000 已撥入帳戶。開始您的第一場專業療程吧！", target: "frame-chart" }
+                    { text: "您好，美學教父！我是 Elsa。左下角面板記錄營運時空，若跳離視窗時間會自動減速保護數據。", target: "fixed-clock" },
+                    { text: "預約表已優化為單頁矩陣，左右滑動可管理未來 7 天排程。呼吸框線標示著待確認的預約。", target: "frame-appt" },
+                    { text: "當預約時間接近目前的遊戲時間，格位會漸漸變紅提醒您儘速處理！開始經營吧。", target: "frame-chart" }
                 ],
                 start: () => { App.router.go('lobby'); App.state.tutorialStep = 0; document.getElementById('tutor-anchor').style.display = 'flex'; App.tutorial.render(); },
                 next: async () => { App.state.tutorialStep++; if (App.state.tutorialStep < App.tutorial.steps.length) App.tutorial.render(); else { document.getElementById('tutor-anchor').style.display = 'none'; App.state.data.isNewPlayer = false; if (App.state.user) localStorage.setItem(`tut_done_${App.state.user.uid}`, 'true'); await App.data.save(); App.ui.notify("祝您經營順利！"); } },
@@ -587,6 +590,8 @@
                 renderTimetable: () => {
                     const container = document.getElementById('calendar-container'); if (!container) return;
                     const hours = [10, 12, 14, 16, 18, 20]; const curDay = App.state.data.gameDay;
+                    const totalGameTime = App.state.data.gameHour + (App.state.data.gameMinute / 60);
+                    
                     let html = `<table class="calendar-table"><thead><tr><th class="w-16">時段</th>`;
                     for(let i=0; i<7; i++) html += `<th>${curDay+i}日</th>`;
                     html += `</tr></thead><tbody>`;
@@ -596,10 +601,30 @@
                             const sid = `${curDay+i}-${h}`; const appt = App.state.data.appointments[sid];
                             const isMarketing = App.state.data.marketingSlots?.[sid];
                             const isPast = (curDay+i < curDay) || (curDay+i === curDay && h < App.state.data.gameHour);
+                            const isToday = (curDay+i === curDay);
+                            
+                            let cellStyle = "";
+                            let breathClass = "";
+                            
                             if (appt) {
-                                const isFin = appt.status === 'finished'; const color = appt.gender === 'male' ? 'occupied-male' : 'occupied-female';
-                                const overdue = isPast && !isFin ? 'overdue' : ''; const icon = appt.gender === 'male' ? '<i class="fa-solid fa-mars"></i>' : '<i class="fa-solid fa-venus"></i>';
-                                html += `<td class="calendar-cell ${color} ${overdue}" onclick="window.apptAction('${sid}')"><div class="flex flex-col items-center justify-center h-full text-[9px] font-black"><span class="truncate w-full text-center px-0.5">${icon} ${appt.name}</span><span class="text-[7px] opacity-70 italic uppercase">${isFin ? 'Done' : (overdue ? 'Lost' : 'Appt')}</span></div></td>`;
+                                const isFin = appt.status === 'finished';
+                                const colorClass = appt.gender === 'male' ? 'occupied-male' : 'occupied-female';
+                                const overdue = isPast && !isFin ? 'overdue' : '';
+                                
+                                // V5.16 漸漸變紅邏輯
+                                if (isToday && !isFin && !overdue) {
+                                    const diff = h - totalGameTime;
+                                    if (diff > 0 && diff <= 1) {
+                                        const intensity = (1 - diff).toFixed(2);
+                                        cellStyle = `background-color: rgba(239, 68, 68, ${intensity}); border-color: rgba(239, 68, 68, ${0.4 + intensity*0.6}); color: ${intensity > 0.6 ? 'white' : 'inherit'}`;
+                                    }
+                                }
+                                
+                                // 呼吸框線標示尚未接受的預約
+                                if (appt.status === 'pending') breathClass = "pending-breath";
+                                
+                                const icon = appt.gender === 'male' ? '<i class="fa-solid fa-mars"></i>' : '<i class="fa-solid fa-venus"></i>';
+                                html += `<td class="calendar-cell ${colorClass} ${overdue} ${breathClass}" style="${cellStyle}" onclick="window.apptAction('${sid}')"><div class="flex flex-col items-center justify-center h-full text-[9px] font-black"><span class="truncate w-full text-center px-0.5">${icon} ${appt.name}</span><span class="text-[7px] opacity-70 italic uppercase">${isFin ? '完成' : (overdue ? '逾時' : '預約')}</span></div></td>`;
                             } else if (isMarketing) {
                                 html += `<td class="calendar-cell marketing-active"><div class="marketing-pulse-wrapper"><div class="radar-circle animate-marketing-radar"></div><i class="fa-solid fa-tower-broadcast text-pure-500 text-xs relative z-10"></i></div></td>`;
                             } else { 
@@ -628,12 +653,12 @@
 
         window.app = App;
 
-        // --- 全域橋接函數 ---
+        // --- 全域互動 ---
         window.toggleLaser = () => {
             App.state.isLaserOn = !App.state.isLaserOn;
             const sw = document.getElementById('laser-power-switch'); const cur = document.getElementById('laser-cursor'); const st = document.getElementById('power-status-text');
-            if (App.state.isLaserOn) { sw.classList.add('on'); cur.classList.add('active-power'); st.innerText = "System Active"; st.className = "text-[8px] font-black text-pure-500 uppercase tracking-widest animate-pulse"; } 
-            else { sw.classList.remove('on'); cur.classList.remove('active-power'); st.innerText = "Standby"; st.className = "text-[8px] font-bold text-slate-400 uppercase tracking-widest"; }
+            if (App.state.isLaserOn) { sw.classList.add('on'); cur.classList.add('active-power'); st.innerText = "系統已啟動 ACTIVE"; st.className = "text-[8px] font-black text-pure-500 uppercase tracking-widest animate-pulse"; } 
+            else { sw.classList.remove('on'); cur.classList.remove('active-power'); st.innerText = "待機模式 STANDBY"; st.className = "text-[8px] font-bold text-slate-400 uppercase tracking-widest"; }
         };
 
         window.apptAction = (sid) => {
@@ -681,7 +706,7 @@
                 document.getElementById('diag-options').innerHTML = `<button onclick="app.router.go('game')" class="w-full py-6 bg-pure-600 text-white rounded-[2.5rem] font-black italic shadow-xl tracking-widest uppercase active:scale-95 transition-all">啟動專業雷射儀 ❯</button>`;
             } else if (appt.status === 'finished') {
                 document.getElementById('diag-text').innerText = `顧客評價：${appt.feedback || '專業且絲滑。'}`;
-                document.getElementById('diag-options').innerHTML = `<button onclick="app.router.go('appointments')" class="w-full p-6 bg-slate-100 text-slate-400 rounded-[2.5rem] font-black">服務已結案</button>`;
+                document.getElementById('diag-options').innerHTML = `<button onclick="app.router.go('appointments')" class="w-full py-6 bg-slate-100 text-slate-400 rounded-[2.5rem] font-black">服務已結案</button>`;
             }
         };
 
@@ -697,7 +722,7 @@
             document.getElementById('customer-avatar-box').innerHTML = `<div class="css-avatar"><div style="position:absolute; top:20%; left:25%; width:50%; height:50%; background:#ffe4e6; border-radius:50%;"></div></div>`;
             document.getElementById('diag-name').innerText = "逾時貴賓";
             document.getElementById('diag-text').innerText = "因為您逾時未開展療程。Elsa 導師建議我們將您的預約往後挪移。";
-            document.getElementById('diag-options').innerHTML = `<button onclick="window.processReschedule('${sid}')" class="w-full py-6 bg-pure-600 text-white rounded-[2.5rem] font-black shadow-xl active:scale-95 transition-all uppercase tracking-widest">進行排程協商 ❯</button>`;
+            document.getElementById('diag-options').innerHTML = `<button onclick="window.processReschedule('${sid}')" class="w-full p-6 bg-pure-600 text-white rounded-[2.5rem] font-black shadow-xl active:scale-95 transition-all uppercase tracking-widest">進行排程協商 ❯</button>`;
         };
 
         window.processReschedule = async (oldSid) => {
